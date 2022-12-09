@@ -27,16 +27,14 @@ namespace Player.Movement
         public float enemyHookDelay;
         private Transform cam;
         private EnemyMovement em;
-
-        private float lowestDistance; //Updates when rope shorter than previous distance
+        private float lowestDistance; //Updates when rope shorter than previous distance, lowest distance reached during grapple
         [Header("Timings/Other")]
         public GameObject grapplePoint;
         public float delay;
-        public float coolDown;
         private PlayerMovement pm;
+        public cooldownData cdd;
         //---------------------------------------------------------------------------------------------
-        [SerializeField]
-        private float cdTimer;
+        
         private Vector3 lerpPos;
         private LineRenderer rope;
         private RaycastHit hit;
@@ -44,10 +42,9 @@ namespace Player.Movement
         private float distance;
         private bool showRope = false;
         private float initialDistance = 0;
-        [SerializeField]
-        private bool wasInAir;
-        [SerializeField]
-        bool canGrapple = true;
+        [SerializeField] private bool wasInAir;
+        //private bool isUsing;
+        
 
         void Awake()
         {
@@ -57,7 +54,7 @@ namespace Player.Movement
         }
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Q) && canGrapple)
+            if (Input.GetKeyDown(KeyCode.Q) && cdd.canUseAbility)
             {
                 lerpPos = transform.position;
                 //visual
@@ -83,14 +80,14 @@ namespace Player.Movement
             distance = Vector3.Distance(cam.position, grapplePoint.transform.position);
 
             //Cool down
-            if (cdTimer <= 0)
+            if (cdd.cdTimer <= 0 && !cdd.isUsing) //if cooldown is ready and player is not using ability
             {
-                canGrapple = true;
+                cdd.canUseAbility = true;
             }
             else
             {
-                canGrapple = false;
-                cdTimer -= Time.fixedDeltaTime;
+                cdd.canUseAbility = false;
+                cdd.cdTimer -= Time.fixedDeltaTime;
             }
 
         }
@@ -101,7 +98,7 @@ namespace Player.Movement
         }
         public void StartGrapple()
         {
-
+            cdd.isUsing = true;
             //if hit something
             if (Physics.Raycast(cam.position, cam.forward, out hit, maxDistance, raycastSurface))
             {
@@ -110,14 +107,14 @@ namespace Player.Movement
                     StartHookEnemy();
                    
                     //cooldown
-                    cdTimer = coolDown;
+                    //cdd.cdTimer = cdd.cdTime;
                 }
                 else
                 {
                     StartGrappleSurface();
 
                     //cooldown
-                    cdTimer = coolDown;
+                    //cdd.cdTimer = cdd.cdTime;
                 }
             }
             else // if hit nothing
@@ -291,6 +288,7 @@ namespace Player.Movement
         }
         public void EndGrapple()
         {
+            cdd.isUsing = false;
             pm.CheckGroundedOrInAir();
 
             if(em != null && em.currentState == EnemyMovement.State.Hooked)
@@ -305,7 +303,7 @@ namespace Player.Movement
             wasInAir = false;
 
             //Initiate Cooldown
-            cdTimer = coolDown;
+            cdd.cdTimer = cdd.cdTime;
         }
         #endregion
 
@@ -323,15 +321,6 @@ namespace Player.Movement
 
                 pm.playerVelocity -= Vector3.up * Vector3.Dot(pm.playerVelocity, Vector3.up);
             }
-        }
-        IEnumerator CoolingDown()
-        {
-            // cdTimer = coolDown;
-            for (cdTimer = coolDown; cdTimer > 0; cdTimer -= Time.fixedDeltaTime)
-            {
-                cdTimer -= Time.fixedDeltaTime;
-            }
-            return null;
         }
 
     }

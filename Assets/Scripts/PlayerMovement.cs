@@ -62,7 +62,7 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 playerVelocity;
     [SerializeField] Vector3 playerZXVel;
     [SerializeField]private int stepSinceGrounded;
-    [SerializeField]private int stepSinceJumped;
+    [SerializeField]public int stepSinceJumped; //assign this to anything that will knock player up
     [SerializeField] private float currentSpeed; //not actual speed, dot product of playervel and wish vel
     private Vector3 wishdir;
     public bool isGrounded;

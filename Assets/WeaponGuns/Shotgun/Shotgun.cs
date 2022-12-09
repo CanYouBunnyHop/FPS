@@ -216,6 +216,8 @@ public class Shotgun : GunBehavior
     {
         if (startKnockBack)
         {
+            //fix interaction where player is on slope
+            pm.stepSinceJumped = 0;
             pm.playerVelocity -= dir * selfKnockBack;
         }
     }
@@ -239,6 +241,7 @@ public class Shotgun : GunBehavior
     //handles everthing the gun manipulates palayer velocity
     private void PlayerKnockBack()
     {
+
         //reset player velocity for better control over movement
         pm.playerVelocity.y = 0;
         if (CheckDirToResetVel())
