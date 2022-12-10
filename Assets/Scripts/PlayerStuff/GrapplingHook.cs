@@ -25,23 +25,26 @@ namespace Player.Movement
         [Header("Hook Enemy")]
         public float flySpeed;
         public float enemyHookDelay;
-        private Transform cam;
         private EnemyMovement em;
         private float lowestDistance; //Updates when rope shorter than previous distance, lowest distance reached during grapple
         [Header("Timings/Other")]
         public GameObject grapplePoint;
         public float delay;
+        public float fovBreak;
         private PlayerMovement pm;
-        public cooldownData cdd;
+        private Transform cam;
+        [SerializeField]private cooldownData cdd;
         //---------------------------------------------------------------------------------------------
-        
+        //Render
         private Vector3 lerpPos;
         private LineRenderer rope;
+        //---------------------------------------------------------------------------------------------
         private RaycastHit hit;
         private Vector3 grappleDir;
         private float distance;
         private bool showRope = false;
         private float initialDistance = 0;
+        [Header("Debug")]
         [SerializeField] private bool wasInAir;
         //private bool isUsing;
         
@@ -80,15 +83,16 @@ namespace Player.Movement
             distance = Vector3.Distance(cam.position, grapplePoint.transform.position);
 
             //Cool down
-            if (cdd.cdTimer <= 0 && !cdd.isUsing) //if cooldown is ready and player is not using ability
-            {
-                cdd.canUseAbility = true;
-            }
-            else
-            {
-                cdd.canUseAbility = false;
-                cdd.cdTimer -= Time.fixedDeltaTime;
-            }
+            // if (cdd.cdTimer <= 0 && !cdd.isUsing) //if cooldown is ready and player is not using ability
+            // {
+            //     cdd.canUseAbility = true;
+            // }
+            // else
+            // {
+            //     cdd.canUseAbility = false;
+            //     cdd.cdTimer -= Time.fixedDeltaTime;
+            // }
+            cdd.CoolingDown();
 
         }
         //testing
@@ -105,16 +109,10 @@ namespace Player.Movement
                 if (hit.collider.tag == "Enemy")
                 {
                     StartHookEnemy();
-                   
-                    //cooldown
-                    //cdd.cdTimer = cdd.cdTime;
                 }
                 else
                 {
                     StartGrappleSurface();
-
-                    //cooldown
-                    //cdd.cdTimer = cdd.cdTime;
                 }
             }
             else // if hit nothing
@@ -153,7 +151,7 @@ namespace Player.Movement
             //set start on line renderer
             lerpPos = transform.position;
         }
-        #region  grapple enemy(not used)
+    #region  grapple enemy(not used)
         //void StartGrappleEnemy()
         //{
         //     pm.playerVelocity = Vector3.zero;
@@ -177,7 +175,7 @@ namespace Player.Movement
         //     //set start on line renderer
         //     lerpPos = transform.position;
         //}
-        #endregion
+    #endregion
         void StartHookEnemy()
         {
             em = hit.collider.GetComponent<EnemyMovement>();
@@ -206,13 +204,13 @@ namespace Player.Movement
             pm.playerVelocity.z = Mathf.Clamp(pm.playerVelocity.z, -grappleMaxSpeed, grappleMaxSpeed);
         }
 
-         #region  exe grappleEnemy (not used)
+    #region  exe grappleEnemy (not used)
         public void ExecuteGrappleEnemy()
         {
             //pull player to object/
             pm.playerVelocity += grappleDir * grappleSpeed * Time.deltaTime;
         }
-        #endregion
+    #endregion
         public void ExecuteHookEnemy()
         {
             //Get controller on enemy
@@ -249,11 +247,18 @@ namespace Player.Movement
                 EndGrapple();
             }
         }
-
-        //End grapple after reaching destination
+        public void CheckPlayerFov()
+        {
+            Vector3 displacement = grapplePoint.transform.position - cam.position;
+            
+            if(Vector3.Angle(displacement, cam.forward) >= fovBreak)
+            {
+                EndGrapple();
+            }
+        }
         public void CheckDistanceAfterGrapple()
         {
-            if (distance <= distanceThreshold)
+            if (distance <= distanceThreshold)  //End grapple after reaching destination
             {
                 EndGrapple();
             }
@@ -303,7 +308,8 @@ namespace Player.Movement
             wasInAir = false;
 
             //Initiate Cooldown
-            cdd.cdTimer = cdd.cdTime;
+            //cdd.cdTimer = cdd.cdTime;
+            cdd.InitiateCoolDown();
         }
         #endregion
 

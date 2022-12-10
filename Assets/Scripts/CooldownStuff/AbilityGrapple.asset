@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 197e65f3e2641b74881cc2e9c5ba38f8, type: 3}
-  m_Name: Grapple
+  m_Name: AbilityGrapple
   m_EditorClassIdentifier: 
   cdTime: 3
   cdTimer: -0.019997705

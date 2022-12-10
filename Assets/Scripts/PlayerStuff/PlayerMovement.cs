@@ -207,6 +207,7 @@ public class PlayerMovement : MonoBehaviour
                 hook.ExecuteGrappleSurface();
                 hook.CheckDistanceAfterGrapple();
                 hook.CheckRopeStretch();
+                hook.CheckPlayerFov();
                 hook.CheckIfPlayerLanded();
                 //for better air steering with grapple
                 //if(!isGrounded)AirPhysics(currentSpeed);
