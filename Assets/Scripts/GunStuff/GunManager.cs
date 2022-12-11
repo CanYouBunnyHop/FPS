@@ -15,9 +15,9 @@ public class GunManager : MonoBehaviour
     //  currentBehavior.GunData > GunBehavior > Unique Guns
     //-------------------------------------------------------------------------------------
     [SerializeField]
-    private GunBehavior[] gunBehaviors;
+    private GunBehaviour[] gunBehaviors;
     [SerializeField]
-    private GunBehavior currentBehavior;
+    private GunBehaviour currentBehavior;
     [SerializeField]
     
     //add delay before you can automatically reload, avoid instant startreload right after shooting
@@ -89,13 +89,13 @@ public class GunManager : MonoBehaviour
    
     
     
-    private GunBehavior SwitchGun()
+    private GunBehaviour SwitchGun()
     {
         if(Input.GetKeyDown(KeyCode.Alpha1) && currentBehavior!=gunBehaviors[0])
         {
             try
             {
-                GunBehavior gunToSwitch = gunBehaviors[0];
+                GunBehaviour gunToSwitch = gunBehaviors[0];
                 //currentBehavior.Anim_Holster
                 currentBehavior.gunModel.SetActive(false);
                 gunToSwitch.gunModel.SetActive(true);
@@ -114,7 +114,7 @@ public class GunManager : MonoBehaviour
         {
             try
             {
-                GunBehavior gunToSwitch = gunBehaviors[1];
+                GunBehaviour gunToSwitch = gunBehaviors[1];
                 //currentBehavior.Anim_Holster
                 currentBehavior.gunModel.SetActive(false);
                 gunToSwitch.gunModel.SetActive(true);
@@ -131,7 +131,7 @@ public class GunManager : MonoBehaviour
         {
             try
             {
-                GunBehavior gunToSwitch = gunBehaviors[2];
+                GunBehaviour gunToSwitch = gunBehaviors[2];
                 //currentBehavior.Anim_Holster
                 currentBehavior.gunModel.SetActive(false);
                 gunToSwitch.gunModel.SetActive(true);

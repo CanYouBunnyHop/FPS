@@ -4,7 +4,7 @@ using UnityEngine;
 using Player.Movement;
 using Enemy.Movement;
 
-public class Shotgun : GunBehavior
+public class Shotgun : GunBehaviour
 {
     public float selfKnockBack;
     public float enemyKnockBack;
@@ -34,76 +34,61 @@ public class Shotgun : GunBehavior
     #region  Shooting Behaviors
     public override void BehaviorInputUpdate()
     {
-         //check if conditions met before shooting
-        if(startQshoot && canShoot)
-        {
-            QueueShoot();
-        }
-        if(startQaltShoot && canShoot)
-        {
-            QueueAltShoot();
-        }
-        ShootInput();
-        AltShootInput();
-        ReloadInput();
-        
+        base.BehaviorInputUpdate();
     }
-    protected override void ShootInput()
+    protected override void ShootInput(FireMode _fireMode, bool _startQ)
     {
-        switch(gunData.fireMode)
-        {
-            case GunData.FireMode.SemiAuto:
-            {
-                //semi auto fire
-                if(Input.GetMouseButtonDown(0) && gunData.currentAmmo > 0 
-                && timeSinceLastShot > timeBetweenShots-0.2f && !startQaltShoot)//mouse 1
-                {
-                    startQshoot = true;
-                }
-            }
-            break;
-            case GunData.FireMode.FullAuto:
-            {
-                if(Input.GetMouseButton(0) && gunData.currentAmmo > 0 && !startQaltShoot)
-                {
-                    startQshoot = true;
-                }
-                else if(Input.GetMouseButtonUp(0))
-                {
-                    startQshoot = false;
-                }
-            }
-            break;
-        }
+        base.ShootInput(_fireMode, _startQ);
+        // switch(gunData.fireMode)
+        // {
+        //     case GunData.FireMode.SemiAuto:
+        //     {
+                
+        //     }
+        //     break;
+        //     case GunData.FireMode.FullAuto:
+        //     {
+        //         if(Input.GetMouseButton(0) && gunData.currentAmmo > 0 && !startQaltShoot)
+        //         {
+        //             startQshoot = true;
+        //         }
+        //         else if(Input.GetMouseButtonUp(0))
+        //         {
+        //             startQshoot = false;
+        //         }
+        //     }
+        //     break;
+        // }
     }
-    protected override void AltShootInput()
-    {
-          switch(gunData.fireMode)
-        {
-            case GunData.FireMode.SemiAuto:
-            {
-                //semi auto fire
-                if(Input.GetMouseButtonDown(1) && gunData.currentAmmo > 0 
-                && timeSinceLastShot > timeBetweenShots-0.2f &&!startQshoot)//mouse 2
-                {
-                    startQaltShoot = true;
-                }
-            }
-            break;
-            case GunData.FireMode.FullAuto:
-            {
-                if(Input.GetMouseButton(1) && gunData.currentAmmo > 0 && !startQshoot)
-                {
-                    startQaltShoot = true;
-                }
-                else if(Input.GetMouseButtonUp(1))
-                {
-                    startQaltShoot = false;
-                }
-            }
-            break;
-        }
-    }
+    // protected override void AltShootInput(FireMode _altFire)
+    // {
+    //     base.ShootInput(_altFire);
+        //   switch(gunData.fireMode)
+        // {
+        //     case GunData.FireMode.SemiAuto:
+        //     {
+        //         //semi auto fire
+        //         if(Input.GetMouseButtonDown(1) && gunData.currentAmmo > 0 
+        //         && timeSinceLastShot > timeBetweenShots-0.2f &&!startQshoot)//mouse 2
+        //         {
+        //             startQaltShoot = true;
+        //         }
+        //     }
+        //     break;
+        //     case GunData.FireMode.FullAuto:
+        //     {
+        //         if(Input.GetMouseButton(1) && gunData.currentAmmo > 0 && !startQshoot)
+        //         {
+        //             startQaltShoot = true;
+        //         }
+        //         else if(Input.GetMouseButtonUp(1))
+        //         {
+        //             startQaltShoot = false;
+        //         }
+        //     }
+        //     break;
+        // }
+    //}
     protected override void ReloadInput()
     {
         base.ReloadInput();
@@ -157,21 +142,11 @@ public class Shotgun : GunBehavior
     }
     public override void QueueShoot()
     {
-        Shoot();
-        canShoot = false;
-        
-        timeSinceLastShot = 0;
-        //animation
-        Anim_Shoot();
+        base.QueueShoot();
     }
     public override void QueueAltShoot()
     {
-        AltShoot();
-        canShoot = false;
-        
-        timeSinceLastShot = 0;
-        //animation
-        Anim_AltShoot();
+         base.QueueAltShoot();
     }
 
     private void ShootingBehavior()
@@ -216,8 +191,9 @@ public class Shotgun : GunBehavior
     {
         if (startKnockBack)
         {
-            //fix interaction where player is on slope
-            pm.stepSinceJumped = 0;
+            // //fix interaction where player is on slope
+            pm.stepSinceKockback = 0;
+
             pm.playerVelocity -= dir * selfKnockBack;
         }
     }

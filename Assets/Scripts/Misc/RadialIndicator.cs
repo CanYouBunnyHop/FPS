@@ -12,6 +12,7 @@ public class RadialIndicator : MonoBehaviour
     [SerializeField]private TMP_Text text;
     private Color bgDefaultColor;
     public Color bgFlashColor;
+    [SerializeField]private int flashCount = 0;
     
     [SerializeField]private cooldownData cddata;
 
@@ -23,25 +24,33 @@ public class RadialIndicator : MonoBehaviour
     {
         float percent = (cddata.cdTimer) / (cddata.cdTime);
 
-        if(!cddata.isUsing)
-        overlay.fillAmount = percent;
+        if(!cddata.isUsing) // not using
+        {
+            overlay.fillAmount = percent;
+        }
 
-        else
-        overlay.fillAmount = 1;
+        else //using
+        {
+            overlay.fillAmount = 1;
+        }
+        
 
         float time = Mathf.Round(cddata.cdTimer);
 
         if(!cddata.isUsing && cddata.cdTimer > 0)
-        text.text = time.ToString();
+        {
+            text.text = time.ToString();
+            flashCount = 0;
+        }
+       
 
         else
         text.ClearMesh();
 
-        // if(percent < 0.05f)
-        // {
-        //     if(Input.GetKeyDown(KeyCode.Alpha0))
-        //    StartCoroutine(FlashBG());
-        // }
+        if(percent <= 0 && flashCount == 0)
+         {
+            StartCoroutine(FlashBG());
+         }
 
         //Debug.Log(percent);
         //default 1 is max
@@ -50,7 +59,7 @@ public class RadialIndicator : MonoBehaviour
     private IEnumerator FlashBG()
     {
         bg.color = bgFlashColor;
-
+        flashCount ++;
         yield return new WaitForSeconds(0.2f);
 
         bg.color = bgDefaultColor;

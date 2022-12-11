@@ -29,9 +29,10 @@ public class PlayerMovement : MonoBehaviour
     private RaycastHit onSlope;
     private Vector3 slopeMoveDir;
     //jump bool variables
-    private bool wishJump = false;
+    
     bool called; //bool for wish jump
-    bool lateFriction; // bool for 1 frame where friction dont apply after landing
+    
+    //[SerializeField] bool lateFriction; // bool for 1 frame where friction dont apply after landing
 //--------------------------------------------------------------------------------------------------------
     [Header("Ground Move")]
     public float groundSpeed; // Moving on ground;
@@ -63,8 +64,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Vector3 playerZXVel;
     [SerializeField]private int stepSinceGrounded;
     [SerializeField]public int stepSinceJumped; //assign this to anything that will knock player up
-    [SerializeField] private float currentSpeed; //not actual speed, dot product of playervel and wish vel
+    [SerializeField]public int stepSinceKockback;
+    [SerializeField]private float currentSpeed; //not actual speed, dot product of playervel and wish vel
     private Vector3 wishdir;
+    [SerializeField]private bool wishJump = false;
     public bool isGrounded;
     [SerializeField] private bool isOnSlope;
     public Text text;//UI remove later
@@ -180,6 +183,7 @@ public class PlayerMovement : MonoBehaviour
 
         //count steps
         stepSinceJumped += 1;
+        stepSinceKockback += 1;
 
         //state Physics handling
         switch(currentState)
@@ -246,20 +250,12 @@ public class PlayerMovement : MonoBehaviour
         while(true)
         {
             yield return new WaitForFixedUpdate(); //apply this after 1 physics timestep late
-                if(isGrounded)
-                {
-                    lateFriction = true;
-                }
-                else
-                {
-                    lateFriction = false;
-                }
 
             switch(currentState)
             {
                 case State.Grounded:
                 {
-                    
+                    ApplyFriction();
                 }
                 break;
                 case State.InAir:
@@ -322,8 +318,8 @@ public class PlayerMovement : MonoBehaviour
             ResetYVel();
 
             //apply friction when on ground but not for the first frame
-            if(lateFriction && !wishJump) // dont apply friction if player wants to continue jumping
-            ApplyFriction();
+            //if(lateFriction)      
+            //ApplyFriction();  //decaprecated, moved to latefixedupdate
     }
     void AirPhysics(float _currentSpeed)
     {
@@ -434,7 +430,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void SnapOnGround()
     {
-        if (stepSinceGrounded > 1 || stepSinceJumped <= 2)//abort when just jumped or havn't been in air long enough
+        if (stepSinceGrounded > 1 || stepSinceJumped <= 2 || stepSinceKockback < 5)//abort when just jumped or havn't been in air long enough
 		return ;
 
         if (!Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, 0.8f, groundMask))
@@ -448,7 +444,7 @@ public class PlayerMovement : MonoBehaviour
 
         float speed = playerVelocity.magnitude;
 		float dot = Vector3.Dot(playerVelocity, hit.normal);
-        Debug.Log(dot);
+        Debug.Log("snaping to ground now"+dot);
 
         if (dot > 0f)
 		playerVelocity = (playerVelocity - hit.normal * dot).normalized * speed;

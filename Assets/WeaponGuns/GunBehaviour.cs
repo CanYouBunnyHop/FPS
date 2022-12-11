@@ -2,21 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class GunBehavior : MonoBehaviour
+public abstract class GunBehaviour : MonoBehaviour
 {
 
     public GunData gunData;
     public Animator anim;
     public GameObject gunModel; //for switching weapon
-    [SerializeField]
-    protected LayerMask enemyMask;
-    [SerializeField]
-    protected LayerMask groundMask;
-    [SerializeField]
-    protected LayerMask groundEnemyMask;
+    [SerializeField] protected LayerMask enemyMask;
+    [SerializeField] protected LayerMask groundMask;
+    [SerializeField] protected LayerMask groundEnemyMask;
     protected Camera cam;
-    [SerializeField]
-    protected GameObject bulletHoleFx;
+    [SerializeField] protected GameObject bulletHoleFx;
     /////
     //extra for determining if can shoot
     public bool canShoot;
@@ -27,6 +23,19 @@ public abstract class GunBehavior : MonoBehaviour
     protected bool startQshoot = false;
     protected bool startQaltShoot = false;
     protected Coroutine reload;
+
+    
+        
+    protected enum FireMode
+    {
+       SemiAuto,
+       FullAuto,
+       BurstFire,
+       Charge,
+    }
+    [Header("Default Fire Select")]
+    [SerializeField] FireMode defaultFireMode;
+    [SerializeField] FireMode altFireMode;
 
     protected void Awake()
     {
@@ -46,18 +55,61 @@ public abstract class GunBehavior : MonoBehaviour
     }
     public virtual void BehaviorInputUpdate()
     {
+         //check if conditions met before shooting
+        if(startQshoot && canShoot)
+        {
+            QueueShoot();
+        }
+        if(startQaltShoot && canShoot)
+        {
+            QueueAltShoot();
+        }
 
+        if(Input.GetMouseButtonDown(0))
+        {
+            ShootInput(defaultFireMode, startQshoot);
+        }
+        if(Input.GetMouseButtonDown(1))
+        {
+            ShootInput(altFireMode, startQaltShoot);
+        }
+        //AltShootInput(altFireMode);
+        ReloadInput();
     }
     #endregion
     #region  inputs
-    protected virtual void ShootInput()
+    protected virtual void ShootInput(FireMode _selectFire, bool _startQ) //i dont want a bool here, but a reference to bool
     {
+        switch(_selectFire)
+        {
+            case FireMode.SemiAuto:
+            {
+                //semi auto fire
+                if( gunData.currentAmmo > 0 
+                && timeSinceLastShot > timeBetweenShots-0.2f && !startQaltShoot)//mouse 1
+                {
+                    startQshoot = true;
+                }
+
+            }
+            break;
+
+            case FireMode.FullAuto:
+            break;
+
+            case FireMode.BurstFire:
+            break;
+
+            case FireMode.Charge:
+            break;
+        }
+        
         
     }
-    protected virtual void AltShootInput()
-    {
+    // protected virtual void AltShootInput(FireMode _altFire)
+    // {
 
-    }
+    // }
     protected virtual void ReloadInput()
     {
         //manual Reload
@@ -95,11 +147,21 @@ public abstract class GunBehavior : MonoBehaviour
     //may not need, for queueing inputs, depends on guns
     public virtual void QueueShoot()
     {
-
+        Shoot(); //remember set q shoot bool to false
+        canShoot = false;
+        
+        timeSinceLastShot = 0;
+        //animation
+        Anim_Shoot();
     }
     public virtual void QueueAltShoot()
     {
-
+        AltShoot();
+        canShoot = false;
+        
+        timeSinceLastShot = 0;
+        //animation
+        Anim_AltShoot();
     }
     //shoot
     public virtual void Shoot()

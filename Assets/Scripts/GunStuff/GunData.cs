@@ -27,14 +27,16 @@ public class GunData : ScriptableObject
     public AnimationCurve recoilZ;
 
     [Header("FireMode")]
-    public FireMode fireMode;
+    
     [Header("Firemode specific stats")]
     public float burstsCount;
-    public enum FireMode
-    {
-        SemiAuto,
-        FullAuto,
-        Bursts,
-        Charged,
-    }
+
+    //public FireMode fireMode;
+    // public enum FireMode
+    // {
+    //     SemiAuto,
+    //     FullAuto,
+    //     Bursts,
+    //     Charged,
+    // }
 }
