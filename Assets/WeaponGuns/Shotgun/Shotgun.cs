@@ -36,59 +36,10 @@ public class Shotgun : GunBehaviour
     {
         base.BehaviorInputUpdate();
     }
-    protected override void ShootInput(FireMode _fireMode, bool _startQ)
+    protected override void ShootInput(FireMode _fireMode, int? _fireInput)
     {
-        base.ShootInput(_fireMode, _startQ);
-        // switch(gunData.fireMode)
-        // {
-        //     case GunData.FireMode.SemiAuto:
-        //     {
-                
-        //     }
-        //     break;
-        //     case GunData.FireMode.FullAuto:
-        //     {
-        //         if(Input.GetMouseButton(0) && gunData.currentAmmo > 0 && !startQaltShoot)
-        //         {
-        //             startQshoot = true;
-        //         }
-        //         else if(Input.GetMouseButtonUp(0))
-        //         {
-        //             startQshoot = false;
-        //         }
-        //     }
-        //     break;
-        // }
+        base.ShootInput(_fireMode, _fireInput);
     }
-    // protected override void AltShootInput(FireMode _altFire)
-    // {
-    //     base.ShootInput(_altFire);
-        //   switch(gunData.fireMode)
-        // {
-        //     case GunData.FireMode.SemiAuto:
-        //     {
-        //         //semi auto fire
-        //         if(Input.GetMouseButtonDown(1) && gunData.currentAmmo > 0 
-        //         && timeSinceLastShot > timeBetweenShots-0.2f &&!startQshoot)//mouse 2
-        //         {
-        //             startQaltShoot = true;
-        //         }
-        //     }
-        //     break;
-        //     case GunData.FireMode.FullAuto:
-        //     {
-        //         if(Input.GetMouseButton(1) && gunData.currentAmmo > 0 && !startQshoot)
-        //         {
-        //             startQaltShoot = true;
-        //         }
-        //         else if(Input.GetMouseButtonUp(1))
-        //         {
-        //             startQaltShoot = false;
-        //         }
-        //     }
-        //     break;
-        // }
-    //}
     protected override void ReloadInput()
     {
         base.ReloadInput();
@@ -111,8 +62,7 @@ public class Shotgun : GunBehaviour
         gunData.currentAmmo--;
 
         //shooting raycast bullets
-        ShootingBehavior();
-        startQshoot = false;
+        ShootingBehavior(); //because of similar behavior between shoot and altshoot, so condensed it
 
         PlayerKnockBack();
         StartCoroutine(EnemyKnockBack());
@@ -135,19 +85,15 @@ public class Shotgun : GunBehaviour
 
         //shooting raycast bullets
         ShootingBehavior();
-        startQaltShoot = false;
 
         PlayerKnockBack();
         StartCoroutine(EnemyKnockBack());
     }
-    public override void QueueShoot()
+    public override void QueueShoot(int? _fireInput)
     {
-        base.QueueShoot();
+        base.QueueShoot(_fireInput);
     }
-    public override void QueueAltShoot()
-    {
-         base.QueueAltShoot();
-    }
+    
 
     private void ShootingBehavior()
     {

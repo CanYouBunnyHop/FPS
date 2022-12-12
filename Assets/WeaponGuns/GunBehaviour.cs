@@ -20,8 +20,12 @@ public abstract class GunBehaviour : MonoBehaviour
     public float timeBetweenShots;
 
     //use these bool to control shooting if gun does not allow simutaneous action
-    protected bool startQshoot = false;
-    protected bool startQaltShoot = false;
+    // protected bool startQshoot = false;
+    // protected bool startQaltShoot = false;
+    protected bool queueingFire;
+    public int? mouseInput;
+    //protected int? QInput;
+    //protected StartQ startQ;
     protected Coroutine reload;
 
     
@@ -55,30 +59,47 @@ public abstract class GunBehaviour : MonoBehaviour
     }
     public virtual void BehaviorInputUpdate()
     {
-         //check if conditions met before shooting
-        if(startQshoot && canShoot)
+        if(Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))//if only m1 is pressed
         {
-            QueueShoot();
+            mouseInput = 0;
         }
-        if(startQaltShoot && canShoot)
+        if(Input.GetMouseButtonDown(1)&& !Input.GetMouseButtonDown(0))// if only m2 is pressed
         {
-            QueueAltShoot();
+            mouseInput = 1;
+        }
+        if(Input.GetMouseButtonDown(1)&& Input.GetMouseButtonDown(0))//if both buttons are pressed
+        {
+            mouseInput = 2;
+        }
+        if(!Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))// if no mouse button is pressed
+        {
+            mouseInput = null;
         }
 
-        if(Input.GetMouseButtonDown(0))
+         //check mouseinput and if conditions met before shooting
+        if(mouseInput != null && canShoot)
         {
-            ShootInput(defaultFireMode, startQshoot);
+            QueueShoot(mouseInput);
         }
-        if(Input.GetMouseButtonDown(1))
+
+
+        //queueing fire inputs
+        if(Input.GetMouseButtonDown(0) && !queueingFire)
         {
-            ShootInput(altFireMode, startQaltShoot);
+            ShootInput(defaultFireMode,0);
+            queueingFire = true;
+        }
+        if(Input.GetMouseButtonDown(1) && !queueingFire)
+        {
+            ShootInput(altFireMode, 1);
+            queueingFire = true;
         }
         //AltShootInput(altFireMode);
         ReloadInput();
     }
     #endregion
     #region  inputs
-    protected virtual void ShootInput(FireMode _selectFire, bool _startQ) //i dont want a bool here, but a reference to bool
+    protected virtual void ShootInput(FireMode _selectFire, int? _fireInput)//bool _startQ) //i dont want a bool here, but a reference to bool
     {
         switch(_selectFire)
         {
@@ -86,9 +107,9 @@ public abstract class GunBehaviour : MonoBehaviour
             {
                 //semi auto fire
                 if( gunData.currentAmmo > 0 
-                && timeSinceLastShot > timeBetweenShots-0.2f && !startQaltShoot)//mouse 1
+                && timeSinceLastShot > timeBetweenShots-0.2f )//mouse 1
                 {
-                    startQshoot = true;
+                   mouseInput = _fireInput; //confirm ready to do behavior depends on fireinput
                 }
 
             }
@@ -106,10 +127,6 @@ public abstract class GunBehaviour : MonoBehaviour
         
         
     }
-    // protected virtual void AltShootInput(FireMode _altFire)
-    // {
-
-    // }
     protected virtual void ReloadInput()
     {
         //manual Reload
@@ -121,8 +138,7 @@ public abstract class GunBehaviour : MonoBehaviour
             Anim_Reload();
         }
         //auto reload
-        if ((Input.GetMouseButtonDown(0) && gunData.currentAmmo <= 0 && Time.time > 0.1f)
-        || (Input.GetMouseButtonDown(1) && gunData.currentAmmo <= 0 && Time.time > 0.1f))
+        if (mouseInput!=null && gunData.currentAmmo <= 0 && Time.time > 0.1f)
         {
             if (!gunData.isReloading)
                 reload = StartCoroutine(Reload());
@@ -130,47 +146,44 @@ public abstract class GunBehaviour : MonoBehaviour
             Anim_Reload();
         }
         //Cancel reload
-        if (Input.GetMouseButtonDown(0) && gunData.isReloading &&
+        if (mouseInput !=null && gunData.isReloading &&
         gunData.currentAmmo > 0 && gunData.canCancelReload)
         {
             CancelReload(reload);
-            QueueShoot();
-        }
-        if (Input.GetMouseButtonDown(1) && gunData.isReloading &&
-        gunData.currentAmmo > 0 && gunData.canCancelReload)
-        {
-            CancelReload(reload);
-            QueueAltShoot();
+            QueueShoot(mouseInput);
         }
     }
     #endregion
     //may not need, for queueing inputs, depends on guns
-    public virtual void QueueShoot()
+    public virtual void QueueShoot(int? _fireInput)
     {
-        Shoot(); //remember set q shoot bool to false
+        if(_fireInput == 0)
+        {
+             Shoot(); //remember set q shoot bool to false
+             Anim_Shoot(); //animation
+        }
+       
+
+        if(_fireInput == 1)
+        {
+            AltShoot();
+            Anim_AltShoot();//animation
+        }
+
         canShoot = false;
         
         timeSinceLastShot = 0;
-        //animation
-        Anim_Shoot();
-    }
-    public virtual void QueueAltShoot()
-    {
-        AltShoot();
-        canShoot = false;
-        
-        timeSinceLastShot = 0;
-        //animation
-        Anim_AltShoot();
+        //animation //need to deferentiate different anim
+        //Anim_Shoot();
     }
     //shoot
     public virtual void Shoot()
     {
-
+        queueingFire = false;
     }
     public virtual void AltShoot()
     {
-
+        queueingFire = false;
     }
     protected void BulletHoleFx(RaycastHit _hit)
     {

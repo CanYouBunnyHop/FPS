@@ -8,43 +8,29 @@ public class HandCannon : GunBehaviour
     {
         base.BehaviorInputUpdate();
     }
-    protected override void ShootInput(FireMode _fireMode, bool _startQ)
+    protected override void ShootInput(FireMode _fireMode, int? _fireInput)
     {
-        // //semi auto fire
-        // if(Input.GetMouseButtonDown(0) && gunData.currentAmmo > 0 
-        // && timeSinceLastShot > timeBetweenShots-0.2f && !startQaltShoot)//mouse 1
-        // {
-        //     startQshoot = true;
-        // }
-        base.ShootInput(_fireMode, _startQ);
+        base.ShootInput(_fireMode, _fireInput);
     }
-    // protected override void AltShootInput(FireMode _altFireMode)
-    // {
-    //   //semi auto fire
-    //   if(Input.GetMouseButtonDown(1) && gunData.currentAmmo > 0 
-    //     && timeSinceLastShot > timeBetweenShots-0.2f &&!startQshoot)//mouse 2
-    //   {
-    //     startQaltShoot = true;
-    //   }
-    // }
+   
     protected override void ReloadInput()
     {
         base.ReloadInput();
     }
-    public override void QueueShoot()
+     public override void QueueShoot(int? _fireInput)
     {
-        base.QueueShoot();
+        base.QueueShoot(_fireInput);
     }
-    public override void QueueAltShoot()
-    {
-       base.QueueAltShoot();
-    }
+    // public override void QueueAltShoot()
+    // {
+    //    base.QueueAltShoot();
+    // }
     #region  Shooting Behaviors
     public override void Shoot()
     {
         RaycastHit hit;
         gunData.currentAmmo --;
-        startQshoot = false;
+        //startQshoot = false;
 
         if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
         {
@@ -61,10 +47,6 @@ public class HandCannon : GunBehaviour
             //enemyHP - (damge - dropOff)
           }
         }
-    }
-    public override void AltShoot()
-    {
-      startQaltShoot = false;
     }
     #endregion
 
