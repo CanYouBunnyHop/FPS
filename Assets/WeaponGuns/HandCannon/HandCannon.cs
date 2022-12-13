@@ -17,10 +17,10 @@ public class HandCannon : GunBehaviour
     {
         base.ReloadInput();
     }
-     public override void QueueShoot(int? _fireInput)
-    {
-        base.QueueShoot(_fireInput);
-    }
+    //  public override void QueueShoot(int? _fireInput)
+    // {
+    //     base.QueueShoot(_fireInput);
+    // }
     // public override void QueueAltShoot()
     // {
     //    base.QueueAltShoot();

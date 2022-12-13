@@ -27,9 +27,6 @@ public abstract class GunBehaviour : MonoBehaviour
     //protected int? QInput;
     //protected StartQ startQ;
     protected Coroutine reload;
-
-    
-        
     protected enum FireMode
     {
        SemiAuto,
@@ -40,12 +37,14 @@ public abstract class GunBehaviour : MonoBehaviour
     [Header("Default Fire Select")]
     [SerializeField] FireMode defaultFireMode;
     [SerializeField] FireMode altFireMode;
-
+    [SerializeField] Queue<FireInputActionItem> FireIAIQ;
     protected void Awake()
     {
         cam = Camera.main;
         gunData.currentAmmo = gunData.magSize;
         gunData.isReloading = false;
+        
+        FireIAIQ = new Queue<FireInputActionItem>();
     }
     #region for manager update and fixedUpdate
     public void BehaviorFixedUpdate()
@@ -56,6 +55,26 @@ public abstract class GunBehaviour : MonoBehaviour
 
         //calc timeSicelastShot
         timeSinceLastShot += Time.deltaTime;
+
+        if(FireIAIQ != null)
+        {
+            FireInputActionItem action = FireIAIQ.Peek();
+            switch(action.fireIAI)
+            {
+                case FireInputActionItem.fireActionItem.FireAction:
+                {
+                    Shoot();
+                }
+                break;
+                case FireInputActionItem.fireActionItem.AltFireAction:
+                {
+                    AltShoot();
+                }
+                break;
+            }
+            FireIAIQ.Dequeue();
+            
+        }
     }
     public virtual void BehaviorInputUpdate()
     {
@@ -76,23 +95,21 @@ public abstract class GunBehaviour : MonoBehaviour
             mouseInput = null;
         }
 
-         //check mouseinput and if conditions met before shooting
-        if(mouseInput != null && canShoot)
-        {
-            QueueShoot(mouseInput);
-        }
+        //check mouseinput and if conditions met before shooting //need to store mouse input into a queue, and check queueing fire instead
+        // if(queueingFire && canShoot)
+        // {
+        //     QueueShoot((FireInputActionItem.fireActionItem)mouseInput);
+        // }
 
 
         //queueing fire inputs
-        if(Input.GetMouseButtonDown(0) && !queueingFire)
+        if(mouseInput == 0 && !queueingFire)
         {
-            ShootInput(defaultFireMode,0);
-            queueingFire = true;
+            ShootInput(defaultFireMode, mouseInput);
         }
-        if(Input.GetMouseButtonDown(1) && !queueingFire)
+        if(mouseInput == 1 && !queueingFire)
         {
-            ShootInput(altFireMode, 1);
-            queueingFire = true;
+            ShootInput(altFireMode, mouseInput);
         }
         //AltShootInput(altFireMode);
         ReloadInput();
@@ -101,15 +118,19 @@ public abstract class GunBehaviour : MonoBehaviour
     #region  inputs
     protected virtual void ShootInput(FireMode _selectFire, int? _fireInput)//bool _startQ) //i dont want a bool here, but a reference to bool
     {
+        queueingFire = true;
+
         switch(_selectFire)
         {
             case FireMode.SemiAuto:
             {
                 //semi auto fire
                 if( gunData.currentAmmo > 0 
-                && timeSinceLastShot > timeBetweenShots-0.2f )//mouse 1
+                && timeSinceLastShot > timeBetweenShots - 0.2f)//only queue the item if this condition is met
                 {
-                   mouseInput = _fireInput; //confirm ready to do behavior depends on fireinput
+                    FireInputActionItem item = new FireInputActionItem((FireInputActionItem.fireActionItem)_fireInput);
+                    FireIAIQ.Enqueue(item); 
+                    //queue here
                 }
 
             }
@@ -150,32 +171,29 @@ public abstract class GunBehaviour : MonoBehaviour
         gunData.currentAmmo > 0 && gunData.canCancelReload)
         {
             CancelReload(reload);
-            QueueShoot(mouseInput);
+            ShootInput((FireMode)mouseInput, mouseInput);
         }
     }
     #endregion
     //may not need, for queueing inputs, depends on guns
-    public virtual void QueueShoot(int? _fireInput)
-    {
-        if(_fireInput == 0)
-        {
-             Shoot(); //remember set q shoot bool to false
-             Anim_Shoot(); //animation
-        }
+    // protected virtual void QueueShoot(FireInputActionItem.fireActionItem _fAI)
+    // {
+    //     if(_fAI == FireInputActionItem.fireActionItem.FireAction)
+    //     {
+    //          Shoot(); //remember set q shoot bool to false
+    //          Anim_Shoot(); //animation
+    //     }
        
 
-        if(_fireInput == 1)
-        {
-            AltShoot();
-            Anim_AltShoot();//animation
-        }
+    //     if(_fAI == FireInputActionItem.fireActionItem.AltFireAction)
+    //     {
+    //         AltShoot();
+    //         Anim_AltShoot();//animation
+    //     }
 
-        canShoot = false;
-        
-        timeSinceLastShot = 0;
-        //animation //need to deferentiate different anim
-        //Anim_Shoot();
-    }
+    //     canShoot = false;
+    //     timeSinceLastShot = 0;
+    // }
     //shoot
     public virtual void Shoot()
     {
@@ -227,4 +245,18 @@ public abstract class GunBehaviour : MonoBehaviour
     }
     #endregion
 
+    //nested class because currently not using in any other things
+    protected class FireInputActionItem
+    {
+        public fireActionItem? fireIAI;
+        public enum fireActionItem
+        {
+            FireAction,
+            AltFireAction,
+        }
+        public FireInputActionItem(fireActionItem? _input) //CONSTRUCTOR
+        {
+            fireIAI = _input;
+        }
+    }
 }

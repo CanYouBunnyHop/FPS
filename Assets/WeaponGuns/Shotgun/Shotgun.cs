@@ -89,10 +89,10 @@ public class Shotgun : GunBehaviour
         PlayerKnockBack();
         StartCoroutine(EnemyKnockBack());
     }
-    public override void QueueShoot(int? _fireInput)
-    {
-        base.QueueShoot(_fireInput);
-    }
+    // public override void QueueShoot(int? _fireInput)
+    // {
+    //     base.QueueShoot(_fireInput);
+    // }
     
 
     private void ShootingBehavior()
