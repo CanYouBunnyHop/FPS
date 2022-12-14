@@ -5,48 +5,42 @@ using UnityEngine;
 public class HandCannon : GunBehaviour
 {
   public override void BehaviorInputUpdate()
-    {
-        base.BehaviorInputUpdate();
-    }
-    protected override void ShootInput(FireMode _fireMode, int? _fireInput)
-    {
-        base.ShootInput(_fireMode, _fireInput);
-    }
-   
-    protected override void ReloadInput()
-    {
-        base.ReloadInput();
-    }
-    //  public override void QueueShoot(int? _fireInput)
-    // {
-    //     base.QueueShoot(_fireInput);
-    // }
-    // public override void QueueAltShoot()
-    // {
-    //    base.QueueAltShoot();
-    // }
-    #region  Shooting Behaviors
-    public override void Shoot()
-    {
-        RaycastHit hit;
-        gunData.currentAmmo --;
-        //startQshoot = false;
+  {
+      base.BehaviorInputUpdate();
+  }
+   #region Input
+  protected override void ShootInput(FireMode _fireMode, int? _fireInput)
+  {
+      base.ShootInput(_fireMode, _fireInput);
+  }
+  
+  protected override void ReloadInput()
+  {
+      base.ReloadInput();
+  }
+  #endregion
+  #region  Shooting Behaviors
+  public override void Shoot()
+  {
+      RaycastHit hit;
+      gunData.currentAmmo --;
+      //startQshoot = false;
 
-        if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
+      if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
+      {
+          BulletHoleFx(hit);
+          if(hit.distance <= gunData.range)
         {
-           BulletHoleFx(hit);
-           if(hit.distance <= gunData.range)
-          {
-            //enemyHP - damage
-            
-          }
-          else
-          {
-            float dropOff = hit.distance - gunData.range;
-            dropOff = Mathf.Clamp(dropOff, 0, gunData.damage/3);
-            //enemyHP - (damge - dropOff)
-          }
+          //enemyHP - damage
+          
         }
+        else
+        {
+          float dropOff = hit.distance - gunData.range;
+          dropOff = Mathf.Clamp(dropOff, 0, gunData.damage/3);
+          //enemyHP - (damge - dropOff)
+        }
+      }
     }
     #endregion
 

@@ -12,7 +12,7 @@ public class Shotgun : GunBehaviour
     public PlayerMovement pm;
     [SerializeField]
     private List<EnemyMovement> emlist = new List<EnemyMovement>();
-    private List<EnemyMovement> emKnockBack = new List<EnemyMovement>();
+    //private List<EnemyMovement> emKnockBack = new List<EnemyMovement>();
     public int pellets;
     public float spread;
     public float resetVelMinDotProduct;
@@ -30,12 +30,12 @@ public class Shotgun : GunBehaviour
     //private float clampMagnitude;
     
 
-
-    #region  Shooting Behaviors
     public override void BehaviorInputUpdate()
     {
         base.BehaviorInputUpdate();
     }
+
+    #region Input
     protected override void ShootInput(FireMode _fireMode, int? _fireInput)
     {
         base.ShootInput(_fireMode, _fireInput);
@@ -44,6 +44,9 @@ public class Shotgun : GunBehaviour
     {
         base.ReloadInput();
     }
+    #endregion
+
+    #region  Shooting Behaviors
     public override void Shoot()
     {
         //remember dir
@@ -66,6 +69,8 @@ public class Shotgun : GunBehaviour
 
         PlayerKnockBack();
         StartCoroutine(EnemyKnockBack());
+
+        Anim_Shoot();
     }
     public override void AltShoot()
     {
@@ -75,7 +80,8 @@ public class Shotgun : GunBehaviour
         //clear list
         emlist.Clear();
 
-        if (pm.currentState == PlayerMovement.State.GrapSurface || pm.currentState == PlayerMovement.State.HookEnemy)
+        if (pm.currentState == PlayerMovement.State.GrapSurface 
+        || pm.currentState == PlayerMovement.State.HookEnemy)
         {
             hook.EndGrapple();
         }
@@ -88,13 +94,10 @@ public class Shotgun : GunBehaviour
 
         PlayerKnockBack();
         StartCoroutine(EnemyKnockBack());
-    }
-    // public override void QueueShoot(int? _fireInput)
-    // {
-    //     base.QueueShoot(_fireInput);
-    // }
-    
 
+        Anim_AltShoot();
+    }
+    
     private void ShootingBehavior()
     {
         for (int x = 0; x < pellets;)
@@ -123,6 +126,7 @@ public class Shotgun : GunBehaviour
         }
     }
     #endregion
+
     #region reload
     public override IEnumerator Reload()
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class GunBehaviour : MonoBehaviour
 {
-
+    [Header("References")]
     public GunData gunData;
     public Animator anim;
     public GameObject gunModel; //for switching weapon
@@ -15,18 +15,13 @@ public abstract class GunBehaviour : MonoBehaviour
     [SerializeField] protected GameObject bulletHoleFx;
     /////
     //extra for determining if can shoot
-    public bool canShoot;
-    public float timeSinceLastShot;
-    public float timeBetweenShots;
-
-    //use these bool to control shooting if gun does not allow simutaneous action
-    // protected bool startQshoot = false;
-    // protected bool startQaltShoot = false;
-    protected bool queueingFire;
+    [Header("Debug")]
+    [SerializeField]protected bool canShoot;
+    [SerializeField]protected float timeSinceLastShot;
+    [SerializeField]protected float timeBetweenShots;
     public int? mouseInput;
-    //protected int? QInput;
-    //protected StartQ startQ;
     protected Coroutine reload;
+    /////////////////////////////////////////////////////
     protected enum FireMode
     {
        SemiAuto,
@@ -34,10 +29,11 @@ public abstract class GunBehaviour : MonoBehaviour
        BurstFire,
        Charge,
     }
+    /////////////////////////////////////////////////////
     [Header("Default Fire Select")]
     [SerializeField] FireMode defaultFireMode;
     [SerializeField] FireMode altFireMode;
-    [SerializeField] Queue<FireInputActionItem> FireIAIQ;
+    Queue<FireInputActionItem> FireIAIQ;
     protected void Awake()
     {
         cam = Camera.main;
@@ -56,7 +52,7 @@ public abstract class GunBehaviour : MonoBehaviour
         //calc timeSicelastShot
         timeSinceLastShot += Time.deltaTime;
 
-        if(FireIAIQ != null)
+        if(FireIAIQ.Count > 0 && canShoot) //if there are action items in queue
         {
             FireInputActionItem action = FireIAIQ.Peek();
             switch(action.fireIAI)
@@ -64,6 +60,7 @@ public abstract class GunBehaviour : MonoBehaviour
                 case FireInputActionItem.fireActionItem.FireAction:
                 {
                     Shoot();
+                    
                 }
                 break;
                 case FireInputActionItem.fireActionItem.AltFireAction:
@@ -72,54 +69,81 @@ public abstract class GunBehaviour : MonoBehaviour
                 }
                 break;
             }
-            FireIAIQ.Dequeue();
-            
+           FireIAIQ.Dequeue(); Debug.Log("dequeue");
+           canShoot = false;
+           timeSinceLastShot = 0;  
+           
         }
     }
     public virtual void BehaviorInputUpdate()
     {
-        if(Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))//if only m1 is pressed
+        //get tap mouse input (only mouse 0 for now, need better code)
+        switch(defaultFireMode)
         {
-            mouseInput = 0;
-        }
-        if(Input.GetMouseButtonDown(1)&& !Input.GetMouseButtonDown(0))// if only m2 is pressed
-        {
-            mouseInput = 1;
-        }
-        if(Input.GetMouseButtonDown(1)&& Input.GetMouseButtonDown(0))//if both buttons are pressed
-        {
-            mouseInput = 2;
-        }
-        if(!Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))// if no mouse button is pressed
-        {
-            mouseInput = null;
-        }
+            case FireMode.SemiAuto or FireMode.BurstFire: //single press, holding is not allowed
+            {
+                if(Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))//if only m1 is pressed
+                {
+                    mouseInput = 0;
+                }
+                if(Input.GetMouseButtonDown(1)&& !Input.GetMouseButtonDown(0))// if only m2 is pressed
+                {
+                    mouseInput = 1;
+                }
+                if(Input.GetMouseButtonDown(1)&& Input.GetMouseButtonDown(0))//if both buttons are pressed
+                {
+                    mouseInput = 2;
+                }
+                //
+                if(!Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))// if no mouse button is pressed
+                {
+                    mouseInput = null;
+                }
+            }
+            break;
+            
 
-        //check mouseinput and if conditions met before shooting //need to store mouse input into a queue, and check queueing fire instead
-        // if(queueingFire && canShoot)
-        // {
-        //     QueueShoot((FireInputActionItem.fireActionItem)mouseInput);
-        // }
+           case FireMode.FullAuto or FireMode.Charge: // holding is allowed
+            {
+                if(Input.GetMouseButton(0) && !Input.GetMouseButton(1))//if only m1 is pressed/held
+                {
+                    mouseInput = 0;
+                }
+                if(Input.GetMouseButton(1)&& !Input.GetMouseButton(0))// if only m2 is pressed/held
+                {
+                    mouseInput = 1;
+                }
+                if(Input.GetMouseButton(1)&& Input.GetMouseButton(0))//if both buttons are pressed/held
+                {
+                    mouseInput = 2;
+                }
+            }
+            break;
+        }
+           
 
+      
+       
 
         //queueing fire inputs
-        if(mouseInput == 0 && !queueingFire)
+        if(mouseInput == 0)
         {
             ShootInput(defaultFireMode, mouseInput);
         }
-        if(mouseInput == 1 && !queueingFire)
+        if(mouseInput == 1)
         {
             ShootInput(altFireMode, mouseInput);
         }
-        //AltShootInput(altFireMode);
         ReloadInput();
+
+        //
+        //Debug.Log("THIS IS MOUSE " + mouseInput);
     }
     #endregion
-    #region  inputs
-    protected virtual void ShootInput(FireMode _selectFire, int? _fireInput)//bool _startQ) //i dont want a bool here, but a reference to bool
-    {
-        queueingFire = true;
 
+    #region  inputs
+    protected virtual void ShootInput(FireMode _selectFire, int? _fireInput)
+    {
         switch(_selectFire)
         {
             case FireMode.SemiAuto:
@@ -130,6 +154,7 @@ public abstract class GunBehaviour : MonoBehaviour
                 {
                     FireInputActionItem item = new FireInputActionItem((FireInputActionItem.fireActionItem)_fireInput);
                     FireIAIQ.Enqueue(item); 
+                    Debug.Log("queue");
                     //queue here
                 }
 
@@ -175,34 +200,18 @@ public abstract class GunBehaviour : MonoBehaviour
         }
     }
     #endregion
-    //may not need, for queueing inputs, depends on guns
-    // protected virtual void QueueShoot(FireInputActionItem.fireActionItem _fAI)
-    // {
-    //     if(_fAI == FireInputActionItem.fireActionItem.FireAction)
-    //     {
-    //          Shoot(); //remember set q shoot bool to false
-    //          Anim_Shoot(); //animation
-    //     }
-       
-
-    //     if(_fAI == FireInputActionItem.fireActionItem.AltFireAction)
-    //     {
-    //         AltShoot();
-    //         Anim_AltShoot();//animation
-    //     }
-
-    //     canShoot = false;
-    //     timeSinceLastShot = 0;
-    // }
-    //shoot
+   
+   #region shootBehaviors
+    //shoot actual behaviors here
     public virtual void Shoot()
     {
-        queueingFire = false;
+       Anim_Shoot();
     }
     public virtual void AltShoot()
     {
-        queueingFire = false;
+       Anim_AltShoot();
     }
+    #endregion
     protected void BulletHoleFx(RaycastHit _hit)
     {
         GameObject hole = Instantiate(bulletHoleFx, _hit.point, transform.rotation);
