@@ -8,6 +8,7 @@ public abstract class GunBehaviour : MonoBehaviour
     public GunData gunData;
     public Animator anim;
     public GameObject gunModel; //for switching weapon
+    [Header("probably should be static")]
     [SerializeField] protected LayerMask enemyMask;
     [SerializeField] protected LayerMask groundMask;
     [SerializeField] protected LayerMask groundEnemyMask;
@@ -19,21 +20,15 @@ public abstract class GunBehaviour : MonoBehaviour
     [SerializeField]protected bool canShoot;
     [SerializeField]protected float timeSinceLastShot;
     [SerializeField]protected float timeBetweenShots;
-    public int? mouseInput;
     protected Coroutine reload;
-    /////////////////////////////////////////////////////
-    protected enum FireMode
-    {
-       SemiAuto,
-       FullAuto,
-       BurstFire,
-       Charge,
-    }
-    /////////////////////////////////////////////////////
-    [Header("Default Fire Select")]
-    [SerializeField] FireMode defaultFireMode;
-    [SerializeField] FireMode altFireMode;
     Queue<FireInputActionItem> FireIAIQ;
+    
+    /// <summary>
+    /// Firemode is Tkey, bool = single fire, !bool = auto fire
+    /// </summary>
+    protected static Dictionary<GunData.FireMode,bool> FireModeDatas;
+
+
     protected void Awake()
     {
         cam = Camera.main;
@@ -41,116 +36,112 @@ public abstract class GunBehaviour : MonoBehaviour
         gunData.isReloading = false;
         
         FireIAIQ = new Queue<FireInputActionItem>();
+
+        FireModeDatas = new Dictionary<GunData.FireMode, bool>() //initialise static dictionary //bool true is semi auto
+        {
+            [GunData.FireMode.SemiAuto] = true,
+            [GunData.FireMode.BurstFire] = true,
+
+            [GunData.FireMode.FullAuto] = false,
+            [GunData.FireMode.Charge] = false,
+        };
+
+        timeBetweenShots = 1 / (gunData.fireRate / 60); //fire rate is in rpm, rounds per minute
     }
     #region for manager update and fixedUpdate
     public void BehaviorFixedUpdate()
     {
-        timeBetweenShots = 1 / (gunData.fireRate / 60); //fire rate is in rpm, rounds per minute
-
         canShoot = !gunData.isReloading && timeSinceLastShot > timeBetweenShots && gunData.currentAmmo > 0;
 
         //calc timeSicelastShot
         timeSinceLastShot += Time.deltaTime;
 
-        if(FireIAIQ.Count > 0 && canShoot) //if there are action items in queue
+        if(FireIAIQ.Count > 0) //if there are action items in queue
         {
             FireInputActionItem action = FireIAIQ.Peek();
             switch(action.fireIAI)
             {
                 case FireInputActionItem.fireActionItem.FireAction:
                 {
-                    Shoot();
+                    if(canShoot)
+                    {
+                        Shoot();
+                        FireIAIQ.Dequeue(); Debug.Log("dequeue");
+                        canShoot = false;
+                        timeSinceLastShot = 0;
+                    }
                     
                 }
                 break;
                 case FireInputActionItem.fireActionItem.AltFireAction:
                 {
-                    AltShoot();
+                    if(canShoot)
+                    {
+                        AltShoot();
+                        FireIAIQ.Dequeue(); Debug.Log("dequeue");
+                        canShoot = false;
+                        timeSinceLastShot = 0;  
+                    }
                 }
                 break;
             }
-           FireIAIQ.Dequeue(); Debug.Log("dequeue");
-           canShoot = false;
-           timeSinceLastShot = 0;  
-           
         }
     }
+    
     public virtual void BehaviorInputUpdate()
     {
-        //get tap mouse input (only mouse 0 for now, need better code)
-        switch(defaultFireMode)
-        {
-            case FireMode.SemiAuto or FireMode.BurstFire: //single press, holding is not allowed
-            {
-                if(Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))//if only m1 is pressed
-                {
-                    mouseInput = 0;
-                }
-                if(Input.GetMouseButtonDown(1)&& !Input.GetMouseButtonDown(0))// if only m2 is pressed
-                {
-                    mouseInput = 1;
-                }
-                if(Input.GetMouseButtonDown(1)&& Input.GetMouseButtonDown(0))//if both buttons are pressed
-                {
-                    mouseInput = 2;
-                }
-                //
-                if(!Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1))// if no mouse button is pressed
-                {
-                    mouseInput = null;
-                }
-            }
-            break;
-            
+        //hold or tap
+         InputUpdate(FireModeDatas.GetValueOrDefault(gunData.defaultFireMode) ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0), 
+                     FireModeDatas.GetValueOrDefault(gunData.altFireMode) ? Input.GetMouseButtonDown(1) : Input.GetMouseButton(1));
 
-           case FireMode.FullAuto or FireMode.Charge: // holding is allowed
-            {
-                if(Input.GetMouseButton(0) && !Input.GetMouseButton(1))//if only m1 is pressed/held
-                {
-                    mouseInput = 0;
-                }
-                if(Input.GetMouseButton(1)&& !Input.GetMouseButton(0))// if only m2 is pressed/held
-                {
-                    mouseInput = 1;
-                }
-                if(Input.GetMouseButton(1)&& Input.GetMouseButton(0))//if both buttons are pressed/held
-                {
-                    mouseInput = 2;
-                }
-            }
-            break;
-        }
-           
-
-      
-       
-
-        //queueing fire inputs
-        if(mouseInput == 0)
-        {
-            ShootInput(defaultFireMode, mouseInput);
-        }
-        if(mouseInput == 1)
-        {
-            ShootInput(altFireMode, mouseInput);
-        }
         ReloadInput();
 
         //
         //Debug.Log("THIS IS MOUSE " + mouseInput);
     }
+    private void InputUpdate(bool _m0, bool _m1) //the bool is input.getmouse
+    {
+        //if allow double fire
+        if(gunData.allowDoubleFire)
+        {
+            if(_m0) 
+            {
+                EnqueueShootInput(gunData.defaultFireMode, 0);
+            }
+            if(_m1) 
+            {
+                EnqueueShootInput(gunData.altFireMode, 1);
+            }
+        }
+        else
+        {
+            if(_m0 && !_m1)
+            {
+                EnqueueShootInput(gunData.defaultFireMode, 0);
+            }
+            if(_m1 && !_m0)
+            {
+                EnqueueShootInput(gunData.altFireMode, 1);
+            }
+        }
+    }
     #endregion
 
     #region  inputs
-    protected virtual void ShootInput(FireMode _selectFire, int? _fireInput)
+
+
+    /// <summary>
+    /// _selectFire is Firemode uses to fire. _fireInput = 0 is normal fire, 1 is alt fire.
+    /// </summary>
+    protected virtual void EnqueueShootInput(GunData.FireMode _selectFire, int? _fireInput)
     {
         switch(_selectFire)
         {
-            case FireMode.SemiAuto:
+            case GunData.FireMode.SemiAuto:
             {
                 //semi auto fire
                 if( gunData.currentAmmo > 0 
-                && timeSinceLastShot > timeBetweenShots - 0.2f)//only queue the item if this condition is met
+                && timeSinceLastShot > timeBetweenShots - gunData.fireBuffer)//only queue the item if this condition is met
                 {
                     FireInputActionItem item = new FireInputActionItem((FireInputActionItem.fireActionItem)_fireInput);
                     FireIAIQ.Enqueue(item); 
@@ -161,13 +152,13 @@ public abstract class GunBehaviour : MonoBehaviour
             }
             break;
 
-            case FireMode.FullAuto:
+            case GunData.FireMode.FullAuto:
             break;
 
-            case FireMode.BurstFire:
+            case GunData.FireMode.BurstFire:
             break;
 
-            case FireMode.Charge:
+            case GunData.FireMode.Charge:
             break;
         }
         
@@ -179,35 +170,49 @@ public abstract class GunBehaviour : MonoBehaviour
         if (Input.GetKey(KeyCode.R) && gunData.currentAmmo < gunData.magSize)
         {
             if (!gunData.isReloading)
+            {
                 reload = StartCoroutine(Reload());
-            //animation
-            Anim_Reload();
+                //animation
+                Anim_Reload();
+            }
+              
         }
         //auto reload
-        if (mouseInput!=null && gunData.currentAmmo <= 0 && Time.time > 0.1f)
+        if ((Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1)) && gunData.currentAmmo <= 0 && timeSinceLastShot > timeBetweenShots-0.2)
         {
             if (!gunData.isReloading)
+            {
                 reload = StartCoroutine(Reload());
-            //animation
-            Anim_Reload();
+                //animation
+                Anim_Reload();
+            }
+               
         }
         //Cancel reload
-        if (mouseInput !=null && gunData.isReloading &&
-        gunData.currentAmmo > 0 && gunData.canCancelReload)
+        if (Input.GetMouseButtonDown(0)&& !Input.GetMouseButtonDown(1) && gunData.isReloading &&
+        gunData.currentAmmo > 0 && gunData.canCancelReloadWithFire)
         {
             CancelReload(reload);
-            ShootInput((FireMode)mouseInput, mouseInput);
+            EnqueueShootInput(gunData.defaultFireMode, 0);
+            Debug.Log("reload q");
+        }
+        if (Input.GetMouseButtonDown(1)&& !Input.GetMouseButtonDown(0) && gunData.isReloading &&
+        gunData.currentAmmo > 0 && gunData.canCancelReloadWithAltFire)
+        {
+            CancelReload(reload);
+            EnqueueShootInput(gunData.altFireMode, 1);
+            Debug.Log("reload q");
         }
     }
     #endregion
    
    #region shootBehaviors
     //shoot actual behaviors here
-    public virtual void Shoot()
+    protected virtual void Shoot()
     {
        Anim_Shoot();
     }
-    public virtual void AltShoot()
+    protected virtual void AltShoot()
     {
        Anim_AltShoot();
     }
@@ -219,7 +224,7 @@ public abstract class GunBehaviour : MonoBehaviour
         //object pooling for the hole fx, to do
     }
     #region reload
-    public virtual IEnumerator Reload()
+    protected virtual IEnumerator Reload()
     {
         WaitForSecondsRealtime wait = new WaitForSecondsRealtime(gunData.reloadSpeed);
         gunData.isReloading = true;
@@ -228,11 +233,11 @@ public abstract class GunBehaviour : MonoBehaviour
         gunData.isReloading = false;
         gunData.currentAmmo = gunData.magSize;
     }
-    public virtual IEnumerator ReloadOne()
-    {
-        return null;
-    }
-    public virtual void CancelReload(Coroutine IEReload)
+    // public virtual IEnumerator ReloadOne()
+    // {
+    //     return null;
+    // }
+    protected virtual void CancelReload(Coroutine IEReload)
     {
         StopCoroutine(IEReload);
         gunData.isReloading = false;
@@ -255,9 +260,15 @@ public abstract class GunBehaviour : MonoBehaviour
     #endregion
 
     //nested class because currently not using in any other things
+    ///<summary>
+    ///Class that defines what action the queue will do next.
+    ///</summary>
     protected class FireInputActionItem
     {
         public fireActionItem? fireIAI;
+        ///<summary>
+        ///Item inclues "FireAction", "AltFireAction, index matches MouseButton0, MouseButton1"
+        ///</summary>
         public enum fireActionItem
         {
             FireAction,

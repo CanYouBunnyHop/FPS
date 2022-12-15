@@ -20,7 +20,8 @@ MonoBehaviour:
   currentAmmo: 2
   reloadSpeed: 1
   isReloading: 0
-  canCancelReload: 1
+  canCancelReloadWithFire: 1
+  canCancelReloadWithAltFire: 1
   recoilX:
     serializedVersion: 2
     m_Curve:
@@ -93,5 +94,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  fireMode: 0
-  burstsCount: 0
+  fireBuffer: 0.2
+  defaultFireMode: 0
+  altFireMode: 0
+  allowDoubleFire: 0

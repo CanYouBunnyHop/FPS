@@ -9,9 +9,9 @@ public class HandCannon : GunBehaviour
       base.BehaviorInputUpdate();
   }
    #region Input
-  protected override void ShootInput(FireMode _fireMode, int? _fireInput)
+  protected override void EnqueueShootInput(GunData.FireMode _fireMode, int? _fireInput)
   {
-      base.ShootInput(_fireMode, _fireInput);
+      base.EnqueueShootInput(_fireMode, _fireInput);
   }
   
   protected override void ReloadInput()
@@ -20,7 +20,7 @@ public class HandCannon : GunBehaviour
   }
   #endregion
   #region  Shooting Behaviors
-  public override void Shoot()
+  protected override void Shoot()
   {
       RaycastHit hit;
       gunData.currentAmmo --;
@@ -45,11 +45,11 @@ public class HandCannon : GunBehaviour
     #endregion
 
     #region reload
-    public override IEnumerator Reload()
+    protected override IEnumerator Reload()
     {
         return base.Reload();
     }
-    public override void CancelReload(Coroutine IEReload)
+    protected override void CancelReload(Coroutine IEReload)
     {
         base.CancelReload(IEReload);
     }

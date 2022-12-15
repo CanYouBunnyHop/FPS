@@ -18,7 +18,8 @@ public class GunData : ScriptableObject
     [Header("Reload")]
     public float reloadSpeed;
     public bool isReloading;
-    public bool canCancelReload;
+    public bool canCancelReloadWithFire;
+    public bool canCancelReloadWithAltFire;
     //[Header("Settings")]
     //public LayerMask enemyMask;
     [Header("Recoil")]
@@ -26,17 +27,17 @@ public class GunData : ScriptableObject
     public AnimationCurve recoilY;
     public AnimationCurve recoilZ;
 
-    [Header("FireMode")]
-    
-    [Header("Firemode specific stats")]
-    public float burstsCount;
-
-    //public FireMode fireMode;
-    // public enum FireMode
-    // {
-    //     SemiAuto,
-    //     FullAuto,
-    //     Bursts,
-    //     Charged,
-    // }
+    [Header("Buffer")]
+    public float fireBuffer = 0.2f;
+    [Header("Select fire")]
+    public FireMode defaultFireMode;
+    public FireMode altFireMode;
+    public bool allowDoubleFire;
+    public enum FireMode
+    {
+       SemiAuto,
+       FullAuto,
+       BurstFire,
+       Charge,
+    }
 }

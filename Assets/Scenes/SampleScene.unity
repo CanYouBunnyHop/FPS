@@ -4156,8 +4156,6 @@ MonoBehaviour:
   canShoot: 0
   timeSinceLastShot: 0
   timeBetweenShots: 0
-  defaultFireMode: 0
-  altFireMode: 0
 --- !u!114 &1460019308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4187,8 +4185,6 @@ MonoBehaviour:
   canShoot: 0
   timeSinceLastShot: 0
   timeBetweenShots: 0
-  defaultFireMode: 0
-  altFireMode: 0
   selfKnockBack: 3
   enemyKnockBack: 1.8
   enemyKnockUp: 1
@@ -4197,6 +4193,7 @@ MonoBehaviour:
   pellets: 9
   spread: 5
   resetVelMinDotProduct: 0.4
+  startKnockBack: 0
   hook: {fileID: 645168645}
   dir: {x: 0, y: 0, z: 0}
 --- !u!43 &1500419238

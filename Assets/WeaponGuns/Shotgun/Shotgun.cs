@@ -6,28 +6,18 @@ using Enemy.Movement;
 
 public class Shotgun : GunBehaviour
 {
+    [Header("Shotgun specific stats")]
     public float selfKnockBack;
     public float enemyKnockBack;
     public float enemyKnockUp;
-    public PlayerMovement pm;
-    [SerializeField]
-    private List<EnemyMovement> emlist = new List<EnemyMovement>();
-    //private List<EnemyMovement> emKnockBack = new List<EnemyMovement>();
-    public int pellets;
-    public float spread;
-    public float resetVelMinDotProduct;
-   // [SerializeField]
-    //private GameObject bulletHoleFx;
-    private bool startKnockBack;
-    [SerializeField]
-    private GrapplingHook hook;
-    [SerializeField]
-    private Vector3 dir;
-    //calc appropriate force to add depeding on player velocity and camera dir
-    // private float dot;
-    //private float forceMultiply;
-    //clamp pm vel
-    //private float clampMagnitude;
+    [SerializeField] PlayerMovement pm;
+    [SerializeField]private List<EnemyMovement> emlist = new List<EnemyMovement>();
+    [SerializeField] int pellets;
+    [SerializeField] float spread;
+    [SerializeField] float resetVelMinDotProduct;
+    [SerializeField] bool startKnockBack;
+    [SerializeField] GrapplingHook hook;
+    [SerializeField] Vector3 dir;
     
 
     public override void BehaviorInputUpdate()
@@ -36,9 +26,9 @@ public class Shotgun : GunBehaviour
     }
 
     #region Input
-    protected override void ShootInput(FireMode _fireMode, int? _fireInput)
+    protected override void EnqueueShootInput(GunData.FireMode _fireMode, int? _fireInput)
     {
-        base.ShootInput(_fireMode, _fireInput);
+        base.EnqueueShootInput(_fireMode, _fireInput);
     }
     protected override void ReloadInput()
     {
@@ -47,7 +37,7 @@ public class Shotgun : GunBehaviour
     #endregion
 
     #region  Shooting Behaviors
-    public override void Shoot()
+    protected override void Shoot()
     {
         //remember dir
         dir = cam.transform.forward;
@@ -72,7 +62,7 @@ public class Shotgun : GunBehaviour
 
         Anim_Shoot();
     }
-    public override void AltShoot()
+    protected override void AltShoot()
     {
         //remember dir
         dir = -cam.transform.forward;
@@ -128,11 +118,11 @@ public class Shotgun : GunBehaviour
     #endregion
 
     #region reload
-    public override IEnumerator Reload()
+    protected override IEnumerator Reload()
     {
        return base.Reload();
     }
-    public override void CancelReload(Coroutine IEReload)
+    protected override void CancelReload(Coroutine IEReload)
     {
         base.CancelReload(IEReload);
     }
