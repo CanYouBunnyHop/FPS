@@ -9,8 +9,23 @@ public class PlayerCamera : MonoBehaviour
     public float mouseSensitivity;
     public Transform campos;
     Vector2 mouse;
-    float xRot;
-    float yRot;
+    public float xRot;
+    public float yRot;
+    ///<summary>
+    ///X = Y recoil
+    ///</summary>
+    [Header("GunRecoil")]
+    public float X = 0;
+
+    ///<summary>
+    ///Y = X recoil
+    ///</summary>
+    public float Y = 0;
+
+    ///<summary>
+    ///xrot = y up down, yrot = x left right
+    ///</summary>
+    public Vector2 recoilRestRot;
 
     private Vector3 velocity = Vector3.zero;
     void Start()
@@ -31,10 +46,10 @@ public class PlayerCamera : MonoBehaviour
         xRot = Mathf.Clamp(xRot, -90, 90);
      
         
-        transform.rotation = Quaternion.Euler(xRot,yRot,0);
+        transform.rotation = Quaternion.Euler(xRot-X,yRot+Y,0);
         body.rotation = Quaternion.Euler(0,yRot,0);
         
-       
+        recoilRestRot = new Vector2(xRot,yRot);
     }
     private void LateUpdate()
     {
@@ -44,5 +59,6 @@ public class PlayerCamera : MonoBehaviour
     {
          mouse.x *= Time.smoothDeltaTime * mouseSensitivity;
          mouse.y *= Time.smoothDeltaTime * mouseSensitivity;
+
     }
 }

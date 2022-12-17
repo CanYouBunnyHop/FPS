@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class AssaultRifle : GunBehaviour
 {
-    
-    public override void BehaviorInputUpdate()
-    {
-        base.BehaviorInputUpdate();
-    }
-
     #region Input
     protected override void EnqueueShootInput(GunData.FireMode _fireMode, int? _fireInput)
     {
@@ -24,7 +18,25 @@ public class AssaultRifle : GunBehaviour
     #region  Shooting Behaviors
     protected override void Shoot()
     {
+        RaycastHit hit;
+        gunData.currentAmmo --;
+        base.Shoot();
 
+        if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
+        {
+            BulletHoleFx(hit);
+            if(hit.distance <= gunData.range)
+            {
+                //enemyHP - damage
+            
+            }
+            else
+            {
+                float dropOff = hit.distance - gunData.range;
+                dropOff = Mathf.Clamp(dropOff, 0, gunData.damage/3);
+                //enemyHP - (damge - dropOff)
+            }
+        }
     }
     protected override void AltShoot()
     {

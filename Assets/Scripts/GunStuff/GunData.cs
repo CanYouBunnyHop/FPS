@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Guns", menuName = "Weapons/Guns")]
+[CreateAssetMenu(fileName = "Guns", menuName = "Weapons/GunData")]
 public class GunData : ScriptableObject
 {
     public string gunName;
     [Header("Stats")]
     public float damage;
-    public float fireRate; //in RPM
+    [Tooltip("Rounds per minute")] public float fireRate; //in RPM
     public float range;
 
     [Header("Ammo")]
@@ -20,12 +20,14 @@ public class GunData : ScriptableObject
     public bool isReloading;
     public bool canCancelReloadWithFire;
     public bool canCancelReloadWithAltFire;
-    //[Header("Settings")]
-    //public LayerMask enemyMask;
+    
     [Header("Recoil")]
     public AnimationCurve recoilX;
     public AnimationCurve recoilY;
-    public AnimationCurve recoilZ;
+    public float recoilXScale = 1;
+    public float recoilYScale = 1;
+    public float recoilSpeed;
+    //public AnimationCurve recoilZ;
 
     [Header("Buffer")]
     public float fireBuffer = 0.2f;

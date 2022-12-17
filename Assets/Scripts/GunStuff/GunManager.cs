@@ -53,19 +53,9 @@ public class GunManager : MonoBehaviour
             }
         }
     }
-    void CST()
-    {
-        //canShoot = true;
-    }
     private void FixedUpdate()
     {
        currentBehavior.BehaviorFixedUpdate();
-        // timeBetweenShots = 1 / (currentBehavior.gunData.fireRate/60); //fire rate is in rpm, rounds per minute
-
-        // canShoot = !currentBehavior.gunData.isReloading && timeSinceLastShot > timeBetweenShots && currentBehavior.gunData.currentAmmo > 0;
-
-        // //calc timeSicelastShot
-        // timeSinceLastShot += Time.deltaTime;
     }
 
     // Input

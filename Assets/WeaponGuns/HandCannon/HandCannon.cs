@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class HandCannon : GunBehaviour
 {
-  public override void BehaviorInputUpdate()
-  {
-      base.BehaviorInputUpdate();
-  }
    #region Input
   protected override void EnqueueShootInput(GunData.FireMode _fireMode, int? _fireInput)
   {
@@ -24,7 +20,6 @@ public class HandCannon : GunBehaviour
   {
       RaycastHit hit;
       gunData.currentAmmo --;
-      //startQshoot = false;
 
       if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
       {

@@ -18,12 +18,6 @@ public class Shotgun : GunBehaviour
     [SerializeField] bool startKnockBack;
     [SerializeField] GrapplingHook hook;
     [SerializeField] Vector3 dir;
-    
-
-    public override void BehaviorInputUpdate()
-    {
-        base.BehaviorInputUpdate();
-    }
 
     #region Input
     protected override void EnqueueShootInput(GunData.FireMode _fireMode, int? _fireInput)

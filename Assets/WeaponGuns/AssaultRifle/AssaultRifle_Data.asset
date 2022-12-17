@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d094ee6fc246e094c8ba524672688b19, type: 3}
+  m_Name: AssaultRifle_Data
+  m_EditorClassIdentifier: 
+  gunName: AR
+  damage: 10
+  fireRate: 300
+  range: 50
+  magSize: 30
+  currentAmmo: 0
+  reloadSpeed: 1
+  isReloading: 0
+  canCancelReloadWithFire: 0
+  canCancelReloadWithAltFire: 0
+  recoilX:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: -0.058541156
+      outSlope: -0.058541156
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.25169995
+      value: -0.0147348065
+      inSlope: 1.9038206
+      outSlope: 1.9038206
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.2030434
+    - serializedVersion: 3
+      time: 1.5
+      value: 0
+      inSlope: 3.1108205
+      outSlope: 3.1108205
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.047648285
+      outWeight: 0.038045008
+    - serializedVersion: 3
+      time: 3
+      value: 0
+      inSlope: 3.6307416
+      outSlope: 3.6307416
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.031947613
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  recoilY:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1.212448
+      tangentMode: 1
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.15922274
+    - serializedVersion: 3
+      time: 0.50752544
+      value: 0.81046474
+      inSlope: 0.12338276
+      outSlope: 0.12338276
+      tangentMode: 1
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.8667861
+      value: 0.39794475
+      inSlope: -1.0979773
+      outSlope: -1.0979773
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.106220365
+      outWeight: 0.19277637
+    - serializedVersion: 3
+      time: 1.9999754
+      value: 0.034147233
+      inSlope: 0.040199593
+      outSlope: 0.040199593
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.16793449
+      outWeight: 0.114880174
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  recoilXScale: 5
+  recoilYScale: 3
+  recoilSpeed: 5
+  fireBuffer: 0.2
+  defaultFireMode: 1
+  altFireMode: 0
+  allowDoubleFire: 1

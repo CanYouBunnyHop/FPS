@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d094ee6fc246e094c8ba524672688b19, type: 3}
-  m_Name: HandCannon
+  m_Name: HandCannon_Data
   m_EditorClassIdentifier: 
   gunName: HandCannon
   damage: 65
-  fireRate: 300
+  fireRate: 200
   range: 55
   magSize: 6
   currentAmmo: 6
@@ -29,12 +29,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   recoilY:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  recoilZ:
     serializedVersion: 2
     m_Curve: []
     m_PreInfinity: 2

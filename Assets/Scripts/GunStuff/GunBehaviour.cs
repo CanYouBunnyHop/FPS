@@ -12,6 +12,7 @@ public abstract class GunBehaviour : MonoBehaviour
     [SerializeField] protected LayerMask enemyMask;
     [SerializeField] protected LayerMask groundMask;
     [SerializeField] protected LayerMask groundEnemyMask;
+    [SerializeField] protected PlayerCamera pcam;
     protected Camera cam;
     [SerializeField] protected GameObject bulletHoleFx;
     /////
@@ -22,6 +23,10 @@ public abstract class GunBehaviour : MonoBehaviour
     [SerializeField]protected float timeBetweenShots;
     protected Coroutine reload;
     Queue<FireInputActionItem> FireIAIQ;
+    [SerializeField]protected int shootTimes = 0;
+    private float dX;
+    private float dY;
+    //[SerializeField]protected bool firing;
     
     /// <summary>
     /// Firemode is Tkey, bool = single fire, !bool = auto fire
@@ -86,9 +91,21 @@ public abstract class GunBehaviour : MonoBehaviour
                 break;
             }
         }
+        
+        if(timeSinceLastShot < timeBetweenShots)// recoil
+        {
+            pcam.Y = Mathf.Lerp(pcam.Y, pcam.Y + dY, gunData.recoilSpeed * Time.deltaTime);
+            pcam.X = Mathf.Lerp(pcam.X, pcam.X + dX, gunData.recoilSpeed * Time.deltaTime);
+        }
+        if(timeSinceLastShot > timeBetweenShots + 0.15f) //recoil rest
+        {
+            pcam.X = Mathf.SmoothStep(pcam.X, 0,  timeSinceLastShot);
+            pcam.Y = Mathf.SmoothStep(pcam.Y, 0,  timeSinceLastShot);  //return to default x pos
+            shootTimes = 0;
+        }
     }
     
-    public virtual void BehaviorInputUpdate()
+    public void BehaviorInputUpdate()
     {
         //hold or tap
          InputUpdate(FireModeDatas.GetValueOrDefault(gunData.defaultFireMode) ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0), 
@@ -113,7 +130,7 @@ public abstract class GunBehaviour : MonoBehaviour
                 EnqueueShootInput(gunData.altFireMode, 1);
             }
         }
-        else
+        else //dont allow double fire
         {
             if(_m0 && !_m1)
             {
@@ -140,12 +157,11 @@ public abstract class GunBehaviour : MonoBehaviour
             case GunData.FireMode.SemiAuto:
             {
                 //semi auto fire
-                if( gunData.currentAmmo > 0 
-                && timeSinceLastShot > timeBetweenShots - gunData.fireBuffer)//only queue the item if this condition is met
+                if( gunData.currentAmmo > 0 && timeSinceLastShot > timeBetweenShots - gunData.fireBuffer)//only queue the item if this condition is met
                 {
                     FireInputActionItem item = new FireInputActionItem((FireInputActionItem.fireActionItem)_fireInput);
                     FireIAIQ.Enqueue(item); 
-                    Debug.Log("queue");
+                    //Debug.Log("queue");
                     //queue here
                 }
 
@@ -153,6 +169,15 @@ public abstract class GunBehaviour : MonoBehaviour
             break;
 
             case GunData.FireMode.FullAuto:
+            {
+                if( gunData.currentAmmo > 0 && timeSinceLastShot > timeBetweenShots)
+                {
+                    Shoot();
+                    canShoot = false;
+                    timeSinceLastShot = 0;
+                }
+
+            }
             break;
 
             case GunData.FireMode.BurstFire:
@@ -208,10 +233,28 @@ public abstract class GunBehaviour : MonoBehaviour
    
    #region shootBehaviors
     //shoot actual behaviors here
+    /// <summary>
+    /// Shoot behaviors don't include default behaviors, needs to override it and define it, 
+    /// base does animation and recoil calculation only
+    /// </summary>
     protected virtual void Shoot()
     {
+        
+        shootTimes+=1;
+        dY = gunData.recoilX.Evaluate(shootTimes * 0.1f) * gunData.recoilXScale;
+        dX = gunData.recoilY.Evaluate(shootTimes * 0.1f) * gunData.recoilYScale;
+        // if(timeSinceLastShot < timeBetweenShots)
+        // {
+        //     pcam.Y = Mathf.Lerp(pcam.Y, pcam.Y+dY, Time.deltaTime);
+        //     pcam.X = Mathf.Lerp(pcam.X, pcam.X+dX, Time.deltaTime);
+        // }
+       
        Anim_Shoot();
     }
+    /// <summary>
+    /// Shoot behaviors don't include default behaviors, needs to override it and define it, 
+    /// base does animation and recoil calculation only
+    /// </summary>
     protected virtual void AltShoot()
     {
        Anim_AltShoot();
