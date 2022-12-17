@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public abstract class GunBehaviour : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public abstract class GunBehaviour : MonoBehaviour
     [SerializeField] protected LayerMask enemyMask;
     [SerializeField] protected LayerMask groundMask;
     [SerializeField] protected LayerMask groundEnemyMask;
-    [SerializeField] protected PlayerCamera pcam;
+    [SerializeField] protected PlayerCamera recoilManager;
     protected Camera cam;
     [SerializeField] protected GameObject bulletHoleFx;
     /////
@@ -92,15 +93,15 @@ public abstract class GunBehaviour : MonoBehaviour
             }
         }
         
-        if(timeSinceLastShot < timeBetweenShots)// recoil
+        // if(timeSinceLastShot < timeBetweenShots)// recoil
+        // {
+        //     recoilManager.Y = Mathf.Lerp(recoilManager.Y, recoilManager.Y + dY, gunData.recoilSpeed * Time.deltaTime);
+        //     recoilManager.X = Mathf.Lerp(recoilManager.X, recoilManager.X + dX, gunData.recoilSpeed * Time.deltaTime);
+        // }
+        if(timeSinceLastShot > timeBetweenShots + 0.3f) //recoil rest
         {
-            pcam.Y = Mathf.Lerp(pcam.Y, pcam.Y + dY, gunData.recoilSpeed * Time.deltaTime);
-            pcam.X = Mathf.Lerp(pcam.X, pcam.X + dX, gunData.recoilSpeed * Time.deltaTime);
-        }
-        if(timeSinceLastShot > timeBetweenShots + 0.15f) //recoil rest
-        {
-            pcam.X = Mathf.SmoothStep(pcam.X, 0,  timeSinceLastShot);
-            pcam.Y = Mathf.SmoothStep(pcam.Y, 0,  timeSinceLastShot);  //return to default x pos
+            recoilManager.X = Mathf.SmoothStep(recoilManager.X, 0,  timeSinceLastShot);
+            recoilManager.Y = Mathf.SmoothStep(recoilManager.Y, 0,  timeSinceLastShot);  //return to default x pos
             shootTimes = 0;
         }
     }
@@ -241,14 +242,17 @@ public abstract class GunBehaviour : MonoBehaviour
     {
         
         shootTimes+=1;
-        dY = gunData.recoilX.Evaluate(shootTimes * 0.1f) * gunData.recoilXScale;
-        dX = gunData.recoilY.Evaluate(shootTimes * 0.1f) * gunData.recoilYScale;
-        // if(timeSinceLastShot < timeBetweenShots)
-        // {
-        //     pcam.Y = Mathf.Lerp(pcam.Y, pcam.Y+dY, Time.deltaTime);
-        //     pcam.X = Mathf.Lerp(pcam.X, pcam.X+dX, Time.deltaTime);
-        // }
+        float percent = (float)shootTimes / gunData.magSize; //time 1 always equals the end
+        Debug.Log(shootTimes +" percent"+percent +" Mag:" +gunData.magSize);
+        dX = gunData.recoilVer.Evaluate(percent) * gunData.recoilVerScale;
+        dY = gunData.recoilHor.Evaluate(percent) * gunData.recoilHorScale;
        
+       recoilManager.Y = dY;
+       recoilManager.X = dX;
+
+       //cam.DOShakeRotation(0.1f, 1, 1, 0, true, ShakeRandomnessMode.Harmonic);
+       //cam.DOShakePosition(0.1f,1,0);
+
        Anim_Shoot();
     }
     /// <summary>

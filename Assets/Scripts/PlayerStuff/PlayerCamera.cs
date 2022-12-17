@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerCamera : MonoBehaviour
 {
@@ -27,7 +28,9 @@ public class PlayerCamera : MonoBehaviour
     ///</summary>
     public Vector2 recoilRestRot;
 
-    private Vector3 velocity = Vector3.zero;
+    private Vector3 mouseRot;
+    private Vector3 recoilRot;
+    public Vector3 targetRot;
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -43,13 +46,23 @@ public class PlayerCamera : MonoBehaviour
         mouse.y = Input.GetAxis("Mouse Y");
         xRot-=mouse.y;
         yRot+=mouse.x;
-        xRot = Mathf.Clamp(xRot, -90, 90);
+        xRot = Mathf.Clamp(xRot, -90 -X, 90 + X);
+
+        mouseRot = new Vector3(xRot, yRot, 0);
+        targetRot += new Vector3(-X,Y, 0);
+       // float xTotal = xRot-X;
+       //float yTotal = yRot+Y;
      
+        targetRot = Vector3.Lerp(targetRot, Vector3.zero, 10f * Time.deltaTime);
+        recoilRot = Vector3.Slerp(recoilRot, targetRot, 10f * Time.deltaTime);
         
-        transform.rotation = Quaternion.Euler(xRot-X,yRot+Y,0);
-        body.rotation = Quaternion.Euler(0,yRot,0);
+        //transform.localRotation = Quaternion.Euler(xTotal,yTotal,0);
+        //body.rotation = Quaternion.Euler(0,yTotal,0);
+
+        transform.localRotation = Quaternion.Euler(recoilRot + mouseRot);
+        body.rotation = Quaternion.Euler(0,recoilRot.y + mouseRot.y,0);
         
-        recoilRestRot = new Vector2(xRot,yRot);
+        //recoilRestRot = new Vector2(xRot,yRot);
     }
     private void LateUpdate()
     {

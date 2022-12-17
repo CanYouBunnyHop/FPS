@@ -17,98 +17,98 @@ MonoBehaviour:
   fireRate: 300
   range: 50
   magSize: 30
-  currentAmmo: 0
+  currentAmmo: 30
   reloadSpeed: 1
   isReloading: 0
   canCancelReloadWithFire: 0
   canCancelReloadWithAltFire: 0
-  recoilX:
+  recoilHor:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: -0.058541156
-      outSlope: -0.058541156
-      tangentMode: 34
+      inSlope: -0.35614446
+      outSlope: -0.35614446
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
+      outWeight: 0.1051015
+    - serializedVersion: 3
+      time: 0.30164212
+      value: 0.0044569373
+      inSlope: -0.33808866
+      outSlope: -0.33808866
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.23885745
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.25169995
-      value: -0.0147348065
-      inSlope: 1.9038206
-      outSlope: 1.9038206
+      time: 0.5000628
+      value: 0.0009702365
+      inSlope: -3.8635762
+      outSlope: -3.8635762
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.10842723
+      outWeight: 0.08039467
+    - serializedVersion: 3
+      time: 0.7455027
+      value: 0.008372521
+      inSlope: 1.9852048
+      outSlope: 1.9852048
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.2030434
+      outWeight: 0.1004672
     - serializedVersion: 3
-      time: 1.5
-      value: 0
-      inSlope: 3.1108205
-      outSlope: 3.1108205
+      time: 1.0068883
+      value: 0.00016248226
+      inSlope: -4.291311
+      outSlope: -4.291311
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.047648285
-      outWeight: 0.038045008
-    - serializedVersion: 3
-      time: 3
-      value: 0
-      inSlope: 3.6307416
-      outSlope: 3.6307416
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.031947613
+      inWeight: 0.09117164
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  recoilY:
+  recoilVer:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
       inSlope: 0
-      outSlope: 1.212448
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.15922274
-    - serializedVersion: 3
-      time: 0.50752544
-      value: 0.81046474
-      inSlope: 0.12338276
-      outSlope: 0.12338276
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.8667861
-      value: 0.39794475
-      inSlope: -1.0979773
-      outSlope: -1.0979773
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.106220365
-      outWeight: 0.19277637
+      inWeight: 0
+      outWeight: 0
     - serializedVersion: 3
-      time: 1.9999754
-      value: 0.034147233
-      inSlope: 0.040199593
-      outSlope: 0.040199593
+      time: 0.8053646
+      value: 0.702429
+      inSlope: 0.10778245
+      outSlope: 0.10778245
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.16793449
-      outWeight: 0.114880174
+      inWeight: 0.33333334
+      outWeight: 0.61775345
+    - serializedVersion: 3
+      time: 1.0004737
+      value: 0.4981652
+      inSlope: -3.2169101
+      outSlope: -3.2169101
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.5559942
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  recoilXScale: 5
-  recoilYScale: 3
-  recoilSpeed: 5
+  recoilHorScale: 1
+  recoilVerScale: 1
+  recoilSpeed: 1
   fireBuffer: 0.2
   defaultFireMode: 1
   altFireMode: 0

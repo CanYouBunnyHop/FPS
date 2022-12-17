@@ -21,11 +21,13 @@ public class GunData : ScriptableObject
     public bool canCancelReloadWithFire;
     public bool canCancelReloadWithAltFire;
     
+    ///<summary> Y rotation </summary>
     [Header("Recoil")]
-    public AnimationCurve recoilX;
-    public AnimationCurve recoilY;
-    public float recoilXScale = 1;
-    public float recoilYScale = 1;
+    public AnimationCurve recoilHor;
+    ///<summary> X rotation </summary>
+    public AnimationCurve recoilVer;
+    public float recoilHorScale = 1;
+    public float recoilVerScale = 1;
     public float recoilSpeed;
     //public AnimationCurve recoilZ;
 
