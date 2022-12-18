@@ -17,7 +17,7 @@ public class GunManager : MonoBehaviour
     [SerializeField]
     private GunBehaviour[] gunBehaviors;
     [SerializeField]
-    private GunBehaviour currentBehavior;
+    public GunBehaviour currentBehavior;
     [SerializeField]
     
     //add delay before you can automatically reload, avoid instant startreload right after shooting

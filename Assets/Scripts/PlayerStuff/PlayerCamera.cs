@@ -5,32 +5,29 @@ using DG.Tweening;
 
 public class PlayerCamera : MonoBehaviour
 {
-    public Transform body; // set here the player transform 
 
+    [Header("Sensitivity")]
+    [Range(1,100)]
     public float mouseSensitivity;
-    public Transform campos;
+
+    [Header("References")]
+    [SerializeField]private Transform body; // set here the player transform 
+    [SerializeField]private GunManager gm;
+    [SerializeField]private Transform campos;
     Vector2 mouse;
+    
+    [Header("Debug")]
     public float xRot;
     public float yRot;
-    ///<summary>
-    ///X = Y recoil
-    ///</summary>
-    [Header("GunRecoil")]
-    public float X = 0;
 
-    ///<summary>
-    ///Y = X recoil
-    ///</summary>
-    public float Y = 0;
-
-    ///<summary>
-    ///xrot = y up down, yrot = x left right
-    ///</summary>
-    public Vector2 recoilRestRot;
-
-    private Vector3 mouseRot;
-    private Vector3 recoilRot;
+    [Header("Rotation Vectors")]
+    [SerializeField]private Vector3 mouseRot;
+    public Vector3 recoilRot;
     public Vector3 targetRot;
+
+    private Vector3 vel = Vector3.zero;
+
+   
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -44,20 +41,19 @@ public class PlayerCamera : MonoBehaviour
         //inputs
         mouse.x = Input.GetAxis("Mouse X");
         mouse.y = Input.GetAxis("Mouse Y");
-        xRot-=mouse.y;
-        yRot+=mouse.x;
-        xRot = Mathf.Clamp(xRot, -90 -X, 90 + X);
 
-        mouseRot = new Vector3(xRot, yRot, 0);
-        targetRot += new Vector3(-X,Y, 0);
-       // float xTotal = xRot-X;
-       //float yTotal = yRot+Y;
-     
-        targetRot = Vector3.Lerp(targetRot, Vector3.zero, 10f * Time.deltaTime);
-        recoilRot = Vector3.Slerp(recoilRot, targetRot, 10f * Time.deltaTime);
+        //calc mouse rotation
+        xRot-=mouse.y; 
+        yRot+=mouse.x;
+        mouseRot = new Vector3(xRot, yRot, 0); 
+        xRot = Mathf.Clamp(xRot, -90 -gm.currentBehavior.dX, 90 + gm.currentBehavior.dX); //clamp x rotation + recoil's position in mind
+
+        //some logic is done in gunBehavior
+        //if(gm.currentBehavior.timeSinceLastShot > gm.currentBehavior.timeBetweenShots)
+        targetRot = Vector3.Slerp(targetRot, Vector3.zero, gm.currentBehavior.gunData.returnSpeed * Time.deltaTime); //return rotation
+
+        recoilRot = Vector3.Slerp(recoilRot, targetRot, gm.currentBehavior.gunData.recoilSpeed * Time.fixedDeltaTime);   //recoil rotation
         
-        //transform.localRotation = Quaternion.Euler(xTotal,yTotal,0);
-        //body.rotation = Quaternion.Euler(0,yTotal,0);
 
         transform.localRotation = Quaternion.Euler(recoilRot + mouseRot);
         body.rotation = Quaternion.Euler(0,recoilRot.y + mouseRot.y,0);
@@ -68,10 +64,10 @@ public class PlayerCamera : MonoBehaviour
     {
     
     }
-     private void FixedUpdate()
+    private void FixedUpdate()
     {
-         mouse.x *= Time.smoothDeltaTime * mouseSensitivity;
-         mouse.y *= Time.smoothDeltaTime * mouseSensitivity;
+         mouse.x *= Time.smoothDeltaTime * mouseSensitivity *1000;
+         mouse.y *= Time.smoothDeltaTime * mouseSensitivity *1000;
 
     }
 }

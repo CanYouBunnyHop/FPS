@@ -79,6 +79,46 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
+      inSlope: 1.9354378
+      outSlope: 1.9354378
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.12286106
+    - serializedVersion: 3
+      time: 0.6267147
+      value: 0.6957914
+      inSlope: -0.077516675
+      outSlope: -0.077516675
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.18095121
+    - serializedVersion: 3
+      time: 1.002732
+      value: 0.4898339
+      inSlope: -1.3612076
+      outSlope: -1.3612076
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.20763345
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  recoilHorScale: 15
+  recoilVerScale: 15
+  recoilSpeed: 10
+  returnSpeed: 2
+  returnDelay: 0.2
+  enableRandomness: 0
+  horizontalRandomness: 6
+  recoilHorOffset:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -86,29 +126,43 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.8053646
-      value: 0.702429
-      inSlope: 0.10778245
-      outSlope: 0.10778245
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.61775345
-    - serializedVersion: 3
-      time: 1.0004737
-      value: 0.4981652
-      inSlope: -3.2169101
-      outSlope: -3.2169101
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.5559942
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  recoilHorScale: 1
-  recoilVerScale: 1
-  recoilSpeed: 1
+  recoilVerOffset:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  horOffSetScale: 1
+  verOffSetScale: 1
   fireBuffer: 0.2
   defaultFireMode: 1
   altFireMode: 0

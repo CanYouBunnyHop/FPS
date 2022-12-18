@@ -22,18 +22,111 @@ MonoBehaviour:
   isReloading: 0
   canCancelReloadWithFire: 1
   canCancelReloadWithAltFire: 0
-  recoilX:
+  recoilHor:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.5065918
+      inSlope: 0.4934082
+      outSlope: 0.4934082
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.4934082
+      outSlope: 0.4934082
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  recoilY:
+  recoilVer:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0.16053383
+      outSlope: 0.16053383
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.15425599
+    - serializedVersion: 3
+      time: 0.99955887
+      value: 1.1501864
+      inSlope: 0.0049757124
+      outSlope: 0.0049757124
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.17406149
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  recoilHorScale: 10
+  recoilVerScale: 10
+  recoilSpeed: 25
+  returnSpeed: 3
+  returnDelay: 0
+  enableRandomness: 1
+  horizontalRandomness: 5
+  recoilHorOffset:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  recoilVerOffset:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  horOffSetScale: 2
+  verOffSetScale: 2
   fireBuffer: 0.2
   defaultFireMode: 0
   altFireMode: 0

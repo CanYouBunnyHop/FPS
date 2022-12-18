@@ -20,13 +20,13 @@ public abstract class GunBehaviour : MonoBehaviour
     //extra for determining if can shoot
     [Header("Debug")]
     [SerializeField]protected bool canShoot;
-    [SerializeField]protected float timeSinceLastShot;
-    [SerializeField]protected float timeBetweenShots;
+    [SerializeField]public float timeSinceLastShot {get; private set;}
+    [SerializeField]public float timeBetweenShots {get; private set;}
     protected Coroutine reload;
     Queue<FireInputActionItem> FireIAIQ;
-    [SerializeField]protected int shootTimes = 0;
-    private float dX;
-    private float dY;
+    public int shootTimes = 0;
+    public float dX {get; private set;}
+    public float dY {get; private set;}
     //[SerializeField]protected bool firing;
     
     /// <summary>
@@ -93,15 +93,11 @@ public abstract class GunBehaviour : MonoBehaviour
             }
         }
         
-        // if(timeSinceLastShot < timeBetweenShots)// recoil
-        // {
-        //     recoilManager.Y = Mathf.Lerp(recoilManager.Y, recoilManager.Y + dY, gunData.recoilSpeed * Time.deltaTime);
-        //     recoilManager.X = Mathf.Lerp(recoilManager.X, recoilManager.X + dX, gunData.recoilSpeed * Time.deltaTime);
-        // }
-        if(timeSinceLastShot > timeBetweenShots + 0.3f) //recoil rest
+        if(timeSinceLastShot > timeBetweenShots + gunData.returnDelay) //recoil rest
         {
-            recoilManager.X = Mathf.SmoothStep(recoilManager.X, 0,  timeSinceLastShot);
-            recoilManager.Y = Mathf.SmoothStep(recoilManager.Y, 0,  timeSinceLastShot);  //return to default x pos
+            dX = Mathf.SmoothStep(dX, 0,  timeSinceLastShot);
+            dY = Mathf.SmoothStep(dY, 0,  timeSinceLastShot);
+
             shootTimes = 0;
         }
     }
@@ -241,17 +237,7 @@ public abstract class GunBehaviour : MonoBehaviour
     protected virtual void Shoot()
     {
         
-        shootTimes+=1;
-        float percent = (float)shootTimes / gunData.magSize; //time 1 always equals the end
-        Debug.Log(shootTimes +" percent"+percent +" Mag:" +gunData.magSize);
-        dX = gunData.recoilVer.Evaluate(percent) * gunData.recoilVerScale;
-        dY = gunData.recoilHor.Evaluate(percent) * gunData.recoilHorScale;
-       
-       recoilManager.Y = dY;
-       recoilManager.X = dX;
-
-       //cam.DOShakeRotation(0.1f, 1, 1, 0, true, ShakeRandomnessMode.Harmonic);
-       //cam.DOShakePosition(0.1f,1,0);
+       DefaultRecoilBehavior();
 
        Anim_Shoot();
     }
@@ -261,7 +247,34 @@ public abstract class GunBehaviour : MonoBehaviour
     /// </summary>
     protected virtual void AltShoot()
     {
+       DefaultRecoilBehavior();
+
        Anim_AltShoot();
+    }
+    private void DefaultRecoilBehavior()
+    {
+        shootTimes+=1;
+        float percent = (float)shootTimes / gunData.magSize; //time 1 always equals the end
+        Debug.Log(shootTimes +" percent"+percent +" Mag:" +gunData.magSize);
+        dX = gunData.recoilVer.Evaluate(percent) * gunData.recoilVerScale;
+        dY = gunData.recoilHor.Evaluate(percent) * gunData.recoilHorScale;
+
+        float xOffSet = Random.Range(-gunData.recoilVerOffset.Evaluate(percent) * gunData.verOffSetScale, gunData.recoilVerOffset.Evaluate(percent) * gunData.verOffSetScale);
+        float yOffSet = Random.Range(-gunData.recoilHorOffset.Evaluate(percent) * gunData.horOffSetScale, gunData.recoilHorOffset.Evaluate(percent) * gunData.horOffSetScale);
+
+       if(gunData.enableRandomness)
+       {
+            float randomness = percent * Random.Range(-gunData.horizontalRandomness, gunData.horizontalRandomness);
+            recoilManager.targetRot += new Vector3(-dX + xOffSet ,(dY * randomness) + yOffSet, 0); //target rot is recoil's target pos
+       }
+       else
+       {
+            recoilManager.targetRot += new Vector3(-dX + xOffSet , dY + yOffSet , 0);
+       }
+        
+        //maybe use this to add more shake?????
+       //cam.DOShakeRotation(0.1f, 1, 1, 0, true, ShakeRandomnessMode.Harmonic);
+       //cam.DOShakePosition(0.1f,1,0);
     }
     #endregion
     protected void BulletHoleFx(RaycastHit _hit)

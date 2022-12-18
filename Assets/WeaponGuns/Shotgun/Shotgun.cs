@@ -54,7 +54,7 @@ public class Shotgun : GunBehaviour
         PlayerKnockBack();
         StartCoroutine(EnemyKnockBack());
 
-        Anim_Shoot();
+        base.Shoot();
     }
     protected override void AltShoot()
     {
@@ -79,7 +79,7 @@ public class Shotgun : GunBehaviour
         PlayerKnockBack();
         StartCoroutine(EnemyKnockBack());
 
-        Anim_AltShoot();
+        base.AltShoot();
     }
     
     private void ShootingBehavior()

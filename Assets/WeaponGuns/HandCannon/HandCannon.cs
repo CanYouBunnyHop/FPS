@@ -21,6 +21,8 @@ public class HandCannon : GunBehaviour
       RaycastHit hit;
       gunData.currentAmmo --;
 
+      base.Shoot();
+
       if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
       {
           BulletHoleFx(hit);
@@ -36,6 +38,10 @@ public class HandCannon : GunBehaviour
           //enemyHP - (damge - dropOff)
         }
       }
+    }
+    protected override void AltShoot()
+    {
+      
     }
     #endregion
 

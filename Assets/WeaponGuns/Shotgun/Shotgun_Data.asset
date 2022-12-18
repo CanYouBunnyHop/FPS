@@ -22,31 +22,7 @@ MonoBehaviour:
   isReloading: 0
   canCancelReloadWithFire: 1
   canCancelReloadWithAltFire: 1
-  recoilX:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0.1674785
-      outSlope: 0.1674785
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.08629506
-    - serializedVersion: 3
-      time: 0.025183022
-      value: 1.0204918
-      inSlope: 0.09052449
-      outSlope: 0.09052449
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.46759608
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  recoilY:
+  recoilHor:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -70,7 +46,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  recoilZ:
+  recoilVer:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -94,6 +70,27 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  recoilHorScale: 1
+  recoilVerScale: 10
+  recoilSpeed: 5
+  returnSpeed: 1
+  returnDelay: 0.2
+  enableRandomness: 0
+  horizontalRandomness: 0
+  recoilHorOffset:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  recoilVerOffset:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  horOffSetScale: 0
+  verOffSetScale: 0
   fireBuffer: 0.2
   defaultFireMode: 0
   altFireMode: 0

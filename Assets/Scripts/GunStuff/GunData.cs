@@ -29,6 +29,20 @@ public class GunData : ScriptableObject
     public float recoilHorScale = 1;
     public float recoilVerScale = 1;
     public float recoilSpeed;
+    public float returnSpeed;
+    public float returnDelay;
+
+    [Header("Recoil Randomness")]
+    public bool enableRandomness;
+    public float horizontalRandomness;
+
+    [Header("Recoil Offset")]
+    public AnimationCurve recoilHorOffset;
+    public AnimationCurve recoilVerOffset;
+    public float horOffSetScale;
+    public float verOffSetScale;
+
+
     //public AnimationCurve recoilZ;
 
     [Header("Buffer")]
