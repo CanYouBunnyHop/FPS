@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: AR
   damage: 10
-  fireRate: 300
+  fireRate: 400
   range: 50
   magSize: 30
   currentAmmo: 30
@@ -35,14 +35,14 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.1051015
     - serializedVersion: 3
-      time: 0.30164212
-      value: 0.0044569373
-      inSlope: -0.33808866
-      outSlope: -0.33808866
+      time: 0.27812833
+      value: 0.002595365
+      inSlope: -1.1367264
+      outSlope: -1.1367264
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.23885745
-      outWeight: 0.33333334
+      outWeight: 0.099136606
     - serializedVersion: 3
       time: 0.5000628
       value: 0.0009702365
@@ -79,29 +79,29 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1.9354378
-      outSlope: 1.9354378
+      inSlope: -0.19368015
+      outSlope: -0.19368015
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.12286106
+      outWeight: 0.2625959
     - serializedVersion: 3
-      time: 0.6267147
-      value: 0.6957914
-      inSlope: -0.077516675
-      outSlope: -0.077516675
+      time: 0.5884124
+      value: 0.51780516
+      inSlope: 0.26173362
+      outSlope: 0.26173362
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.18095121
+      outWeight: 0.21701685
     - serializedVersion: 3
-      time: 1.002732
-      value: 0.4898339
-      inSlope: -1.3612076
-      outSlope: -1.3612076
+      time: 0.99585956
+      value: 0.31532276
+      inSlope: -0.48090088
+      outSlope: -0.48090088
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.20763345
+      inWeight: 0.19406503
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -161,7 +161,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  horOffSetScale: 1
+  horOffSetScale: 3
   verOffSetScale: 1
   fireBuffer: 0.2
   defaultFireMode: 1

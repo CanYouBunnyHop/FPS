@@ -301,7 +301,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27516
+  m_Name: pb_Mesh27510
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -527,7 +527,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 277386336}
-  m_Layer: 7
+  m_Layer: 5
   m_Name: crosshairs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -569,7 +569,7 @@ GameObject:
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
   - component: {fileID: 330585548}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -615,7 +615,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 87
+    m_Bits: 215
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -709,7 +709,7 @@ GameObject:
   - component: {fileID: 354754124}
   - component: {fileID: 354754126}
   - component: {fileID: 354754125}
-  m_Layer: 7
+  m_Layer: 5
   m_Name: RawImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -968,7 +968,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27536
+  m_Name: pb_Mesh27530
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1164,7 +1164,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27424
+  m_Name: pb_Mesh27418
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1328,7 +1328,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27568
+  m_Name: pb_Mesh27562
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2027,7 +2027,7 @@ GameObject:
   - component: {fileID: 843167162}
   - component: {fileID: 843167161}
   - component: {fileID: 843167160}
-  m_Layer: 7
+  m_Layer: 5
   m_Name: CanvasCrosshair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2434,7 +2434,7 @@ GameObject:
   - component: {fileID: 910553072}
   - component: {fileID: 910553074}
   - component: {fileID: 910553073}
-  m_Layer: 7
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2637,7 +2637,7 @@ GameObject:
   m_Component:
   - component: {fileID: 915097480}
   - component: {fileID: 915097481}
-  m_Layer: 7
+  m_Layer: 5
   m_Name: GunSwayCon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3096,12 +3096,12 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 18e3de437151ac1478c93de27939d68e,
         type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 18e3de437151ac1478c93de27939d68e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 18e3de437151ac1478c93de27939d68e, type: 3}
@@ -3450,7 +3450,7 @@ Camera:
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 384
+    m_Bits: 288
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -4094,7 +4094,7 @@ GameObject:
   - component: {fileID: 1460019308}
   - component: {fileID: 1460019307}
   - component: {fileID: 1460019309}
-  m_Layer: 7
+  m_Layer: 5
   m_Name: gunContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4167,11 +4167,7 @@ MonoBehaviour:
   bulletHoleFx: {fileID: 1807750906952569253, guid: 51e8235ba95001e4a86e771fefa44b9b,
     type: 3}
   canShoot: 0
-  timeSinceLastShot: 0
-  timeBetweenShots: 0
   shootTimes: 0
-  dX: 0
-  dY: 0
 --- !u!114 &1460019308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4200,11 +4196,7 @@ MonoBehaviour:
   bulletHoleFx: {fileID: 1807750906952569253, guid: 51e8235ba95001e4a86e771fefa44b9b,
     type: 3}
   canShoot: 0
-  timeSinceLastShot: 0
-  timeBetweenShots: 0
   shootTimes: 0
-  dX: 0
-  dY: 0
   selfKnockBack: 3
   enemyKnockBack: 1.8
   enemyKnockUp: 1
@@ -4244,18 +4236,19 @@ MonoBehaviour:
   bulletHoleFx: {fileID: 1807750906952569253, guid: 51e8235ba95001e4a86e771fefa44b9b,
     type: 3}
   canShoot: 0
-  timeSinceLastShot: 0
-  timeBetweenShots: 0
   shootTimes: 0
-  dX: 0
-  dY: 0
+  Grenade: {fileID: 231405877796452273, guid: d531eeef80e383849adb5e6973d19f79, type: 3}
+  altVerRecoil: 4
+  altFirePower: 800
+  altUpFirePower: 50
+  ARgrenadeData: {fileID: 11400000, guid: e33dd69af6c7d91428ce3e14cfe0bf3b, type: 2}
 --- !u!43 &1500419238
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27592
+  m_Name: pb_Mesh27586
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -4784,7 +4777,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27348
+  m_Name: pb_Mesh27342
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5287,7 +5280,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27498
+  m_Name: pb_Mesh27492
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -7853,6 +7846,7 @@ RectTransform:
   - {fileID: 1825915248}
   - {fileID: 1296108421}
   - {fileID: 982004658}
+  - {fileID: 2135647451}
   m_Father: {fileID: 1162689229}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -8272,7 +8266,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27462
+  m_Name: pb_Mesh27456
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -8543,12 +8537,12 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 534748c93c556c84280616f4673d8856,
         type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 534748c93c556c84280616f4673d8856,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 534748c93c556c84280616f4673d8856, type: 3}
@@ -8642,7 +8636,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 20a1e92c918d2ae4abc8414bf0886cdd,
         type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 20a1e92c918d2ae4abc8414bf0886cdd,
         type: 3}
@@ -8651,6 +8645,98 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 20a1e92c918d2ae4abc8414bf0886cdd, type: 3}
+--- !u!1 &2135647450
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2135647451}
+  - component: {fileID: 2135647454}
+  - component: {fileID: 2135647453}
+  - component: {fileID: 2135647452}
+  m_Layer: 5
+  m_Name: AltAmmoBar/CooldownBar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2135647451
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2135647450}
+  m_LocalRotation: {x: 0, y: 0, z: 0.38268343, w: 0.92387956}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1839007679}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2135647452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2135647450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 2100000, guid: 180aec44cc905654392350359804907a, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: ab997d723e884af42bd4fde7cf465ad7, type: 3}
+  m_Type: 3
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 0.25
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2135647453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2135647450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0a7b36d88186da428d884b5f8e32ddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radialBar: {fileID: 2135647452}
+  cddata: {fileID: 11400000, guid: e33dd69af6c7d91428ce3e14cfe0bf3b, type: 2}
+  maxFill: 0.25
+--- !u!222 &2135647454
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2135647450}
+  m_CullTransparentMesh: 1
 --- !u!1 &2137833532
 GameObject:
   m_ObjectHideFlags: 0

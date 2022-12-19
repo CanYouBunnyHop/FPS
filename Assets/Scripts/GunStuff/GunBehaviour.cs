@@ -9,6 +9,7 @@ public abstract class GunBehaviour : MonoBehaviour
     public GunData gunData;
     public Animator anim;
     public GameObject gunModel; //for switching weapon
+
     [Header("probably should be static")]
     [SerializeField] protected LayerMask enemyMask;
     [SerializeField] protected LayerMask groundMask;
@@ -18,15 +19,19 @@ public abstract class GunBehaviour : MonoBehaviour
     [SerializeField] protected GameObject bulletHoleFx;
     /////
     //extra for determining if can shoot
+
     [Header("Debug")]
     [SerializeField]protected bool canShoot;
-    [SerializeField]public float timeSinceLastShot {get; private set;}
-    [SerializeField]public float timeBetweenShots {get; private set;}
-    protected Coroutine reload;
-    Queue<FireInputActionItem> FireIAIQ;
+    [SerializeField]public float timeSinceLastShot {get; protected set;}
+    [SerializeField]public float timeBetweenShots {get; protected set;}
+
+    [Header("Other Debug")]
     public int shootTimes = 0;
     public float dX {get; private set;}
     public float dY {get; private set;}
+    protected Coroutine reload;
+    public Queue<FireInputActionItem> FireIAIQ;
+   
     //[SerializeField]protected bool firing;
     
     /// <summary>
@@ -55,12 +60,17 @@ public abstract class GunBehaviour : MonoBehaviour
         timeBetweenShots = 1 / (gunData.fireRate / 60); //fire rate is in rpm, rounds per minute
     }
     #region for manager update and fixedUpdate
-    public void BehaviorFixedUpdate()
+    public virtual void BehaviorFixedUpdate()
     {
         canShoot = !gunData.isReloading && timeSinceLastShot > timeBetweenShots && gunData.currentAmmo > 0;
 
+        //canAltShoot = !gunData.isReloading && timeSinceLastAltShot > timeBetweenAltShots;
+
         //calc timeSicelastShot
         timeSinceLastShot += Time.deltaTime;
+
+        // if(gunData.allowDoubleFire)
+        // timeSinceLastAltShot += Time.deltaTime;
 
         if(FireIAIQ.Count > 0) //if there are action items in queue
         {
@@ -69,6 +79,7 @@ public abstract class GunBehaviour : MonoBehaviour
             {
                 case FireInputActionItem.fireActionItem.FireAction:
                 {
+
                     if(canShoot)
                     {
                         Shoot();
@@ -81,13 +92,27 @@ public abstract class GunBehaviour : MonoBehaviour
                 break;
                 case FireInputActionItem.fireActionItem.AltFireAction:
                 {
-                    if(canShoot)
+                    if(!gunData.allowDoubleFire)
                     {
-                        AltShoot();
-                        FireIAIQ.Dequeue(); Debug.Log("dequeue");
-                        canShoot = false;
-                        timeSinceLastShot = 0;  
+                         if(canShoot)
+                        {
+                            AltShoot();
+                            FireIAIQ.Dequeue(); Debug.Log("dequeue");
+                            canShoot = false;
+                            timeSinceLastShot = 0;  
+                        }
                     }
+                    else //if allow double fire
+                    {
+                        // if(canAltShoot)
+                        // {
+                        //     AltShoot();
+                        //     FireIAIQ.Dequeue(); Debug.Log("dequeue");
+                        //     canAltShoot = false;
+                        //     timeSinceLastAltShot = 0;  
+                        // }
+                    }
+                       
                 }
                 break;
             }
@@ -265,7 +290,7 @@ public abstract class GunBehaviour : MonoBehaviour
        if(gunData.enableRandomness)
        {
             float randomness = percent * Random.Range(-gunData.horizontalRandomness, gunData.horizontalRandomness);
-            recoilManager.targetRot += new Vector3(-dX + xOffSet ,(dY * randomness) + yOffSet, 0); //target rot is recoil's target pos
+            recoilManager.targetRot += new Vector3(-dX + xOffSet ,(dY * randomness) + yOffSet, 0);  //target rot is recoil's target pos
        }
        else
        {
@@ -323,7 +348,7 @@ public abstract class GunBehaviour : MonoBehaviour
     ///<summary>
     ///Class that defines what action the queue will do next.
     ///</summary>
-    protected class FireInputActionItem
+    public class FireInputActionItem
     {
         public fireActionItem? fireIAI;
         ///<summary>

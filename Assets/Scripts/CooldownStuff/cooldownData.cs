@@ -5,28 +5,61 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CooldownData", menuName = "ability/Cooldown")]
 public class cooldownData : ScriptableObject
 {
+    
     public float cdTime;
+    public countMethod count_Method;
 
     [Header("Debug")]
     public float cdTimer;
     public bool canUseAbility;
     public bool isUsing = false;
 
+    public enum countMethod
+    {
+        CountDown,
+        CountUp
+    }
+
     public void CoolingDown()
     {
-        //Cool down
-            if (cdTimer <= 0 && !isUsing) //if cooldown is ready and player is not using ability
+        switch(count_Method)
+        {
+            case countMethod.CountDown:
             {
-                canUseAbility = true;
+                //Cool down
+                if (cdTimer <= 0 && !isUsing) //if cooldown is ready and player is not using ability
+                {
+                    canUseAbility = true;
+                }
+                else
+                {
+                    canUseAbility = false;
+                    cdTimer -= Time.fixedDeltaTime;
+                }
             }
-            else
+            break;
+            case countMethod.CountUp:
             {
-                canUseAbility = false;
-                cdTimer -= Time.fixedDeltaTime;
+                if(cdTimer>= cdTime && !isUsing)
+                {
+                    canUseAbility = true;
+                }
+                else
+                {
+                    canUseAbility = false;
+                    cdTimer += Time.fixedDeltaTime;
+                }
             }
+            break;
+        }
+        
     }
     public void InitiateCoolDown()
     {
+        if(count_Method == countMethod.CountDown)
         cdTimer = cdTime;
+
+        else
+        cdTimer = 0;
     }
 }
