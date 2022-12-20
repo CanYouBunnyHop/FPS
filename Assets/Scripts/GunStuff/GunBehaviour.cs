@@ -27,8 +27,8 @@ public abstract class GunBehaviour : MonoBehaviour
 
     [Header("Other Debug")]
     public int shootTimes = 0;
-    public float dX {get; private set;}
-    public float dY {get; private set;}
+    public float dX {get; protected set;}
+    public float dY {get; protected set;}
     protected Coroutine reload;
     public Queue<FireInputActionItem> FireIAIQ;
    
@@ -101,18 +101,7 @@ public abstract class GunBehaviour : MonoBehaviour
                             canShoot = false;
                             timeSinceLastShot = 0;  
                         }
-                    }
-                    else //if allow double fire
-                    {
-                        // if(canAltShoot)
-                        // {
-                        //     AltShoot();
-                        //     FireIAIQ.Dequeue(); Debug.Log("dequeue");
-                        //     canAltShoot = false;
-                        //     timeSinceLastAltShot = 0;  
-                        // }
-                    }
-                       
+                    }  
                 }
                 break;
             }
@@ -124,6 +113,10 @@ public abstract class GunBehaviour : MonoBehaviour
             dY = Mathf.SmoothStep(dY, 0,  timeSinceLastShot);
 
             shootTimes = 0;
+        }
+        void LocalTest()
+        {
+            Debug.Log("local works");
         }
     }
     

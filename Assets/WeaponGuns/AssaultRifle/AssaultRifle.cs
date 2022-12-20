@@ -10,17 +10,16 @@ public class AssaultRifle : GunBehaviour
     public float altUpFirePower;
     public cooldownData ARgrenadeData;
 
-    //[Header("Debug if double fire is allowed")]
-    // [SerializeField]protected bool canAltShoot; //not used unless doublefire is true
-    // [SerializeField]public float timeSinceLastAltShot;
-    // [SerializeField]public float timeBetweenAltShots;
+    //Changing firemode for this gun will break script since things are hard coded, maybe need to rewrite more code? But will be difficult because each guns are unique
 
     public override void BehaviorFixedUpdate()
     {
-        // canAltShoot = !gunData.isReloading && timeSinceLastAltShot > timeBetweenAltShots;
-        // timeSinceLastAltShot += Time.deltaTime;
-        //base.BehaviorFixedUpdate();
         ARgrenadeData.CoolingDown();
+
+        canShoot = !gunData.isReloading && timeSinceLastShot > timeBetweenShots && gunData.currentAmmo > 0;
+
+        //calc timeSicelastShot
+        timeSinceLastShot += Time.deltaTime;
 
         if(FireIAIQ.Count > 0) //if there are action items in queue
         {
@@ -45,7 +44,7 @@ public class AssaultRifle : GunBehaviour
                     if(ARgrenadeData.canUseAbility)
                     {
                         AltShoot();
-                        FireIAIQ.Dequeue(); Debug.Log("dequeue");
+                        FireIAIQ.Dequeue();
                         ARgrenadeData.canUseAbility = false;
                         ARgrenadeData.InitiateCoolDown();
                     }
@@ -53,12 +52,44 @@ public class AssaultRifle : GunBehaviour
                 break;
             }
         }
+         if(timeSinceLastShot > timeBetweenShots + gunData.returnDelay) //recoil rest
+        {
+            dX = Mathf.SmoothStep(dX, 0,  timeSinceLastShot);
+            dY = Mathf.SmoothStep(dY, 0,  timeSinceLastShot);
+
+            shootTimes = 0;
+        }
+        //base.BehaviorFixedUpdate();
     }
 
     #region Input
     protected override void EnqueueShootInput(GunData.FireMode _fireMode, int? _fireInput)
     {
-        base.EnqueueShootInput(_fireMode, _fireInput);
+         switch(_fireMode)
+        {
+            case GunData.FireMode.FullAuto: //shoot
+            {
+                if( gunData.currentAmmo > 0 && timeSinceLastShot > timeBetweenShots)
+                {
+                    Shoot();
+                    canShoot = false;
+                    timeSinceLastShot = 0;
+                }
+
+            }
+            break;
+
+            case GunData.FireMode.SemiAuto: //altshoot
+            {
+                if(ARgrenadeData.cdTimer > ARgrenadeData.cdTime - 0.1f)
+                {
+                    FireInputActionItem item = new FireInputActionItem((FireInputActionItem.fireActionItem)_fireInput);
+                    FireIAIQ.Enqueue(item); 
+                }
+            }
+            break;
+        }
+        //base.EnqueueShootInput(_fireMode, _fireInput);
     }
     protected override void ReloadInput()
     {

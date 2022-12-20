@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cdTime: 3
   count_Method: 1
-  cdTimer: 3.0199978
+  cdTimer: 3
   canUseAbility: 1
   isUsing: 0

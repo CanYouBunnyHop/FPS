@@ -19,7 +19,17 @@ public class cooldownData : ScriptableObject
         CountDown,
         CountUp
     }
-
+    public void AwakeTimer()
+    {
+        if(count_Method == countMethod.CountDown)
+        {
+            cdTimer = 0;
+        }
+        if(count_Method == countMethod.CountUp)
+        {
+            cdTimer = cdTime;
+        }
+    }
     public void CoolingDown()
     {
         switch(count_Method)

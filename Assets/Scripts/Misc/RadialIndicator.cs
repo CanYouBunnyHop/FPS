@@ -19,6 +19,7 @@ public class RadialIndicator : MonoBehaviour
     private void Awake()
     {
         bgDefaultColor = bg.color;
+        cddata.AwakeTimer();
     }
     private void Update()
     {
