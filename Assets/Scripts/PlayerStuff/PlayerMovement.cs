@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Debug")]
     public State currentState;
     public Vector3 playerVelocity;
-    [SerializeField] Vector3 playerZXVel;
+    public Vector3 playerZXVel;
     [SerializeField]private int stepSinceGrounded;
     [SerializeField]public int stepSinceJumped; //assign this to anything that will knock player up
     [SerializeField]public int stepSinceKockback;

@@ -273,7 +273,7 @@ public abstract class GunBehaviour : MonoBehaviour
     {
         shootTimes+=1;
         float percent = (float)shootTimes / gunData.magSize; //time 1 always equals the end
-        Debug.Log(shootTimes +" percent"+percent +" Mag:" +gunData.magSize);
+        //Debug.Log(shootTimes +" percent"+percent +" Mag:" +gunData.magSize);
         dX = gunData.recoilVer.Evaluate(percent) * gunData.recoilVerScale;
         dY = gunData.recoilHor.Evaluate(percent) * gunData.recoilHorScale;
 

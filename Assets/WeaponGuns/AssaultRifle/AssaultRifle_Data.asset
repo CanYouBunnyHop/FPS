@@ -20,7 +20,7 @@ MonoBehaviour:
   currentAmmo: 30
   reloadSpeed: 1
   isReloading: 0
-  canCancelReloadWithFire: 0
+  canCancelReloadWithFire: 1
   canCancelReloadWithAltFire: 0
   recoilHor:
     serializedVersion: 2
@@ -35,26 +35,35 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.1051015
     - serializedVersion: 3
-      time: 0.27812833
-      value: 0.002595365
-      inSlope: -1.1367264
-      outSlope: -1.1367264
+      time: 0.20107074
+      value: 0.0002187388
+      inSlope: 0.74347824
+      outSlope: 0.74347824
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.23885745
-      outWeight: 0.099136606
+      outWeight: 0.1435453
     - serializedVersion: 3
-      time: 0.5000628
-      value: 0.0009702365
-      inSlope: -3.8635762
-      outSlope: -3.8635762
+      time: 0.5978474
+      value: -0.0023989975
+      inSlope: 0.5873244
+      outSlope: 0.5873244
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.10842723
+      inWeight: 0.14299935
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.662218
+      value: -0.001669534
+      inSlope: -6.4509096
+      outSlope: -6.4509096
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.017094603
       outWeight: 0.08039467
     - serializedVersion: 3
-      time: 0.7455027
-      value: 0.008372521
+      time: 0.7899205
+      value: -0.0019332096
       inSlope: 1.9852048
       outSlope: 1.9852048
       tangentMode: 0
@@ -62,13 +71,31 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.1004672
     - serializedVersion: 3
-      time: 1.0068883
-      value: 0.00016248226
-      inSlope: -4.291311
-      outSlope: -4.291311
+      time: 0.89780265
+      value: -0.003610713
+      inSlope: -5.4044266
+      outSlope: -5.4044266
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.09117164
+      inWeight: 0.058939934
+      outWeight: 0.08046958
+    - serializedVersion: 3
+      time: 0.949272
+      value: 0.00081631873
+      inSlope: 15.280145
+      outSlope: 15.280145
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.024929166
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.0020734
+      value: -0.112525076
+      inSlope: -6.247753
+      outSlope: -6.247753
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.057105176
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -106,8 +133,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  recoilHorScale: 15
-  recoilVerScale: 15
+  recoilHorScale: 8
+  recoilVerScale: 6
   recoilSpeed: 10
   returnSpeed: 2
   returnDelay: 0.2

@@ -20,7 +20,8 @@ public class AltShootIndicator : MonoBehaviour
     }
     private void Update()
     {
-        float percent = (cddata.cdTimer) / (cddata.cdTime);// range =  0 - 1
+        float cdTimerFlipped = cddata.cdTime - cddata.cdTimer;//
+        float percent = (cdTimerFlipped) / (cddata.cdTime);// range =  0 - 1
         float moddedPercent =  percent * maxFill;          // range = 0 - maxfill
 
         radialBar.fillAmount = moddedPercent;
@@ -30,8 +31,6 @@ public class AltShootIndicator : MonoBehaviour
         
         Vector3 rot = new Vector3(0,0, z);
         radialBar.rectTransform.rotation = Quaternion.Euler(rot);
-
-        Debug.Log(z);
 
         if(moddedPercent < maxFill)
         radialBar.color = turnColor;

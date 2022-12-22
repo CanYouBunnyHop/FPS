@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Player.Movement;
 public class AssaultRifle : GunBehaviour
 {
     public GameObject Grenade;
@@ -9,6 +9,8 @@ public class AssaultRifle : GunBehaviour
     public float altFirePower;
     public float altUpFirePower;
     public cooldownData ARgrenadeData;
+    [Header("probably should be static")]
+    [SerializeField] private PlayerMovement pm;
 
     //Changing firemode for this gun will break script since things are hard coded, maybe need to rewrite more code? But will be difficult because each guns are unique
 
@@ -81,7 +83,7 @@ public class AssaultRifle : GunBehaviour
 
             case GunData.FireMode.SemiAuto: //altshoot
             {
-                if(ARgrenadeData.cdTimer > ARgrenadeData.cdTime - 0.1f)
+                if(ARgrenadeData.cdTimer < 0.3f)
                 {
                     FireInputActionItem item = new FireInputActionItem((FireInputActionItem.fireActionItem)_fireInput);
                     FireIAIQ.Enqueue(item); 
@@ -123,16 +125,31 @@ public class AssaultRifle : GunBehaviour
     protected override void AltShoot()
     {
         GameObject nade = Instantiate<GameObject>(Grenade , cam.transform.position, cam.transform.rotation);
+        MeshRenderer renderer = nade.GetComponent<MeshRenderer>();
         Rigidbody nadeRB = nade.AddComponent<Rigidbody>();
         nadeRB.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        renderer.enabled = false;
 
-        Vector3 force = new Vector3(-altUpFirePower, 0, altFirePower);
-        nadeRB.AddRelativeForce(force);
+        Invoke(nameof(EnableMesh), 0.1f);
+
+        float forceMultiplier = Mathf.Clamp(Vector3.Dot(pm.playerZXVel, cam.transform.forward), 0, 1); //make sure no negative force is added
+
+        Vector3 force = new Vector3(0, altUpFirePower, altFirePower + Mathf.Abs(pm.playerZXVel.magnitude) * forceMultiplier); //need to account for shot direction
+
+        
+        
+        nadeRB.AddRelativeForce(force, ForceMode.Impulse);
 
         //recoil
         recoilManager.targetRot += new Vector3(-altVerRecoil, 0);
 
+        
 
+        IEnumerator EnableMesh()
+        {
+
+            return null;
+        }
     }
     #endregion
 
