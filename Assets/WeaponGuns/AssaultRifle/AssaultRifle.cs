@@ -8,11 +8,15 @@ public class AssaultRifle : GunBehaviour
     public float altVerRecoil;
     public float altFirePower;
     public float altUpFirePower;
+
+    [Tooltip("the forward distance the nade will shoot out of")] public float offsetFirePos;
     public cooldownData ARgrenadeData;
     [Header("probably should be static")]
     [SerializeField] private PlayerMovement pm;
+    [SerializeField] private LayerMask nadeHitSurface;
 
-    //Changing firemode for this gun will break script since things are hard coded, maybe need to rewrite more code? But will be difficult because each guns are unique
+    //Changing firemode for this gun will break script since things are hard coded, maybe need to rewrite more code?
+    //But will be difficult because each guns are unique
 
     public override void BehaviorFixedUpdate()
     {
@@ -124,32 +128,33 @@ public class AssaultRifle : GunBehaviour
     }
     protected override void AltShoot()
     {
-        GameObject nade = Instantiate<GameObject>(Grenade , cam.transform.position, cam.transform.rotation);
-        MeshRenderer renderer = nade.GetComponent<MeshRenderer>();
-        Rigidbody nadeRB = nade.AddComponent<Rigidbody>();
-        nadeRB.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-        renderer.enabled = false;
+        //calc fire pos
+        //if there are objects that will interact with the nade obstructing fire pos, change fire pos
+        float realOffset = offsetFirePos;
 
-        Invoke(nameof(EnableMesh), 0.1f);
+        if(Physics.SphereCast(cam.transform.position, 0.3f ,cam.transform.forward, out RaycastHit hit, offsetFirePos))
+        {
+            if(hit.collider.gameObject.layer == nadeHitSurface)
+            {
+                realOffset = hit.distance - 0.1f; //if hit something set new pos
+            }
+        }
+        //spawn nade
+        GameObject nade = Instantiate<GameObject>(Grenade , cam.transform.position + realOffset * cam.transform.forward, cam.transform.rotation);
 
+        //debug error
+        if(!nade.TryGetComponent<Rigidbody>(out Rigidbody nadeRB))
+        {
+            Debug.Log("Nade don't have rigidbody");
+        }
+
+        //force
         float forceMultiplier = Mathf.Clamp(Vector3.Dot(pm.playerZXVel, cam.transform.forward), 0, 1); //make sure no negative force is added
-
         Vector3 force = new Vector3(0, altUpFirePower, altFirePower + Mathf.Abs(pm.playerZXVel.magnitude) * forceMultiplier); //need to account for shot direction
-
-        
-        
         nadeRB.AddRelativeForce(force, ForceMode.Impulse);
 
         //recoil
         recoilManager.targetRot += new Vector3(-altVerRecoil, 0);
-
-        
-
-        IEnumerator EnableMesh()
-        {
-
-            return null;
-        }
     }
     #endregion
 

@@ -191,6 +191,7 @@ MonoBehaviour:
   horOffSetScale: 3
   verOffSetScale: 1
   fireBuffer: 0.2
+  enableAltShootIndicator: 1
   defaultFireMode: 1
   altFireMode: 0
   allowDoubleFire: 1

@@ -114,10 +114,6 @@ public abstract class GunBehaviour : MonoBehaviour
 
             shootTimes = 0;
         }
-        void LocalTest()
-        {
-            Debug.Log("local works");
-        }
     }
     
     public void BehaviorInputUpdate()

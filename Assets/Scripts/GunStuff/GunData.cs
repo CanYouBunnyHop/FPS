@@ -42,11 +42,12 @@ public class GunData : ScriptableObject
     public float horOffSetScale;
     public float verOffSetScale;
 
-
     //public AnimationCurve recoilZ;
 
-    [Header("Buffer")]
+    [Header("Buffer and Ui")]
     public float fireBuffer = 0.2f;
+    public bool enableAltShootIndicator = false;
+
     [Header("Select fire")]
     public FireMode defaultFireMode;
     public FireMode altFireMode;

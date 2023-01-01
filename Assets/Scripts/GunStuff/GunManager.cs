@@ -20,17 +20,9 @@ public class GunManager : MonoBehaviour
     public GunBehaviour currentBehavior;
     [SerializeField]
     
-    //add delay before you can automatically reload, avoid instant startreload right after shooting
-    private float delayAutoReload;
-    private Coroutine reload;
-    // //extra for determining if can shoot
-    // private bool canShoot;
-    // private float timeSinceLastShot;
-    // private float timeBetweenShots;
-    //bool for queueing inputs for shooting
-    
     //Ui
     public Text ammoDisplay;
+    public Image altShootIndicator;
    
     [SerializeField]
     private int currentAmmo;
@@ -64,14 +56,12 @@ public class GunManager : MonoBehaviour
         //Switch Gun input
         currentBehavior = SwitchGun();
 
-        //define current gun data
-        //currentBehavior.gunData = currentBehavior.gunData;
-
         //define current ammo
         currentAmmo = currentBehavior.gunData.currentAmmo;
 
         //UI
         ammoDisplay.text = currentAmmo.ToString() + "/" + currentBehavior.gunData.magSize.ToString();
+        altShootIndicator.enabled = currentBehavior.gunData.enableAltShootIndicator;
 
         //Gun inputs
         currentBehavior.BehaviorInputUpdate();
@@ -138,16 +128,5 @@ public class GunManager : MonoBehaviour
         {
             return currentBehavior;
         }
-        
     }
-   
-   //For later use 
-   private IEnumerator ReloadOne()
-   {
-     WaitForSecondsRealtime wait = new WaitForSecondsRealtime(currentBehavior.gunData.reloadSpeed);
-     for(currentBehavior.gunData.currentAmmo = 0; currentBehavior.gunData.currentAmmo <= 0; currentAmmo++)
-     {
-        yield return wait;
-     }
-   }
 }
