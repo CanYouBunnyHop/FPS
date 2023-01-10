@@ -14,6 +14,18 @@ public class GunData : ScriptableObject
     [Header("Ammo")]
     public int magSize;
     public int currentAmmo;
+    
+
+    [Header("altshoot indicator")]
+    //public bool enableAltShootIndicator = false;
+    public AmmoOrCd indicatorType;
+    public enum AmmoOrCd
+    {
+        NotUsed,
+        Ammo,
+        Cd,
+        Other
+    } 
 
     [Header("Reload")]
     public float reloadSpeed;
@@ -21,10 +33,8 @@ public class GunData : ScriptableObject
     public bool canCancelReloadWithFire;
     public bool canCancelReloadWithAltFire;
     
-    ///<summary> Y rotation </summary>
     [Header("Recoil")]
     public AnimationCurve recoilHor;
-    ///<summary> X rotation </summary>
     public AnimationCurve recoilVer;
     public float recoilHorScale = 1;
     public float recoilVerScale = 1;
@@ -44,9 +54,10 @@ public class GunData : ScriptableObject
 
     //public AnimationCurve recoilZ;
 
-    [Header("Buffer and Ui")]
+    [Header("Buffer")]
     public float fireBuffer = 0.2f;
-    public bool enableAltShootIndicator = false;
+
+    
 
     [Header("Select fire")]
     public FireMode defaultFireMode;

@@ -22,7 +22,7 @@ public class GunManager : MonoBehaviour
     
     //Ui
     public Text ammoDisplay;
-    public SpriteRenderer altShootIndicator;
+    public AltShootIndicator aSI;
    
     [SerializeField]
     private int currentAmmo;
@@ -61,7 +61,7 @@ public class GunManager : MonoBehaviour
 
         //UI
         ammoDisplay.text = currentAmmo.ToString() + "/" + currentBehavior.gunData.magSize.ToString();
-        //altShootIndicator.enabled = currentBehavior.gunData.enableAltShootIndicator;
+        aSI.enabled = currentBehavior.gunData.indicatorType != GunData.AmmoOrCd.NotUsed? true : false;
 
         //Gun inputs
         currentBehavior.BehaviorInputUpdate();

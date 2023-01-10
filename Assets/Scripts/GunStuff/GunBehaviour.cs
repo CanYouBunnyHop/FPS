@@ -250,7 +250,6 @@ public abstract class GunBehaviour : MonoBehaviour
     /// </summary>
     protected virtual void Shoot()
     {
-        
        DefaultRecoilBehavior();
 
        Anim_Shoot();
