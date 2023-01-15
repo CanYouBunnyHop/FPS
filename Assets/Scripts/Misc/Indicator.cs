@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
-
-public class RadialIndicator : MonoBehaviour
+public class Indicator : MonoBehaviour
 {
+    //this is for ability cooldowns
     [SerializeField]private Image overlay;
     [SerializeField]private Image bg;
     [SerializeField]private TMP_Text text;

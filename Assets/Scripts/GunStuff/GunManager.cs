@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
-
 public class GunManager : MonoBehaviour
 {
     //-------------------------------------------------------------------------------------
@@ -14,18 +13,14 @@ public class GunManager : MonoBehaviour
     //  
     //  currentBehavior.GunData > GunBehavior > Unique Guns
     //-------------------------------------------------------------------------------------
-    [SerializeField]
-    private GunBehaviour[] gunBehaviors;
-    [SerializeField]
-    public GunBehaviour currentBehavior;
-    [SerializeField]
-    
+    [SerializeField] private GunBehaviour[] gunBehaviors;
+    [SerializeField] public GunBehaviour currentBehavior;
+    [SerializeField] private Dictionary<KeyCode, int> keyCodeDic;
     //Ui
     public Text ammoDisplay;
-    public AltShootIndicator aSI;
-   
-    [SerializeField]
-    private int currentAmmo;
+    public Image aSI;
+    [SerializeField] private IndicatorManager iM;
+    [SerializeField] private int currentAmmo;
     void Awake()
     {
         currentBehavior = gunBehaviors[0];
@@ -44,6 +39,14 @@ public class GunManager : MonoBehaviour
                 gunBehaviors[x].gunModel.SetActive(true);
             }
         }
+
+        keyCodeDic = new Dictionary<KeyCode,int>()
+        {
+            [KeyCode.Alpha1] = 0,
+            [KeyCode.Alpha2] = 1,
+            [KeyCode.Alpha3] = 2,
+            [KeyCode.Alpha4] = 3,
+        };
     }
     private void FixedUpdate()
     {
@@ -54,7 +57,8 @@ public class GunManager : MonoBehaviour
     void Update()
     {
         //Switch Gun input
-        currentBehavior = SwitchGun();
+        SwitchGun(out GunBehaviour _gunToSwitch);
+        currentBehavior = _gunToSwitch;
 
         //define current ammo
         currentAmmo = currentBehavior.gunData.currentAmmo;
@@ -69,64 +73,29 @@ public class GunManager : MonoBehaviour
    
     
     
-    private GunBehaviour SwitchGun()
+    private void SwitchGun(out GunBehaviour _gunToSwitch)
     {
-        if(Input.GetKeyDown(KeyCode.Alpha1) && currentBehavior!=gunBehaviors[0])
+        _gunToSwitch = currentBehavior;
+        foreach(KeyValuePair<KeyCode, int> key in keyCodeDic)//loop through dictionary to match inputs
         {
-            try
+            if(Input.GetKeyDown(key.Key) && currentBehavior != gunBehaviors[key.Value]) 
             {
-                GunBehaviour gunToSwitch = gunBehaviors[0];
-                //currentBehavior.Anim_Holster
-                currentBehavior.gunModel.SetActive(false);
-                gunToSwitch.gunModel.SetActive(true);
-                //gunToSwitch.Anim_Unholster
-                return gunBehaviors[0];
-               
-                //currentBehavior.Anim_Unholster
+                try //switch weapon
+                {
+                    GunBehaviour gunToSwitch = gunBehaviors[key.Value];
+                    //currentBehavior.Anim_Holster
+                    currentBehavior.gunModel.SetActive(false);
+                    gunToSwitch.gunModel.SetActive(true);
+                    //gunToSwitch.Anim_Unholster
+                    _gunToSwitch = gunToSwitch;
+                    //currentBehavior.Anim_Unholster
+                }
+                catch(IndexOutOfRangeException)
+                {
+                    Debug.Log("You don't have that many weapons");
+                    _gunToSwitch = currentBehavior;
+                }
             }
-            catch(IndexOutOfRangeException)
-            {
-                Debug.Log("You don't have that many weapons");
-                return currentBehavior;
-            }
-        }
-        if(Input.GetKeyDown(KeyCode.Alpha2) && currentBehavior!=gunBehaviors[1])
-        {
-            try
-            {
-                GunBehaviour gunToSwitch = gunBehaviors[1];
-                //currentBehavior.Anim_Holster
-                currentBehavior.gunModel.SetActive(false);
-                gunToSwitch.gunModel.SetActive(true);
-                //gunToSwitch.Anim_Unholster
-                return gunBehaviors[1];
-            }
-            catch(IndexOutOfRangeException)
-            {
-                Debug.Log("You don't have that many weapons");
-                return currentBehavior;
-            }
-        }
-        if(Input.GetKeyDown(KeyCode.Alpha3) && currentBehavior!=gunBehaviors[2])
-        {
-            try
-            {
-                GunBehaviour gunToSwitch = gunBehaviors[2];
-                //currentBehavior.Anim_Holster
-                currentBehavior.gunModel.SetActive(false);
-                gunToSwitch.gunModel.SetActive(true);
-                //gunToSwitch.Anim_Unholster
-                return gunBehaviors[2];
-            }
-            catch(IndexOutOfRangeException)
-            {
-                Debug.Log("You don't have that many weapons");
-                return currentBehavior;
-            }
-        }
-        else
-        {
-            return currentBehavior;
         }
     }
 }

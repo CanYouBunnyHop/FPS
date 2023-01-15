@@ -7,16 +7,15 @@ public class IndicatorData : ScriptableObject
 {
     [Header("Init Material")]
     public Color defaultColor;
-    [Range(0,1)] public float radius , lineWidth, segmentSpacing;
+    public Color turnColor;
+    [Range(0,1)] public float radius , lineWidth, segmentSpacing, fill;
     public uint segmentCount;
     public uint removedSegment;
+    public int segmentRotation;
+    [Header("Used if cd type")]
+    public cooldownData cddata;
 
-    // [Header("CountType")]
-    // public CountType countType;
-    // public enum CountType
-    // {
-    //     ammo,
-    //     Cd,
-        
-    // }
+    // [Header("used in runtime")]
+    // public Color curColor;
+
 }

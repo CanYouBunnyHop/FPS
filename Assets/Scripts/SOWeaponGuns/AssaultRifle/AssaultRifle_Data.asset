@@ -18,6 +18,8 @@ MonoBehaviour:
   range: 50
   magSize: 30
   currentAmmo: 30
+  indicatorType: 2
+  indicatorData: {fileID: 11400000, guid: f3d68dda6274ace46bc49e2aad672d00, type: 2}
   reloadSpeed: 1
   isReloading: 0
   canCancelReloadWithFire: 1
@@ -191,7 +193,6 @@ MonoBehaviour:
   horOffSetScale: 3
   verOffSetScale: 1
   fireBuffer: 0.2
-  enableAltShootIndicator: 1
   defaultFireMode: 1
   altFireMode: 0
   allowDoubleFire: 1
