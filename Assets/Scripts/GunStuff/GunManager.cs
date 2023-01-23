@@ -13,13 +13,12 @@ public class GunManager : MonoBehaviour
     //  
     //  currentBehavior.GunData > GunBehavior > Unique Guns
     //-------------------------------------------------------------------------------------
-    [SerializeField] private GunBehaviour[] gunBehaviors;
+    [SerializeField] public GunBehaviour[] gunBehaviors;
     [SerializeField] public GunBehaviour currentBehavior;
     [SerializeField] private Dictionary<KeyCode, int> keyCodeDic;
     //Ui
     public Text ammoDisplay;
-    public Image aSI;
-    [SerializeField] private IndicatorManager iM;
+    public IndicatorManager indicatorManager;
     [SerializeField] private int currentAmmo;
     void Awake()
     {
@@ -60,13 +59,14 @@ public class GunManager : MonoBehaviour
         SwitchGun(out GunBehaviour _gunToSwitch);
         currentBehavior = _gunToSwitch;
 
+
+
         //define current ammo
         currentAmmo = currentBehavior.gunData.currentAmmo;
 
         //UI
         ammoDisplay.text = currentAmmo.ToString() + "/" + currentBehavior.gunData.magSize.ToString();
-        aSI.enabled = currentBehavior.gunData.indicatorType != GunData.AmmoOrCd.NotUsed? true : false;
-
+        indicatorManager.InitMat(_gunToSwitch);
         //Gun inputs
         currentBehavior.BehaviorInputUpdate();
     }

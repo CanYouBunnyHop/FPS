@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5841a640d877d7446b53237f4a52bcd1, type: 3}
-  m_Name: testing
+  m_Name: ARIndicatorData
   m_EditorClassIdentifier: 
   defaultColor: {r: 1, g: 1, b: 1, a: 0}
   turnColor: {r: 1, g: 0, b: 0, a: 0}
-  radius: 0.415
-  lineWidth: 0.13
-  segmentSpacing: 0.035
-  fill: 1
-  segmentCount: 2
-  removedSegment: 0
-  segmentRotation: 0
-  cddata: {fileID: 0}
+  radius: 0.05
+  lineWidth: 0.002
+  segmentSpacing: 0.001
+  fill: 0
+  segmentCount: 4
+  removedSegment: 3
+  segmentRotation: -45
+  cddata: {fileID: 11400000, guid: e33dd69af6c7d91428ce3e14cfe0bf3b, type: 2}

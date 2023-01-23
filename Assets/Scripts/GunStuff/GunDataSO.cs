@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Guns", menuName = "Weapons/GunData")]
-public class GunData : ScriptableObject
+public class GunDataSO : ScriptableObject
 {
     public string gunName;
     [Header("Stats")]
@@ -26,7 +26,7 @@ public class GunData : ScriptableObject
         Cd,
         Other
     } 
-    public IndicatorData indicatorData;
+    public IndicatorDataSO indicatorData;
 
     [Header("Reload")]
     public float reloadSpeed;

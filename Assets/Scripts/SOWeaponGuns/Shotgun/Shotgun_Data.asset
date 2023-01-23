@@ -18,8 +18,8 @@ MonoBehaviour:
   range: 30
   magSize: 2
   currentAmmo: 2
-  indicatorType: 1
-  indicatorData: {fileID: 11400000, guid: 7fe222ed6320eee41a552c9f82c6c979, type: 2}
+  indicatorType: 0
+  indicatorData: {fileID: 0}
   reloadSpeed: 1
   isReloading: 0
   canCancelReloadWithFire: 1

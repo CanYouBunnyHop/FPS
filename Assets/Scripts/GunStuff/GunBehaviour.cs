@@ -6,7 +6,7 @@ using DG.Tweening;
 public abstract class GunBehaviour : MonoBehaviour
 {
     [Header("References")]
-    public GunData gunData;
+    public GunDataSO gunData;
     public Animator anim;
     public GameObject gunModel; //for switching weapon
 
@@ -37,7 +37,7 @@ public abstract class GunBehaviour : MonoBehaviour
     /// <summary>
     /// Firemode is Tkey, bool = single fire, !bool = auto fire
     /// </summary>
-    protected static Dictionary<GunData.FireMode,bool> FireModeDatas;
+    protected static Dictionary<GunDataSO.FireMode,bool> FireModeDatas;
 
 
     protected void Awake()
@@ -48,13 +48,13 @@ public abstract class GunBehaviour : MonoBehaviour
         
         FireIAIQ = new Queue<FireInputActionItem>();
 
-        FireModeDatas = new Dictionary<GunData.FireMode, bool>() //initialise static dictionary //bool true is semi auto
+        FireModeDatas = new Dictionary<GunDataSO.FireMode, bool>() //initialise static dictionary //bool true is semi auto
         {
-            [GunData.FireMode.SemiAuto] = true,
-            [GunData.FireMode.BurstFire] = true,
+            [GunDataSO.FireMode.SemiAuto] = true,
+            [GunDataSO.FireMode.BurstFire] = true,
 
-            [GunData.FireMode.FullAuto] = false,
-            [GunData.FireMode.Charge] = false,
+            [GunDataSO.FireMode.FullAuto] = false,
+            [GunDataSO.FireMode.Charge] = false,
         };
 
         timeBetweenShots = 1 / (gunData.fireRate / 60); //fire rate is in rpm, rounds per minute
@@ -161,11 +161,11 @@ public abstract class GunBehaviour : MonoBehaviour
     /// <summary>
     /// _selectFire is Firemode uses to fire. _fireInput = 0 is normal fire, 1 is alt fire.
     /// </summary>
-    protected virtual void EnqueueShootInput(GunData.FireMode _selectFire, int? _fireInput)
+    protected virtual void EnqueueShootInput(GunDataSO.FireMode _selectFire, int? _fireInput)
     {
         switch(_selectFire)
         {
-            case GunData.FireMode.SemiAuto:
+            case GunDataSO.FireMode.SemiAuto:
             {
                 //semi auto fire
                 if( gunData.currentAmmo > 0 && timeSinceLastShot > timeBetweenShots - gunData.fireBuffer)//only queue the item if this condition is met
@@ -179,7 +179,7 @@ public abstract class GunBehaviour : MonoBehaviour
             }
             break;
 
-            case GunData.FireMode.FullAuto:
+            case GunDataSO.FireMode.FullAuto:
             {
                 if( gunData.currentAmmo > 0 && timeSinceLastShot > timeBetweenShots)
                 {
@@ -191,10 +191,10 @@ public abstract class GunBehaviour : MonoBehaviour
             }
             break;
 
-            case GunData.FireMode.BurstFire:
+            case GunDataSO.FireMode.BurstFire:
             break;
 
-            case GunData.FireMode.Charge:
+            case GunDataSO.FireMode.Charge:
             break;
         }
         

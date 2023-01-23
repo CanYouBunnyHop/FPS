@@ -13,7 +13,7 @@ public class Indicator : MonoBehaviour
     public Color bgFlashColor;
     [SerializeField]private int flashCount = 0;
     
-    [SerializeField]private cooldownData cddata;
+    [SerializeField]private cooldownDataSO cddata;
 
     private void Awake()
     {

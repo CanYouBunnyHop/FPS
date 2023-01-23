@@ -33,7 +33,7 @@ namespace Player.Movement
         public float fovBreak;
         private PlayerMovement pm;
         private Transform cam;
-        [SerializeField]private cooldownData cdd;
+        [SerializeField]private cooldownDataSO cdd;
         //---------------------------------------------------------------------------------------------
         //Render
         private Vector3 lerpPos;

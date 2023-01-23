@@ -10,7 +10,7 @@ public class AssaultRifle : GunBehaviour
     public float altUpFirePower;
 
     [Tooltip("the forward distance the nade will shoot out of")] public float offsetFirePos;
-    public cooldownData ARgrenadeData;
+    public cooldownDataSO ARgrenadeData;
     [Header("probably should be static")]
     [SerializeField] private PlayerMovement pm;
     [SerializeField] private LayerMask nadeHitSurface;
@@ -69,11 +69,11 @@ public class AssaultRifle : GunBehaviour
     }
 
     #region Input
-    protected override void EnqueueShootInput(GunData.FireMode _fireMode, int? _fireInput)
+    protected override void EnqueueShootInput(GunDataSO.FireMode _fireMode, int? _fireInput)
     {
          switch(_fireMode)
         {
-            case GunData.FireMode.FullAuto: //shoot
+            case GunDataSO.FireMode.FullAuto: //shoot
             {
                 if( gunData.currentAmmo > 0 && timeSinceLastShot > timeBetweenShots)
                 {
@@ -85,7 +85,7 @@ public class AssaultRifle : GunBehaviour
             }
             break;
 
-            case GunData.FireMode.SemiAuto: //altshoot
+            case GunDataSO.FireMode.SemiAuto: //altshoot
             {
                 if(ARgrenadeData.cdTimer < 0.3f)
                 {

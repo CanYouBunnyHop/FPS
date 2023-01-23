@@ -5,7 +5,7 @@ using UnityEngine;
 public class HandCannon : GunBehaviour
 {
    #region Input
-  protected override void EnqueueShootInput(GunData.FireMode _fireMode, int? _fireInput)
+  protected override void EnqueueShootInput(GunDataSO.FireMode _fireMode, int? _fireInput)
   {
       base.EnqueueShootInput(_fireMode, _fireInput);
   }
