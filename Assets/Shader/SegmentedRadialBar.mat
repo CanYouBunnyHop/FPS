@@ -94,7 +94,7 @@ Material:
     - _DrawOrder: 0
     - _DstBlend: 0
     - _EnvironmentReflections: 1
-    - _Fill: 1.006666
+    - _Fill: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
