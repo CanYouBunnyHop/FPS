@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Player.Movement;
+using FPS.Player.Movement;
 public class AssaultRifle : GunBehaviour
 {
     public GameObject Grenade;
@@ -45,11 +45,11 @@ public class AssaultRifle : GunBehaviour
                     
                 }
                 break;
-                case FireInputActionItem.fireActionItem.AltFireAction:
+                case FireInputActionItem.fireActionItem.SpecialFireAction:
                 {
                     if(ARgrenadeData.canUseAbility)
                     {
-                        AltShoot();
+                        SpecialShoot();
                         FireIAIQ.Dequeue();
                         ARgrenadeData.canUseAbility = false;
                         ARgrenadeData.InitiateCoolDown();
@@ -85,7 +85,7 @@ public class AssaultRifle : GunBehaviour
             }
             break;
 
-            case GunDataSO.FireMode.SemiAuto: //altshoot
+            case GunDataSO.FireMode.SemiAuto: //special Shoot
             {
                 if(ARgrenadeData.cdTimer < 0.3f)
                 {
@@ -110,7 +110,7 @@ public class AssaultRifle : GunBehaviour
         gunData.currentAmmo --;
         base.Shoot();
 
-        if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
+        if(Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
         {
             BulletHoleFx(hit);
             if(hit.distance <= gunData.range)
@@ -126,7 +126,7 @@ public class AssaultRifle : GunBehaviour
             }
         }
     }
-    protected override void AltShoot()
+    protected override void SpecialShoot()
     {
         //calc fire pos
         //if there are objects that will interact with the nade obstructing fire pos, change fire pos

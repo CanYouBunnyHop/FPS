@@ -39,7 +39,7 @@ public class HandCannon : GunBehaviour
         }
       }
     }
-    protected override void AltShoot()
+    protected override void SpecialShoot()
     {
       
     }
@@ -62,7 +62,7 @@ public class HandCannon : GunBehaviour
     {
 
     }
-    public override void Anim_AltShoot()
+    public override void Anim_SpecialShoot()
     {
 
     }

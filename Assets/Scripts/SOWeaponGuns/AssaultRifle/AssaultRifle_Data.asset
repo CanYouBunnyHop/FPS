@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: AssaultRifle_Data
   m_EditorClassIdentifier: 
   gunName: AR
+  backWards: 1
   damage: 10
   fireRate: 400
   range: 50
   magSize: 30
-  currentAmmo: 30
+  currentAmmo: 21
   indicatorType: 2
   indicatorData: {fileID: 11400000, guid: f3d68dda6274ace46bc49e2aad672d00, type: 2}
   reloadSpeed: 1
@@ -142,6 +143,10 @@ MonoBehaviour:
   returnDelay: 0.2
   enableRandomness: 0
   horizontalRandomness: 6
+  ADS_recoilHorScale: 4
+  ADS_recoilVerScale: 3
+  ADS_fov: 75
+  ADS_speed: 30
   recoilHorOffset:
     serializedVersion: 2
     m_Curve:
@@ -194,5 +199,4 @@ MonoBehaviour:
   verOffSetScale: 1
   fireBuffer: 0.2
   defaultFireMode: 1
-  altFireMode: 0
-  allowDoubleFire: 1
+  specialFireMode: 0

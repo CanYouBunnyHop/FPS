@@ -313,7 +313,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 86308864}
   m_LocalRotation: {x: -0, y: -0, z: 1.6590268e-16, w: 1}
-  m_LocalPosition: {x: -7.275958e-12, y: 0.59, z: 0}
+  m_LocalPosition: {x: -7.275958e-12, y: 0.44, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1.0000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -429,7 +429,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28742
+  m_Name: pb_Mesh56666
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -687,7 +687,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
+  m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
@@ -700,7 +700,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -1088,7 +1088,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28582
+  m_Name: pb_Mesh56502
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1397,8 +1397,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 1
-  jumpForce: 5
-  groundSpeed: 12
+  jumpForce: 7
+  groundSpeed: 15
   groundAccelerate: 1
   friction: 8
   airSpeed: 8
@@ -1629,12 +1629,17 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: b705824f70da0bb4f8dcccd33a9cbf6e,
         type: 3}
       propertyPath: m_Name
-      value: Y Bot
+      value: Y Bot (not using)
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b705824f70da0bb4f8dcccd33a9cbf6e,
         type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b705824f70da0bb4f8dcccd33a9cbf6e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1087340843069023580, guid: b705824f70da0bb4f8dcccd33a9cbf6e,
         type: 3}
@@ -2536,8 +2541,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90f51dd61661a054680f48f3ef5f81f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smooth: 6
-  swayMultipier: 2
+  smooth: 8
+  swayMultipier: 3
 --- !u!4 &931698693 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 534748c93c556c84280616f4673d8856,
@@ -2695,7 +2700,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28708
+  m_Name: pb_Mesh56632
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3115,6 +3120,66 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: -1444460858095362738, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: -1580535799172915004, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: -1391134871863005975, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: -4973734387028869240, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[4]
+      value: 
+      objectReference: {fileID: -6477940958727351939, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[5]
+      value: 
+      objectReference: {fileID: 2100000, guid: d80da3e7bec6e8d4f807fc0f57188c62, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[6]
+      value: 
+      objectReference: {fileID: 2100000, guid: d80da3e7bec6e8d4f807fc0f57188c62, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[7]
+      value: 
+      objectReference: {fileID: 2100000, guid: d80da3e7bec6e8d4f807fc0f57188c62, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 18e3de437151ac1478c93de27939d68e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[8]
+      value: 
+      objectReference: {fileID: 2100000, guid: d80da3e7bec6e8d4f807fc0f57188c62, type: 2}
     - target: {fileID: 919132149155446097, guid: 18e3de437151ac1478c93de27939d68e,
         type: 3}
       propertyPath: m_Name
@@ -3128,7 +3193,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 18e3de437151ac1478c93de27939d68e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 18e3de437151ac1478c93de27939d68e, type: 3}
@@ -3440,7 +3505,7 @@ GameObject:
   - component: {fileID: 1162689226}
   - component: {fileID: 1162689227}
   m_Layer: 5
-  m_Name: UICamera
+  m_Name: UI_Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3486,7 +3551,7 @@ Camera:
   m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
+  m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
 --- !u!114 &1162689227
@@ -3545,7 +3610,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28504
+  m_Name: pb_Mesh56422
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3709,7 +3774,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28674
+  m_Name: pb_Mesh56598
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3879,7 +3944,7 @@ GameObject:
   - component: {fileID: 1267439923}
   - component: {fileID: 1267439921}
   m_Layer: 5
-  m_Name: GunsCamera
+  m_Name: Guns_Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3913,7 +3978,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
+  m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 1
@@ -3929,7 +3994,7 @@ MonoBehaviour:
   m_AntialiasingQuality: 2
   m_StopNaN: 0
   m_Dithering: 0
-  m_ClearDepth: 1
+  m_ClearDepth: 0
   m_AllowXRRendering: 1
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
@@ -3957,11 +4022,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 1
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -3974,7 +4039,7 @@ Camera:
   m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
+  m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
 --- !u!1 &1296108420
@@ -4183,7 +4248,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 25a9fb42d361f46ad89221f6d301e96e, type: 2}
+  - {fileID: 2100000, guid: 78694a7dcead2a7469d2234ed26b45a5, type: 2}
+  - {fileID: 2100000, guid: d80da3e7bec6e8d4f807fc0f57188c62, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4639,7 +4705,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1460019304}
   m_LocalRotation: {x: -0.057191968, y: -0.07609951, z: 0.004337592, w: 0.99544924}
-  m_LocalPosition: {x: 0.196, y: -0.13199997, z: -0.253}
+  m_LocalPosition: {x: 0.209, y: -0.143, z: -0.342}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4696,8 +4762,10 @@ MonoBehaviour:
   recoilManager: {fileID: 330585548}
   bulletHoleFx: {fileID: 1807750906952569253, guid: 51e8235ba95001e4a86e771fefa44b9b,
     type: 3}
-  canShoot: 0
   shootTimes: 0
+  canShoot: 0
+  canSpecialShoot: 0
+  aimDir: {x: 0, y: 0, z: 0}
 --- !u!114 &1460019308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4725,8 +4793,10 @@ MonoBehaviour:
   recoilManager: {fileID: 330585548}
   bulletHoleFx: {fileID: 1807750906952569253, guid: 51e8235ba95001e4a86e771fefa44b9b,
     type: 3}
-  canShoot: 0
   shootTimes: 0
+  canShoot: 0
+  canSpecialShoot: 0
+  aimDir: {x: 0, y: 0, z: 0}
   selfKnockBack: 3
   enemyKnockBack: 1.8
   enemyKnockUp: 1
@@ -4737,7 +4807,6 @@ MonoBehaviour:
   resetVelMinDotProduct: 0.4
   startKnockBack: 0
   hook: {fileID: 645168645}
-  dir: {x: 0, y: 0, z: 0}
 --- !u!114 &1460019309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4765,8 +4834,10 @@ MonoBehaviour:
   recoilManager: {fileID: 330585548}
   bulletHoleFx: {fileID: 1807750906952569253, guid: 51e8235ba95001e4a86e771fefa44b9b,
     type: 3}
-  canShoot: 0
   shootTimes: 0
+  canShoot: 0
+  canSpecialShoot: 0
+  aimDir: {x: 0, y: 0, z: 0}
   Grenade: {fileID: 231405877796452273, guid: d531eeef80e383849adb5e6973d19f79, type: 3}
   altVerRecoil: 4
   altFirePower: 10
@@ -4783,7 +4854,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28632
+  m_Name: pb_Mesh56552
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -4947,7 +5018,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28766
+  m_Name: pb_Mesh56690
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -8766,7 +8837,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 534748c93c556c84280616f4673d8856,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 534748c93c556c84280616f4673d8856, type: 3}
@@ -8875,7 +8946,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28690
+  m_Name: pb_Mesh56614
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

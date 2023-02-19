@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Player.Movement;
+using FPS.Player.Movement;
 using Enemy.Movement;
 
 public class Shotgun : GunBehaviour
@@ -17,7 +17,6 @@ public class Shotgun : GunBehaviour
     [SerializeField] float resetVelMinDotProduct;
     [SerializeField] bool startKnockBack;
     [SerializeField] GrapplingHook hook;
-    [SerializeField] Vector3 dir;
 
     #region Input
     protected override void EnqueueShootInput(GunDataSO.FireMode _fireMode, int? _fireInput)
@@ -33,9 +32,6 @@ public class Shotgun : GunBehaviour
     #region  Shooting Behaviors
     protected override void Shoot()
     {
-        //remember dir
-        dir = cam.transform.forward;
-
         //clear list
         emlist.Clear();
 
@@ -44,32 +40,6 @@ public class Shotgun : GunBehaviour
         {
             hook.EndGrapple();
         }
-
-        //ammo
-        gunData.currentAmmo--;
-
-        //shooting raycast bullets
-        ShootingBehavior(); //because of similar behavior between shoot and altshoot, so condensed it
-
-        PlayerKnockBack();
-        StartCoroutine(EnemyKnockBack());
-
-        base.Shoot();
-    }
-    protected override void AltShoot()
-    {
-        //remember dir
-        dir = -cam.transform.forward;
-
-        //clear list
-        emlist.Clear();
-
-        if (pm.currentState == PlayerMovement.State.GrapSurface 
-        || pm.currentState == PlayerMovement.State.HookEnemy)
-        {
-            hook.EndGrapple();
-        }
-
         //ammo
         gunData.currentAmmo--;
 
@@ -79,15 +49,14 @@ public class Shotgun : GunBehaviour
         PlayerKnockBack();
         StartCoroutine(EnemyKnockBack());
 
-        base.AltShoot();
+        base.Shoot();
     }
-    
     private void ShootingBehavior()
     {
         for (int x = 0; x < pellets;)
         {
             //calc where to shoot linecast to
-            Vector3 hit = cam.transform.position + dir * gunData.range;
+            Vector3 hit = cam.transform.position + aimDir * gunData.range;
             float randomSpreadx = Random.Range(-spread, spread);
             float randomSpready = Random.Range(-spread, spread);
             float randomSpreadz = Random.Range(-spread, spread);
@@ -128,7 +97,7 @@ public class Shotgun : GunBehaviour
             // //fix interaction where player is on slope
             pm.stepSinceKockback = 0;
 
-            pm.playerVelocity -= dir * selfKnockBack;
+            pm.playerVelocity -= aimDir * selfKnockBack;
         }
     }
     private void StartKnockBackFalse()
@@ -138,7 +107,7 @@ public class Shotgun : GunBehaviour
     private bool CheckDirToResetVel()
     {
         Vector3 vec = new Vector3(pm.playerVelocity.x, 0, pm.playerVelocity.z);
-        if (Vector3.Dot(vec.normalized, dir) > resetVelMinDotProduct) //same or close direction 
+        if (Vector3.Dot(vec.normalized, aimDir) > resetVelMinDotProduct) //same or close direction 
         {
            // Debug.Log("Reseted vel");
             return true;
@@ -170,7 +139,7 @@ public class Shotgun : GunBehaviour
         {
             em.canResetVel = true;
             em.agentUpdatePos = false;
-            em.enemyVelocity += dir * enemyKnockBack;
+            em.enemyVelocity += aimDir * enemyKnockBack;
             em.enemyVelocity += Vector3.up * enemyKnockUp;
         }
         yield return null;
@@ -183,9 +152,9 @@ public class Shotgun : GunBehaviour
     {
         anim.Play("Shoot");
     }
-    public override void Anim_AltShoot()
+    public override void Anim_SpecialShoot()
     {
-        anim.Play("AltShoot");
+        //anim.Play("AltShoot");
     }
     public override void Anim_Reload()
     {

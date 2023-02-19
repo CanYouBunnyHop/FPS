@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Shotgun_Data
   m_EditorClassIdentifier: 
   gunName: CoachGun
+  backWards: 0
   damage: 25
   fireRate: 100
   range: 30
@@ -79,6 +80,10 @@ MonoBehaviour:
   returnDelay: 0.2
   enableRandomness: 0
   horizontalRandomness: 0
+  ADS_recoilHorScale: 1
+  ADS_recoilVerScale: 6
+  ADS_fov: 60
+  ADS_speed: 50
   recoilHorOffset:
     serializedVersion: 2
     m_Curve: []
@@ -95,5 +100,4 @@ MonoBehaviour:
   verOffSetScale: 0
   fireBuffer: 0.2
   defaultFireMode: 0
-  altFireMode: 0
-  allowDoubleFire: 0
+  specialFireMode: 0

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
+
+namespace FPS.Weapon
+{
 public class GunManager : MonoBehaviour
 {
     //-------------------------------------------------------------------------------------
@@ -20,6 +23,7 @@ public class GunManager : MonoBehaviour
     public Text ammoDisplay;
     public IndicatorManager indicatorManager;
     [SerializeField] private int currentAmmo;
+    
     void Awake()
     {
         currentBehavior = gunBehaviors[0];
@@ -53,13 +57,11 @@ public class GunManager : MonoBehaviour
     }
 
     // Input
-    void Update()
+    private void Update()
     {
         //Switch Gun input
         SwitchGun(out GunBehaviour _gunToSwitch);
         currentBehavior = _gunToSwitch;
-
-
 
         //define current ammo
         currentAmmo = currentBehavior.gunData.currentAmmo;
@@ -67,6 +69,7 @@ public class GunManager : MonoBehaviour
         //UI
         ammoDisplay.text = currentAmmo.ToString() + "/" + currentBehavior.gunData.magSize.ToString();
         indicatorManager.InitMat(_gunToSwitch);
+        
         //Gun inputs
         currentBehavior.BehaviorInputUpdate();
     }
@@ -86,6 +89,9 @@ public class GunManager : MonoBehaviour
                     //currentBehavior.Anim_Holster
                     currentBehavior.gunModel.SetActive(false);
                     gunToSwitch.gunModel.SetActive(true);
+
+                    gunToSwitch.gunData.backWards = false; //this bool always start false, aim forwards
+
                     //gunToSwitch.Anim_Unholster
                     _gunToSwitch = gunToSwitch;
                     //currentBehavior.Anim_Unholster
@@ -98,4 +104,4 @@ public class GunManager : MonoBehaviour
             }
         }
     }
-}
+}}

@@ -4,7 +4,7 @@ using UnityEngine;
 using Enemy.Movement;
 
 
-namespace Player.Movement
+namespace FPS.Player.Movement
 {
     [RequireComponent(typeof(PlayerMovement))]
     public class GrapplingHook : MonoBehaviour
@@ -67,11 +67,12 @@ namespace Player.Movement
                 
                 StartGrapple();
             }
-
+        }
+        private void LateUpdate()
+        {
             //visual
             if (showRope)
                 DrawRope();
-
         }
         private void FixedUpdate()
         {
@@ -96,10 +97,6 @@ namespace Player.Movement
 
         }
         //testing
-        private void OnDrawGizmos()
-        {
-            // Gizmos.DrawLine(cam.position, grapplePoint.transform.position);
-        }
         public void StartGrapple()
         {
             cdd.isUsing = true;
@@ -205,11 +202,11 @@ namespace Player.Movement
         }
 
     #region  exe grappleEnemy (not used)
-        public void ExecuteGrappleEnemy()
-        {
-            //pull player to object/
-            pm.playerVelocity += grappleDir * grappleSpeed * Time.deltaTime;
-        }
+        // public void ExecuteGrappleEnemy()
+        // {
+        //     //pull player to object/
+        //     pm.playerVelocity += grappleDir * grappleSpeed * Time.deltaTime;
+        // }
     #endregion
         public void ExecuteHookEnemy()
         {

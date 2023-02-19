@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-
+using FPS.Weapon;
 public class PlayerCamera : MonoBehaviour
 {
 
@@ -46,13 +46,13 @@ public class PlayerCamera : MonoBehaviour
         xRot-=mouse.y; 
         yRot+=mouse.x;
         mouseRot = new Vector3(xRot, yRot, 0); 
-        xRot = Mathf.Clamp(xRot, -90 -gm.currentBehavior.dX, 90 + gm.currentBehavior.dX); //clamp x rotation + recoil's position in mind
+        xRot = Mathf.Clamp(xRot, -90 -gm.currentBehavior.dX, 90 + gm.currentBehavior.dX); //clamp x rotation (vertical) + recoil's position in mind
 
         //some logic is done in gunBehavior
-        //if(gm.currentBehavior.timeSinceLastShot > gm.currentBehavior.timeBetweenShots)
         targetRot = Vector3.Slerp(targetRot, Vector3.zero, gm.currentBehavior.gunData.returnSpeed * Time.deltaTime); //return rotation
-
-        recoilRot = Vector3.Slerp(recoilRot, targetRot, gm.currentBehavior.gunData.recoilSpeed * Time.fixedDeltaTime);   //recoil rotation
+        
+        
+        recoilRot = Vector3.Slerp(recoilRot, targetRot, gm.currentBehavior.gunData.recoilSpeed * Time.fixedDeltaTime);  //recoil rotation
         
 
         transform.localRotation = Quaternion.Euler(recoilRot + mouseRot);

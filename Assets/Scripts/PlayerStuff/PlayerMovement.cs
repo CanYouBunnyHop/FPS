@@ -11,7 +11,7 @@ using System;
 //      sensitivity = 1 
 //      Snap = false    (this is so the input gets a gradual change, important if you want counter strafe
 //-------------------------------------------------------------------------------------------------------
-namespace Player.Movement
+namespace FPS.Player.Movement
 {
 public class PlayerMovement : MonoBehaviour
 {
@@ -28,11 +28,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce;
     private RaycastHit onSlope;
     private Vector3 slopeMoveDir;
-    //jump bool variables
-    
     bool called; //bool for wish jump
-    
-    //[SerializeField] bool lateFriction; // bool for 1 frame where friction dont apply after landing
 //--------------------------------------------------------------------------------------------------------
     [Header("Ground Move")]
     public float groundSpeed; // Moving on ground;
@@ -56,7 +52,6 @@ public class PlayerMovement : MonoBehaviour
     [Header("Snap On Ground")]
     public float minGroundDotProduct;
     public float snapMaxVel; //abort snap if playervel is greater
-
 //------------------------------------------------------------------------------------------------------
     [Header("Debug")]
     public State currentState;
@@ -123,6 +118,11 @@ public class PlayerMovement : MonoBehaviour
 #region Updateloops Statemachine
     void Update()
     {
+        controller.Move(playerVelocity * Time.deltaTime); //since controller don't use unity's physics update, we can getaway with update
+
+        //Check slope
+        CheckOnSlope();
+
         //state INPUTS handling
         switch(currentState)
         {
@@ -130,12 +130,17 @@ public class PlayerMovement : MonoBehaviour
             {
                 DirectionInputs();
                 JumpInput();
+                //previously in FixedUpdate
+                
+
             }
             break;
             case State.InAir:
             {
                 DirectionInputs();
                 JumpInput();
+                //previously in FixedUpdate
+                
             }
             break;
             case State.GrapSurface:
@@ -143,12 +148,16 @@ public class PlayerMovement : MonoBehaviour
                 DirectionInputs();
                 JumpInput();
                 hook.CancelHookInput();
+                //previously in FixedUpdate
+                
             }
             break;
             case State.HookEnemy:
             {
                 DirectionInputs();
                 hook.CancelHookInput();
+                //previously in FixedUpdate
+                
             }
             break;
         }
@@ -163,17 +172,14 @@ public class PlayerMovement : MonoBehaviour
         //Check grounded
         isGrounded = Physics.CheckSphere(groundCheck.position, 0.3f, groundMask);
 
-        //Check slope
-        CheckOnSlope();
-
         //Always keep moving
         //roundup small numbers avoid small movements
         if(Math.Abs(playerVelocity.x)< 0.01)
         playerVelocity.x = 0;
+
         if(Math.Abs(playerVelocity.z)< 0.01)
         playerVelocity.z = 0;
         
-        controller.Move(playerVelocity * Time.deltaTime);
 
         currentSpeed = Vector3.Dot(wishdir, playerVelocity);
         playerZXVel = new Vector3(playerVelocity.x, 0, playerVelocity.z);
@@ -181,7 +187,7 @@ public class PlayerMovement : MonoBehaviour
         //test debug 
         //Debug.Log(currentSpeed);
 
-        //count steps
+        //count steps //stay in fixedUpdate
         stepSinceJumped += 1;
         stepSinceKockback += 1;
 
@@ -190,9 +196,9 @@ public class PlayerMovement : MonoBehaviour
         {
             case State.Grounded:
             {
-                GroundPhysics(currentSpeed);
-                CheckGroundedOrInAir();
-                //count steps
+                GroundPhysics(currentSpeed); //unlike controller.Move(), physics have to be in fixed update for some reason, buggy in Update()
+                CheckGroundedOrInAir();      //Maybe because most of my physics calculation is already in fixedUpdate                       
+                //count steps                // Maybe if everything is in Update() movement will be smoother, (not a big difference)
                 stepSinceGrounded = 0;
             }
             break;
@@ -208,11 +214,12 @@ public class PlayerMovement : MonoBehaviour
             break;
             case State.GrapSurface:
             {
-                hook.ExecuteGrappleSurface();
+              
                 hook.CheckDistanceAfterGrapple();
                 hook.CheckRopeStretch();
                 hook.CheckPlayerFov();
                 hook.CheckIfPlayerLanded();
+                hook.ExecuteGrappleSurface();
                 //for better air steering with grapple
                 //if(!isGrounded)AirPhysics(currentSpeed);
                
@@ -384,8 +391,11 @@ public class PlayerMovement : MonoBehaviour
         //have to use hit.move direction for y rather than playervelocity, otherwise the check is buggy
            playerVelocity.z -= hit.normal.z * Vector3.Dot(playerVelocity, hit.normal);
            playerVelocity.x -= hit.normal.x * Vector3.Dot(playerVelocity, hit.normal);
+
+           if(playerVelocity.y > 2)//stay on ceiling just a bit longer, otherwise slight touch with the ceiling will start going down fast
            playerVelocity.y -= hit.normal.y * Vector3.Dot(hit.moveDirection, hit.normal);
-           //Debug.Log(hit.moveLength);
+
+           Debug.Log(Vector3.Dot(hit.moveDirection, hit.normal));
         }
     }
     //when grounded apply the raycast normal direction, works on flat and slope surface

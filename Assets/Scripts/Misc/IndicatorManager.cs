@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using FPS.Weapon;
 public class IndicatorManager : MonoBehaviour
 {
     [SerializeField]private Image radialBar;

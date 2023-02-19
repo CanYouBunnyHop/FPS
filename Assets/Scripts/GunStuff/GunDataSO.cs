@@ -6,6 +6,10 @@ using UnityEngine;
 public class GunDataSO : ScriptableObject
 {
     public string gunName;
+
+    [Header("Controls")]
+    public bool backWards = false;
+   
     [Header("Stats")]
     public float damage;
     [Tooltip("Rounds per minute")] public float fireRate; //in RPM
@@ -16,8 +20,8 @@ public class GunDataSO : ScriptableObject
     public int currentAmmo;
     
 
-    [Header("altshoot indicator")]
-    //public bool enableAltShootIndicator = false;
+    [Header("Special Shoot indicator")]
+    //public bool enableSpecialShootIndicator = false;
     public AmmoOrCd indicatorType;
     public enum AmmoOrCd
     {
@@ -45,7 +49,13 @@ public class GunDataSO : ScriptableObject
 
     [Header("Recoil Randomness")]
     public bool enableRandomness;
-    public float horizontalRandomness;
+    public float horizontalRandomness; 
+
+    [Header("ADS settings")]
+    public float ADS_recoilHorScale = 1;
+    public float ADS_recoilVerScale = 1;
+    public float ADS_fov = 103;
+    public float ADS_speed = 5;
 
     [Header("Recoil Offset")]
     public AnimationCurve recoilHorOffset;
@@ -62,8 +72,7 @@ public class GunDataSO : ScriptableObject
 
     [Header("Select fire")]
     public FireMode defaultFireMode;
-    public FireMode altFireMode;
-    public bool allowDoubleFire;
+    [Tooltip("Use SemiAuto, other fireMode for special is decaprecated")] public FireMode specialFireMode;
     public enum FireMode
     {
        SemiAuto,
@@ -71,4 +80,6 @@ public class GunDataSO : ScriptableObject
        BurstFire,
        Charge,
     }
+
+    
 }
