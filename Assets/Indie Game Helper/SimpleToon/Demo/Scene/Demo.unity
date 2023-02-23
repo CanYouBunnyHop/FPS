@@ -812,7 +812,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &771709691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1107,26 +1107,22 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: -7735237656247634713, guid: 4b22bd1cbb7dbd045ae103318eb7a848,
-        type: 3}
+      objectReference: {fileID: 2100000, guid: ded3ee337069fe34aad399430dc3856c, type: 2}
     - target: {fileID: -7511558181221131132, guid: 742526dc4e547a64a991a4b3367501d6,
         type: 3}
       propertyPath: m_Materials.Array.data[1]
       value: 
-      objectReference: {fileID: -4923169938548480685, guid: 8efc7fe4d5532dc4b8ebbb76b351d9ab,
-        type: 3}
+      objectReference: {fileID: 2100000, guid: 5a39bd3dffc95dc4ca4759d5823e6622, type: 2}
     - target: {fileID: -7511558181221131132, guid: 742526dc4e547a64a991a4b3367501d6,
         type: 3}
       propertyPath: m_Materials.Array.data[2]
       value: 
-      objectReference: {fileID: -1444460858095362738, guid: 534748c93c556c84280616f4673d8856,
-        type: 3}
+      objectReference: {fileID: 2100000, guid: 32c524f702b0d224f8d55e4a82600761, type: 2}
     - target: {fileID: -7511558181221131132, guid: 742526dc4e547a64a991a4b3367501d6,
         type: 3}
       propertyPath: m_Materials.Array.data[3]
       value: 
-      objectReference: {fileID: -1444460858095362738, guid: 534748c93c556c84280616f4673d8856,
-        type: 3}
+      objectReference: {fileID: 2100000, guid: ded3ee337069fe34aad399430dc3856c, type: 2}
     - target: {fileID: 919132149155446097, guid: 742526dc4e547a64a991a4b3367501d6,
         type: 3}
       propertyPath: m_Name

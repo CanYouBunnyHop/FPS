@@ -11,10 +11,6 @@ public class BlitMaterialFeature : ScriptableRendererFeature
         private Material material;
         private RenderTargetIdentifier source; //RenderTargetIdentifier points to a texture directly
         private RenderTargetHandle tempTexture; //RenderTargetHandle Points to a texture variable in a shader
-        // public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
-        // {
-        //    
-        // }
         public CustomRenderPass(string _profilingname, Material _m, int _materialPassIndex) : base()
         {
             profilingname = _profilingname;

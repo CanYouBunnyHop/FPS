@@ -95,6 +95,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - REQUIRE_DEPTH_TEXTURE: 1
+    - REQUIRE_OPAQUE_TEXTURE: 1
+    - _AcuteDepthStartDot: 0
+    - _AcuteDepthThresholdMult: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -102,17 +106,28 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _DepthStrength: 1
+    - _DepthThreshold: 1
+    - _DepthTightnening: 1
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
     - _EnvironmentReflections: 1
+    - _FarDepthStart: 0
+    - _FarDepthThresholdMult: 0
+    - _FarNormalStartDepth: 0
+    - _FarNormalThresholdMult: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.85
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 3
+    - _NormalsStrength: 1
+    - _NormalsThreshold: 1
+    - _NormalsTightnening: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Shininess: 0.68
@@ -121,12 +136,14 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 5
     - _Surface: 1
+    - _Thickness: 0.0015
     - _UVSec: 0
     - _WorkflowMode: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.0713751, g: 0.5754717, b: 0.019001435, a: 0.80784315}
-    - _Color: {r: 0.07137508, g: 0.57547164, b: 0.019001435, a: 0.80784315}
+    - _BaseColor: {r: 0.09620414, g: 1, b: 0, a: 0.2901961}
+    - _Color: {r: 0.09620411, g: 1, b: 0, a: 0.2901961}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

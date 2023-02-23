@@ -10,9 +10,7 @@ Material:
   m_Name: PostProcessOutlines
   m_Shader: {fileID: -6465566751694194690, guid: d73dacf10bbf19745a0e6ab4cd468aa0,
     type: 3}
-  m_ValidKeywords:
-  - REQUIRE_DEPTH_TEXTURE
-  - REQUIRE_OPAQUE_TEXTURE
+  m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -48,7 +46,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 2493c3ff0accb4b4aa0420f6a17b5a74, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -81,36 +79,48 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - REQUIRE_DEPTH_TEXTURE: 1
-    - REQUIRE_OPAQUE_TEXTURE: 1
+    - REQUIRE_DEPTH_TEXTURE: 0
+    - REQUIRE_OPAQUE_TEXTURE: 0
+    - _AcuteAngleStartDot: 10
+    - _AcuteDepthStartDot: 0
+    - _AcuteDepthThreshold: 20
+    - _AcuteDepthThresholdMult: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
     - _CastShadows: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _ColorStrength: 1.5
+    - _ColorStrength: 0
     - _ColorThickness: 2
     - _ColorThreshold: 2
     - _ColorTightnening: 1
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthStrength: 30
+    - _DepthStrength: 0
     - _DepthThickness: 0.1
-    - _DepthThreshold: 0.05
-    - _DepthTightnening: 1
+    - _DepthThreshold: 0
+    - _DepthTightnening: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EnvironmentReflections: 1
+    - _FarDepthStart: 1
+    - _FarDepthThresholdMult: 2
+    - _FarNormalStartDepth: 1
+    - _FarNormalThresholdMult: 2
+    - _FarNormalThresholdMultiplier: 0
     - _Float: -0.27
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _NormalsStrength: 78.92
-    - _NormalsThreshold: 2.8
-    - _NormalsTightnening: 0.53
+    - _NormalAdjustFarDepth: 0
+    - _NormalAdjustNearDepth: 0
+    - _NormalsFarThreshold: 1
+    - _NormalsStrength: 1
+    - _NormalsThreshold: 1
+    - _NormalsTightnening: 100
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
@@ -122,7 +132,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _Thickness: 0.001
+    - _Thickness: 0.0015
     - _WorkflowMode: 1
     - _ZTest: 4
     - _ZWrite: 1
