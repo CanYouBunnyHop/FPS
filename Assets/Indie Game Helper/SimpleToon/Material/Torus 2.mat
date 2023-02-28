@@ -30,9 +30,9 @@ Material:
     - _Gloss: 10
     - _OutlineWidth: 0
     - _RimPower: 2.2
-    - _RimStep: 0.904
+    - _RimStep: 0.743
     - _RimStepSmooth: 0
-    - _ShadowStep: 0.891
+    - _ShadowStep: 0.248
     - _ShadowStepSmooth: 0.293
     - _SpecularStep: 0.975
     - _SpecularStepSmooth: 0
