@@ -64,7 +64,11 @@ public class Shotgun : GunBehaviour
 
             //if linecast hits
             RaycastHit spreadHit;
-            if (Physics.Linecast(cam.transform.position, newPos, out spreadHit, groundEnemyMask, QueryTriggerInteraction.Ignore))
+
+            bool validLayer = Physics.Raycast(cam.transform.position, aimDir, out spreadHit, Mathf.Infinity, groundMask, QueryTriggerInteraction.Ignore) || 
+                            Physics.Raycast(cam.transform.position, aimDir, out spreadHit, Mathf.Infinity, enemyMask, QueryTriggerInteraction.Ignore);
+
+            if(validLayer)
             {
                 BulletHoleFx(spreadHit);
 

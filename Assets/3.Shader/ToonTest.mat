@@ -110,41 +110,49 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthStrength: 0.4
+    - _DepthStrength: 1
     - _DepthThreshold: 1
     - _DepthTightnening: 1
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EnvironmentReflections: 1
-    - _FarDepthStart: 1
-    - _FarDepthThresholdMult: 1
-    - _FarNormalStartDepth: 1
-    - _FarNormalThresholdMult: 1
+    - _FarDepthStart: 0
+    - _FarDepthThresholdMult: 0
+    - _FarNormalStartDepth: 0
+    - _FarNormalThresholdMult: 0
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _MAINLIGHTPOSITION: 0
     - _MAIN_LIGHT_SHADOWS_CASCADE: 1
     - _Metallic: 0
-    - _NormalsStrength: 1
-    - _NormalsThreshold: 1
-    - _NormalsTightnening: 3
+    - _NormalsStrength: 0
+    - _NormalsThreshold: 2
+    - _NormalsTightnening: 100
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RampSampleV: 0
     - _ReceiveShadows: 1
-    - _RimSmoothStep: 0
+    - _RimPower: 1
+    - _RimSmoothStep: 0.3
     - _RimStep: 0.65
+    - _RimStrength: 1
     - _SHADOWS_SOFT: 1
+    - _ShadowEdgePower: 1
+    - _ShadowEdgeStrength: 1
+    - _ShadowPower: 1
+    - _ShadowSmoothStep: 0.3
+    - _ShadowStep: 0.65
     - _Smoothness: 3
     - _SmoothnessTextureChannel: 0
     - _SpecRampSampleV: 1
     - _SpecularColorOpacity: -0.56
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _Strength: 10
     - _Surface: 0
     - _Thickness: 0.0015
     - _Vibrance: 1
@@ -155,8 +163,9 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - _RimColor: {r: 2, g: 2, b: 2, a: 0}
+    - _RimColor: {r: 0, g: 0.5254902, b: 1.6470588, a: 0}
     - _SecondaryColor: {r: 1, g: 0, b: 0.18952465, a: 0}
+    - _ShadowEdgeColor: {r: 1.4980392, g: 0.69803923, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 1, g: 0.59607846, b: 0, a: 0}
   m_BuildTextureStacks: []

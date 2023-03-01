@@ -13,6 +13,11 @@ public class IndicatorManager : MonoBehaviour
     //-----------------------------------------------------------
     private void Awake()
     {
+        // if(!this.gameObject.activeSelf)
+        // {
+        //     this.gameObject.SetActive(true);
+        // }
+
         mat = radialBar.material;
 
         foreach(GunBehaviour gb in gm.gunBehaviors) // reset cooldown for every cd in weapons list (make sure not in cd when starting)

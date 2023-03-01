@@ -71,7 +71,7 @@ public class AssaultRifle : GunBehaviour
     #region Input
     protected override void EnqueueShootInput(GunDataSO.FireMode _fireMode, int? _fireInput)
     {
-         switch(_fireMode)
+        switch(_fireMode)
         {
             case GunDataSO.FireMode.FullAuto: //shoot
             {
@@ -109,8 +109,10 @@ public class AssaultRifle : GunBehaviour
         RaycastHit hit;
         gunData.currentAmmo --;
         base.Shoot();
-
-        if(Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
+        
+        bool validLayer = Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, groundMask, QueryTriggerInteraction.Ignore) || 
+                        Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, enemyMask, QueryTriggerInteraction.Ignore);
+        if(validLayer)
         {
             BulletHoleFx(hit);
             if(hit.distance <= gunData.range)

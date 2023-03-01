@@ -19,7 +19,7 @@ public abstract class GunBehaviour : MonoBehaviour
     [Header("probably should be static")]
     [SerializeField] protected LayerMask enemyMask;
     [SerializeField] protected LayerMask groundMask;
-    [SerializeField] protected LayerMask groundEnemyMask;
+    //[SerializeField] protected LayerMask groundEnemyMask; //is there a way to get around this?
     [SerializeField] protected PlayerCamera recoilManager;
     protected Camera cam;
     protected float camDefaultFOV;

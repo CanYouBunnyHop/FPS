@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HandCannon : GunBehaviour
 {
-   #region Input
+#region Input
   protected override void EnqueueShootInput(GunDataSO.FireMode _fireMode, int? _fireInput)
   {
       base.EnqueueShootInput(_fireMode, _fireInput);
@@ -14,8 +14,8 @@ public class HandCannon : GunBehaviour
   {
       base.ReloadInput();
   }
-  #endregion
-  #region  Shooting Behaviors
+#endregion
+#region  Shooting Behaviors
   protected override void Shoot()
   {
       RaycastHit hit;
@@ -23,7 +23,10 @@ public class HandCannon : GunBehaviour
 
       base.Shoot();
 
-      if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, Mathf.Infinity, groundEnemyMask, QueryTriggerInteraction.Ignore))
+      bool validLayer = Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, groundMask, QueryTriggerInteraction.Ignore) || 
+                        Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, enemyMask, QueryTriggerInteraction.Ignore);
+
+      if(validLayer)
       {
           BulletHoleFx(hit);
           if(hit.distance <= gunData.range)
@@ -43,9 +46,9 @@ public class HandCannon : GunBehaviour
     {
       
     }
-    #endregion
+#endregion
 
-    #region reload
+#region reload
     protected override IEnumerator Reload()
     {
         return base.Reload();
@@ -54,10 +57,10 @@ public class HandCannon : GunBehaviour
     {
         base.CancelReload(IEReload);
     }
-    #endregion
+#endregion
     
     //animations
-    #region  animations
+#region  animations
     public override void Anim_Shoot()
     {
 
@@ -70,5 +73,5 @@ public class HandCannon : GunBehaviour
     {
 
     }
-    #endregion
+#endregion
 }
