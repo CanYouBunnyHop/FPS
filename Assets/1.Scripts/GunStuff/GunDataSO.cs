@@ -69,16 +69,15 @@ public class GunDataSO : ScriptableObject
     public float fireBuffer = 0.2f;
 
     
-
     [Header("Select fire")]
     public FireMode defaultFireMode;
     [Tooltip("Use SemiAuto, other fireMode for special is decaprecated")] public FireMode specialFireMode;
     public enum FireMode
     {
-       SemiAuto,
-       FullAuto,
-       BurstFire,
-       Charge,
+        SemiAuto,
+        FullAuto,
+        BurstFire,
+        Charge,
     }
 
     

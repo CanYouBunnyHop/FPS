@@ -49,7 +49,22 @@ public class PlayerMovement : MonoBehaviour
         GrapSurface,
         HookEnemy,
     }
-    [Header("Snap On Ground")]
+    public enum GroundedMovementState
+    {
+        Walk,
+        Run,
+        Crouch,
+        Slide,
+    }
+    public enum ActionState
+    {
+
+    }
+
+    /// <summary>
+    /// if the hit normal is less than this, abort snap, for steep angles
+    /// </summary>
+    [Header("Snap On Ground")] [Tooltip("if the hit normal is less than this, abort snap, for steep angles")]
     public float minGroundDotProduct;
     public float snapMaxVel; //abort snap if playervel is greater
 //------------------------------------------------------------------------------------------------------
@@ -57,7 +72,8 @@ public class PlayerMovement : MonoBehaviour
     public State currentState;
     public Vector3 playerVelocity;
     public Vector3 playerZXVel;
-    [SerializeField]private int stepSinceGrounded;
+    [SerializeField]public int stepInAir;
+    [SerializeField]public int stepOnGround;
     [SerializeField]public int stepSinceJumped; //assign this to anything that will knock player up
     [SerializeField]public int stepSinceKockback;
     [SerializeField]private float currentSpeed; //not actual speed, dot product of playervel and wish vel
@@ -66,6 +82,10 @@ public class PlayerMovement : MonoBehaviour
     public bool isGrounded;
     [SerializeField] private bool isOnSlope;
     public Text text;//UI remove later
+    [Header("Debug Gizmo")]
+    [SerializeField]private bool drawGizmo;
+    [SerializeField]private float snapGroundRayLength;
+    [SerializeField]private float groundCheckRadius = 0.3f;
 //--------------------------------------------------------------------------------------------------------
     // Start is called before the first frame update
     void Start()
@@ -74,7 +94,7 @@ public class PlayerMovement : MonoBehaviour
         hook = GetComponent<GrapplingHook>();
         currentState = State.InAir;
         StartCoroutine(LateFixedUpdate());
-       
+
         //controller.stepOffset
     }
 #region Inputs
@@ -105,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
                 if(!isGrounded)
                 hook.EndGrapple();
             }
-           
+
         }
         if(wishJump && called == false)
         {
@@ -140,6 +160,8 @@ public class PlayerMovement : MonoBehaviour
                 DirectionInputs();
                 JumpInput();
                 //previously in FixedUpdate
+
+                
                 
             }
             break;
@@ -170,7 +192,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         //Check grounded
-        isGrounded = Physics.CheckSphere(groundCheck.position, 0.3f, groundMask);
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
 
         //Always keep moving
         //roundup small numbers avoid small movements
@@ -197,9 +219,9 @@ public class PlayerMovement : MonoBehaviour
             case State.Grounded:
             {
                 GroundPhysics(currentSpeed); //unlike controller.Move(), physics have to be in fixed update for some reason, buggy in Update()
-                CheckGroundedOrInAir();      //Maybe because most of my physics calculation is already in fixedUpdate                       
-                //count steps                // Maybe if everything is in Update() movement will be smoother, (not a big difference)
-                stepSinceGrounded = 0;
+                CheckGroundedOrInAir();      //Maybe because most of my physics calculation is already in fixedUpdate
+                //                             // Maybe if everything is in Update() movement will be smoother, (not a big difference)
+                
             }
             break;
             case State.InAir:
@@ -207,14 +229,13 @@ public class PlayerMovement : MonoBehaviour
                 AirPhysics(currentSpeed);
                 CheckGroundedOrInAir();
                 CapBhopSpeed();
-                
-                //count steps
-                stepSinceGrounded += 1;
+
+                SnapOnGround();
             }
             break;
             case State.GrapSurface:
             {
-              
+            
                 hook.CheckDistanceAfterGrapple();
                 hook.CheckRopeStretch();
                 hook.CheckPlayerFov();
@@ -222,7 +243,7 @@ public class PlayerMovement : MonoBehaviour
                 hook.ExecuteGrappleSurface();
                 //for better air steering with grapple
                 //if(!isGrounded)AirPhysics(currentSpeed);
-               
+            
             }
             break;
             case State.HookEnemy:
@@ -230,7 +251,7 @@ public class PlayerMovement : MonoBehaviour
                 hook.ExecuteHookEnemy();
                 hook.CheckDistanceAfterGrapple();
                 hook.CheckObstaclesBetween();
-                 if(isGrounded)
+                if(isGrounded)
                 {
                     GroundPhysics(currentSpeed);
                 }
@@ -250,7 +271,7 @@ public class PlayerMovement : MonoBehaviour
         {
             playerVelocity.y = 0;
         }
-       
+        
     }   
     IEnumerator LateFixedUpdate()
     {
@@ -267,7 +288,7 @@ public class PlayerMovement : MonoBehaviour
                 break;
                 case State.InAir:
                 {
-                    SnapOnGround();
+                   //SnapOnGround(); //Has to later than fixedUpdate, or else, will constantly snap after jumping
                 }
                 break;
                 case State.GrapSurface:
@@ -362,10 +383,18 @@ public class PlayerMovement : MonoBehaviour
          if(isGrounded) //while grounded
         {
             currentState = State.Grounded;
+
+            //count steps                
+            stepInAir = 0;
+            stepOnGround += 1;
         }
         else // while in air
         {
             currentState = State.InAir;
+            
+            //count steps
+            stepOnGround = 0;
+            stepInAir += 1;
         }
     }
 #endregion
@@ -385,9 +414,22 @@ public class PlayerMovement : MonoBehaviour
     //Apply equal opposite force after hitting something, like a wall, resets momentum. For some reason it don't work on ceiling
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        //when using int, it can check collsions, when using layer it doesnt check at all
-        if(hit.gameObject.layer == 0)
-        {
+        if(groundMask == (groundMask | (1 << hit.gameObject.layer)))// using bitwise operators equivalent of 
+        {                                                           // if(hit.gameObject.layer == groundMask), 
+        //                                                          // if using '==' would actually works
+        //                                                          // shift operator example
+        //                                                          // A = 1, which is '0000 0001' in 8 bit
+        //                                                          // A << 2 = '0000 0100' which is '4'
+        //
+        // layerMask is an integer formatted as a bitmask where every '1' represents a layer to include 
+        // and every '0' represents a layer to exclude.
+        // if GroundMask = '0000 1001' = 'layer 0' + 'layer 3', and hit.layer = 3(index)  = '0000 1000'(layerMask)
+        // even doh layer 3 is true in the inspector
+        // because '0000 1001' != '0000 1000', it won't have the desired results
+        // if('0000 1001' == '0000 1001' | ('0000 0001' << '3')) after applying the shift which then is
+        // if('0000 1001' == '0000 1001' | ('0000 1000') then applying the 'or' bitwise operator
+        // if('0000 1001' == '0000 1001')   in this case, the satement is true, because layer 3 is included
+
         //have to use hit.move direction for y rather than playervelocity, otherwise the check is buggy
            playerVelocity.z -= hit.normal.z * Vector3.Dot(playerVelocity, hit.normal);
            playerVelocity.x -= hit.normal.x * Vector3.Dot(playerVelocity, hit.normal);
@@ -438,15 +480,26 @@ public class PlayerMovement : MonoBehaviour
         }
         else isOnSlope = false;
     }
+    void OnDrawGizmos()
+    {
+        //Gizmos.DrawLine(groundCheck.position, Vector3.forward);
+        Gizmos.DrawRay(groundCheck.position, Vector3.down* snapGroundRayLength);
+        Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);
+    }
     void SnapOnGround()
     {
-        if (stepSinceGrounded > 1 || stepSinceJumped <= 2 || stepSinceKockback < 5)//abort when just jumped or havn't been in air long enough
+        //bool r = Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, snapGroundRayLength, groundMask);
+       // Debug.Log("bruh"+ hit.normal);
+
+        
+        
+        if (stepInAir > 10 || stepSinceJumped <= 2 || stepSinceKockback < 5) //abort when just jumped or havn't been in air long enough
 		return ;
 
-        if (!Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, 0.8f, groundMask))
-		return;
+        if (!Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, snapGroundRayLength, groundMask))
+        return;
 
-        if (hit.normal.y < minGroundDotProduct)
+        if (hit.normal.y < minGroundDotProduct) //if surface is too steep, return
 		return;
 
         if(playerZXVel.magnitude > snapMaxVel)//abort if playervel is too fast
@@ -454,11 +507,14 @@ public class PlayerMovement : MonoBehaviour
 
         float speed = playerVelocity.magnitude;
 		float dot = Vector3.Dot(playerVelocity, hit.normal);
-        Debug.Log("snaping to ground now"+dot);
+        
 
         if (dot > 0f)
-		playerVelocity = (playerVelocity - hit.normal * dot).normalized * speed;
-		//return true;
+        {
+            playerVelocity = (playerVelocity - hit.normal * dot).normalized * speed;
+            Debug.Log("snaping to ground now"+ dot);
+        }
+		
     }
 #endregion
     

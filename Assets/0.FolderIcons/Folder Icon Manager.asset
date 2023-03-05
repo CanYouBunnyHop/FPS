@@ -60,3 +60,9 @@ MonoBehaviour:
   - folder: {fileID: 102900000, guid: d37bc9a26f459d2448ae0459331d5c56, type: 3}
     folderIcon: {fileID: 2800000, guid: 9eb3abe27b751d940897ed27d44dccc6, type: 3}
     overlayIcon: {fileID: 2800000, guid: 90f8fdd975ce6b74f9ff13d9672b45eb, type: 3}
+  - folder: {fileID: 102900000, guid: 419b6340487f2a946b5ab3cca07705ea, type: 3}
+    folderIcon: {fileID: 2800000, guid: e660ce91d6cdc6b4099e612e9b4abbbc, type: 3}
+    overlayIcon: {fileID: 0}
+  - folder: {fileID: 102900000, guid: 423abfd661640624eb081a1e2b53729f, type: 3}
+    folderIcon: {fileID: 2800000, guid: b3453e84aa7d88a47a6b80b04864177c, type: 3}
+    overlayIcon: {fileID: 0}

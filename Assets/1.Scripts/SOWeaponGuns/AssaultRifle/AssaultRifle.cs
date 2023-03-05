@@ -110,9 +110,7 @@ public class AssaultRifle : GunBehaviour
         gunData.currentAmmo --;
         base.Shoot();
         
-        bool validLayer = Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, groundMask, QueryTriggerInteraction.Ignore) || 
-                        Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, enemyMask, QueryTriggerInteraction.Ignore);
-        if(validLayer)
+        if(Physics.Raycast(cam.transform.position, aimDir, out hit, Mathf.Infinity, (enemyMask | groundMask), QueryTriggerInteraction.Ignore))
         {
             BulletHoleFx(hit);
             if(hit.distance <= gunData.range)

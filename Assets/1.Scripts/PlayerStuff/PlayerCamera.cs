@@ -51,9 +51,7 @@ public class PlayerCamera : MonoBehaviour
         //some logic is done in gunBehavior
         targetRot = Vector3.Slerp(targetRot, Vector3.zero, gm.currentBehavior.gunData.returnSpeed * Time.deltaTime); //return rotation
         
-        
-        recoilRot = Vector3.Slerp(recoilRot, targetRot, gm.currentBehavior.gunData.recoilSpeed * Time.fixedDeltaTime);  //recoil rotation
-        
+        recoilRot = Vector3.Slerp(recoilRot, targetRot, gm.currentBehavior.gunData.recoilSpeed * Time.fixedDeltaTime);//recoil rotation //fixed because this affects gun recoil
 
         transform.localRotation = Quaternion.Euler(recoilRot + mouseRot);
         body.rotation = Quaternion.Euler(0,recoilRot.y + mouseRot.y,0);

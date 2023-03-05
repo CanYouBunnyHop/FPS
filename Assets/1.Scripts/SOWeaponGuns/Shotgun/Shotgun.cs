@@ -65,10 +65,7 @@ public class Shotgun : GunBehaviour
             //if linecast hits
             RaycastHit spreadHit;
 
-            bool validLayer = Physics.Raycast(cam.transform.position, aimDir, out spreadHit, Mathf.Infinity, groundMask, QueryTriggerInteraction.Ignore) || 
-                            Physics.Raycast(cam.transform.position, aimDir, out spreadHit, Mathf.Infinity, enemyMask, QueryTriggerInteraction.Ignore);
-
-            if(validLayer)
+            if(Physics.Raycast(cam.transform.position, aimDir, out spreadHit, Mathf.Infinity, (enemyMask | groundMask), QueryTriggerInteraction.Ignore))
             {
                 BulletHoleFx(spreadHit);
 
@@ -87,7 +84,7 @@ public class Shotgun : GunBehaviour
     #region reload
     protected override IEnumerator Reload()
     {
-       return base.Reload();
+        return base.Reload();
     }
     protected override void CancelReload(Coroutine IEReload)
     {
