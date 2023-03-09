@@ -19,13 +19,13 @@ public class Shotgun : GunBehaviour
     [SerializeField] GrapplingHook hook;
 
     #region Input
-    protected override void EnqueueShootInput(GunDataSO.FireMode _fireMode, int? _fireInput)
+    protected override void EnqueueShoot_Input(GunDataSO.FireMode _fireMode, int? _fireInput)
     {
-        base.EnqueueShootInput(_fireMode, _fireInput);
+        base.EnqueueShoot_Input(_fireMode, _fireInput);
     }
-    protected override void ReloadInput()
+    protected override void Reload_Input()
     {
-        base.ReloadInput();
+        base.Reload_Input();
     }
     #endregion
 

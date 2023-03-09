@@ -66,6 +66,7 @@ public class GunDataSO : ScriptableObject
     //public AnimationCurve recoilZ;
 
     [Header("Buffer")]
+    ///<summary> how much earlier when pressing fire input between fire rates, will be registered once it's ready </summary>
     public float fireBuffer = 0.2f;
 
     

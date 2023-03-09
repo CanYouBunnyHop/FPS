@@ -19,15 +19,13 @@ public class PlayerMovement : MonoBehaviour
     public float gravity;
     private CharacterController controller;
     public GrapplingHook hook; //Additional movement abilities
-    public Transform headCheck;
-    public Transform groundCheck;
     public LayerMask groundMask;
 
 //--------------------------------------------------------------------------------------------------------
     [Header("Jumping")]
     public float jumpForce;
     private RaycastHit onSlope;
-    private Vector3 slopeMoveDir;
+    private Vector3 slopeMoveDir => Vector3.ProjectOnPlane(wishdir, onSlope.normal);
     bool called; //bool for wish jump
 //--------------------------------------------------------------------------------------------------------
     [Header("Ground Move")]
@@ -42,6 +40,22 @@ public class PlayerMovement : MonoBehaviour
     public float capBhopSpeed;
     private float airWishSpeed;
 //------------------------------------------------------------------------------------------------------
+    [Header("Crouch")]
+    [SerializeField] private float crouchMoveSpeed;
+    [SerializeField] private float crouchInOutSpeed;
+    [SerializeField] private float crouchDistance;
+    [SerializeField] private bool wishCrouching;
+    public bool isCrouching => wishCrouching && isGrounded;
+    private float standYScale;
+    // [SerializeField] private float crouchHeight = 0.5f;
+    // [SerializeField] private float standingHeight = 2f;
+    //[SerializeField] private float timeToCrouch = 0.25f;
+    //private Vector3 crouchingPivot = new Vector3(0, 0.5f, 0);
+    //private Vector3 standingPivot = Vector3.zero;
+    //private bool canCrouch => isGrounded;
+    //private bool isCrouching = false;
+//------------------------------------------------------------------------------------------------------
+#region enums
     public enum State
     {
         Grounded,
@@ -56,22 +70,18 @@ public class PlayerMovement : MonoBehaviour
         Crouch,
         Slide,
     }
-    public enum ActionState
-    {
-
-    }
-
-    /// <summary>
-    /// if the hit normal is less than this, abort snap, for steep angles
-    /// </summary>
+#endregion
+    
     [Header("Snap On Ground")] [Tooltip("if the hit normal is less than this, abort snap, for steep angles")]
     public float minGroundDotProduct;
     public float snapMaxVel; //abort snap if playervel is greater
+    
 //------------------------------------------------------------------------------------------------------
+#region Debug variables
     [Header("Debug")]
     public State currentState;
     public Vector3 playerVelocity;
-    public Vector3 playerZXVel;
+    public bool isGrounded;
     [SerializeField]public int stepInAir;
     [SerializeField]public int stepOnGround;
     [SerializeField]public int stepSinceJumped; //assign this to anything that will knock player up
@@ -79,40 +89,49 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]private float currentSpeed; //not actual speed, dot product of playervel and wish vel
     private Vector3 wishdir;
     [SerializeField]private bool wishJump = false;
-    public bool isGrounded;
-    [SerializeField] private bool isOnSlope;
+    private Collider[] gCheckColliders;
+    [SerializeField]private Vector3 magnetism = Vector3.zero;
+    //private float timeElapsed;
+    
+    //private bool controllerHitGround;
     public Text text;//UI remove later
+
     [Header("Debug Gizmo")]
-    [SerializeField]private bool drawGizmo;
-    [SerializeField]private float snapGroundRayLength;
-    [SerializeField]private float groundCheckRadius = 0.3f;
+    [SerializeField] private bool drawGizmo;
+    [SerializeField] private float snapGroundRayLength;
+    [SerializeField] private Vector3 groundCheckOffset;
+    [SerializeField] private float groundCheckRadius = 0.3f;
+#endregion
 //--------------------------------------------------------------------------------------------------------
-    // Start is called before the first frame update
-    void Start()
+    public Vector3 playerZXVel => new Vector3(playerVelocity.x, 0, playerVelocity.z); 
+    private bool isOnSlope => Physics.Raycast(transform.position, Vector3.down, out onSlope, 0.6f, groundMask) ? true : false;
+    [SerializeField] Coroutine jumpBufferTimer; 
+    
+    void Awake()
     {
         controller = GetComponent<CharacterController>();
         hook = GetComponent<GrapplingHook>();
         currentState = State.InAir;
         StartCoroutine(LateFixedUpdate());
 
-        //controller.stepOffset
+        standYScale = transform.localScale.y; //get player's y scale which is the standing's height
     }
 #region Inputs
-    void DirectionInputs()
+    void Direction_Input()
     {
         //get WASD input into wish direction
         wishdir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         wishdir = transform.TransformDirection(wishdir);
 		wishdir.Normalize();
         
-        wishSpeed = wishdir.magnitude;
+        wishSpeed = wishdir.magnitude; //source code here
         wishSpeed*= groundSpeed;
 
         airWishSpeed = wishdir.magnitude;
         airWishSpeed*= airSpeed;
     }
     
-    void JumpInput()
+    void Jump_Input()
     {
          //Inputs for jump
         if(Input.GetKeyDown(KeyCode.Space)||Input.GetAxis("Mouse ScrollWheel") < 0f )
@@ -127,29 +146,49 @@ public class PlayerMovement : MonoBehaviour
             }
 
         }
-        if(wishJump && called == false)
+
+        
+        if(wishJump && jumpBufferTimer == null)
         {
-            called = true;
-            Invoke(nameof(WJF), 0.1f); //sets Wish jump false with delay
+            jumpBufferTimer = StartCoroutine(JumpBufferTimer());
+        }
+
+        IEnumerator JumpBufferTimer()
+        {
+            Debug.Log("started");
+            yield return new WaitForSecondsRealtime(0.1f);
+
+            if(!isGrounded) wishJump = false;
+
+            jumpBufferTimer = null;
         }
     }
+    
+    void Crouch_Input()
+    {   
+        wishCrouching = Input.GetKey(KeyCode.LeftControl) && isGrounded;
+    }
+
+
 #endregion
 
-#region Updateloops Statemachine
+#region Updateloops Statemachine / gizmo
     void Update()
     {
         controller.Move(playerVelocity * Time.deltaTime); //since controller don't use unity's physics update, we can getaway with update
 
         //Check slope
-        CheckOnSlope();
+        //CheckOnSlope();
 
         //state INPUTS handling
         switch(currentState)
         {
             case State.Grounded:
             {
-                DirectionInputs();
-                JumpInput();
+                Direction_Input();
+                Jump_Input();
+                Crouch_Input();
+                
                 //previously in FixedUpdate
                 
 
@@ -157,8 +196,9 @@ public class PlayerMovement : MonoBehaviour
             break;
             case State.InAir:
             {
-                DirectionInputs();
-                JumpInput();
+                Direction_Input();
+                Jump_Input();
+                Crouch_Input();
                 //previously in FixedUpdate
 
                 
@@ -167,8 +207,8 @@ public class PlayerMovement : MonoBehaviour
             break;
             case State.GrapSurface:
             {
-                DirectionInputs();
-                JumpInput();
+                Direction_Input();
+                Jump_Input();
                 hook.CancelHookInput();
                 //previously in FixedUpdate
                 
@@ -176,38 +216,33 @@ public class PlayerMovement : MonoBehaviour
             break;
             case State.HookEnemy:
             {
-                DirectionInputs();
+                Direction_Input();
                 hook.CancelHookInput();
                 //previously in FixedUpdate
                 
             }
             break;
         }
-        
+
         //UI remove later
         string dec = Convert.ToString(wishSpeed);
         text.text = "currentspeed: "+ playerZXVel.magnitude;
-        //
     }
     void FixedUpdate()
     {
+    
         //Check grounded
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
-
-        //Always keep moving
-        //roundup small numbers avoid small movements
-        if(Math.Abs(playerVelocity.x)< 0.01)
-        playerVelocity.x = 0;
-
-        if(Math.Abs(playerVelocity.z)< 0.01)
-        playerVelocity.z = 0;
+        isGrounded = Physics.CheckSphere(transform.position + groundCheckOffset , groundCheckRadius , groundMask);
         
+        //roundup small numbers avoid small movements
+        if(Mathf.Abs(playerZXVel.magnitude) < 0.1) //Horizontal velocity rounded
+        {
+            playerVelocity.x = 0;
+            playerVelocity.z = 0;
+        }
+
 
         currentSpeed = Vector3.Dot(wishdir, playerVelocity);
-        playerZXVel = new Vector3(playerVelocity.x, 0, playerVelocity.z);
-
-        //test debug 
-        //Debug.Log(currentSpeed);
 
         //count steps //stay in fixedUpdate
         stepSinceJumped += 1;
@@ -220,8 +255,8 @@ public class PlayerMovement : MonoBehaviour
             {
                 GroundPhysics(currentSpeed); //unlike controller.Move(), physics have to be in fixed update for some reason, buggy in Update()
                 CheckGroundedOrInAir();      //Maybe because most of my physics calculation is already in fixedUpdate
-                //                             // Maybe if everything is in Update() movement will be smoother, (not a big difference)
-                
+                //
+                CheckToCrouch();                             // Maybe if everything is in Update() movement will be smoother, (not a big difference)
             }
             break;
             case State.InAir:
@@ -231,6 +266,7 @@ public class PlayerMovement : MonoBehaviour
                 CapBhopSpeed();
 
                 SnapOnGround();
+                CheckToCrouch();  
             }
             break;
             case State.GrapSurface:
@@ -266,11 +302,7 @@ public class PlayerMovement : MonoBehaviour
 
         //jumping buffer, runs outside of state handler currently, 
         //reset y vel avoid jump boost on after running on slope
-        
-        if (wishJump && isGrounded)
-        {
-            playerVelocity.y = 0;
-        }
+        if (wishJump && isGrounded) playerVelocity.y = 0;
         
     }   
     IEnumerator LateFixedUpdate()
@@ -304,13 +336,24 @@ public class PlayerMovement : MonoBehaviour
                 break;
             }
 
-            //jump here
+            //jump here //LateFixedUpdate
             if (wishJump && isGrounded)
             {
-                QueueJump();
+                playerVelocity.y += jumpForce;
                 stepSinceJumped = 0;
             }
         }
+    }
+    void OnDrawGizmos()
+    {
+        //Gizmos.DrawLine(groundCheck.position, Vector3.forward);
+        Gizmos.DrawRay(transform.position, Vector3.down * snapGroundRayLength);
+
+        Gizmos.color = new Color(1,1,1,0.5f);
+        Gizmos.DrawSphere(transform.position + groundCheckOffset, groundCheckRadius);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawRay(transform.position + new Vector3(0,1,0), Vector3.down * 0.9f);
     }
 #endregion
 
@@ -328,26 +371,17 @@ public class PlayerMovement : MonoBehaviour
             //WASD movement
             if(!isOnSlope)
             {
-                //if not on sloper use wishDir
+                //if not on slope use wishDir
                 playerVelocity.z += accelSpeed* wishdir.z;
                 playerVelocity.x += accelSpeed* wishdir.x;
             }
             else
             {
-                //when player is on slope
-                slopeMoveDir = Vector3.ProjectOnPlane(wishdir, onSlope.normal);
-                playerVelocity += accelSpeed* slopeMoveDir;
+                //when player is on slope use slope dir
+                //slopeMoveDir = Vector3.ProjectOnPlane(wishdir, onSlope.normal);
+                playerVelocity += accelSpeed * slopeMoveDir;
             }
             
-            
-            //Reset y vel when on ground, but with onSlope's normal 
-            //So when applying opposite equal force, the angle of surface is calculated
-            if(!wishJump && isGrounded)
-            ResetYVel();
-
-            //apply friction when on ground but not for the first frame
-            //if(lateFriction)      
-            //ApplyFriction();  //decaprecated, moved to latefixedupdate
     }
     void AirPhysics(float _currentSpeed)
     {
@@ -370,7 +404,7 @@ public class PlayerMovement : MonoBehaviour
     }
 #endregion
 
-#region Ground air check + cap bhop speed
+#region Ground air check + cap bhop speed + crouch
     void CapBhopSpeed()
     {
         //capping bhop speed 
@@ -380,7 +414,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void CheckGroundedOrInAir()
     {
-         if(isGrounded) //while grounded
+        if(isGrounded) //while grounded
         {
             currentState = State.Grounded;
 
@@ -396,6 +430,25 @@ public class PlayerMovement : MonoBehaviour
             stepOnGround = 0;
             stepInAir += 1;
         }
+    }
+
+    private void CheckToCrouch()
+    {
+        Vector3 targetScale = wishCrouching ?  //if holding inputs or not
+            targetScale = new Vector3(1, standYScale - crouchDistance, 1) :      //crouched
+            targetScale = new Vector3(1, standYScale, 1);                       //stand
+
+        if(transform.localScale != targetScale)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, targetScale, crouchInOutSpeed * Time.deltaTime);
+        }
+
+        //push player up if he is underground
+        // RaycastHit[] hits = Physics.RaycastAll(transform.position + new Vector3(0,1,0), Vector3.down , 0.9f, groundMask);
+        // if(hits.Length > 0)
+        // {   
+        //     playerVelocity.y += Mathf.Lerp(playerVelocity.y, crouchInOutSpeed , crouchInOutSpeed * Time.deltaTime); 
+        // }
     }
 #endregion
 
@@ -434,69 +487,67 @@ public class PlayerMovement : MonoBehaviour
            playerVelocity.z -= hit.normal.z * Vector3.Dot(playerVelocity, hit.normal);
            playerVelocity.x -= hit.normal.x * Vector3.Dot(playerVelocity, hit.normal);
 
-            if(playerVelocity.y > 2)//stay on ceiling just a bit longer, otherwise slight touch with the ceiling will start going down fast
-           playerVelocity.y -= hit.normal.y * Vector3.Dot(hit.moveDirection, hit.normal);
+            //stay on ceiling just a bit longer, otherwise slight touch with the ceiling will start going down fast
+            if(playerVelocity.y > 2 && (controller.collisionFlags & CollisionFlags.Above) != 0)
+            playerVelocity.y -= hit.normal.y * Vector3.Dot(hit.moveDirection, hit.normal);
 
-           // Debug.Log(Vector3.Dot(hit.moveDirection, hit.normal));
+            //when grounded apply the raycast normal direction, works on flat and slope surface
+            if(isGrounded)
+            {
+                //Vector3 oppositeForce = onSlope.normal * Vector3.Dot(playerVelocity, onSlope.normal);
+                //playerVelocity -= oppositeForce; ///reset yvel
+                //playerVelocity.y = Mathf.Lerp(playerVelocity.y, -1f, 0.5f/Time.deltaTime); 
+
+                //need to apply opposite normal force instead
+                //Vector3 slopeNormal = -onSlope.normal;
+                //magnetism = slopeNormal;
+                //playerVelocity += magnetism.normalized  * Time.deltaTime;
+                
+                ////////////////////////////////////////////////
+                // Vector3 slopeNormal = -onSlope.normal.normalized;
+                // magnetism = Vector3.MoveTowards(playerVelocity, slopeNormal, 0.1f);
+                    
+                // playerVelocity += magnetism.normalized  * Time.deltaTime;
+
+                if(Physics.Raycast(transform.position, -onSlope.normal.normalized , out RaycastHit hitGround, 0.25f, groundMask))
+                {
+                    //Vector3 targetPos = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+
+                    
+                }
+            }
         }
-    }
-    //when grounded apply the raycast normal direction, works on flat and slope surface
-    public void ResetYVel()
-    {
-        playerVelocity -= onSlope.normal * Vector3.Dot(playerVelocity, onSlope.normal);
     }
 #endregion
 
 #region jump physics
-    void QueueJump()
-    {
-        playerVelocity.y += jumpForce;
-        //playerVelocity.y = Mathf.Lerp(playerVelocity.y, jumpForce, 0.2f);
-    }
+    //private void QueueJump() => playerVelocity.y += jumpForce;
+    
     //wish jump false for invoking
-    public void WJF()
-    {
-        if(!isGrounded)
-        wishJump = false;
-        called = false;
-    }
+    // private void WJF()
+    // {
+    //     if(!isGrounded)
+    //     wishJump = false;
+
+    //     called = false;
+    // }
 #endregion
 
 #region slope physics
     //handles ground movement when player is on slopes, prevents skipping down slopes 
-    void CheckOnSlope()
-    {
-        if(Physics.Raycast(groundCheck.position, Vector3.down, out onSlope, 0.6f, groundMask))
-        {
-            //when hitting raycasting into the ground, if the normal is not up, must be on slope
-            if(onSlope.normal!= Vector3.up)
-            {
-                isOnSlope = true;
-            }
-            else
-            {
-                isOnSlope = false;
-            }
-        }
-        else isOnSlope = false;
-    }
-    void OnDrawGizmos()
-    {
-        //Gizmos.DrawLine(groundCheck.position, Vector3.forward);
-        Gizmos.DrawRay(groundCheck.position, Vector3.down* snapGroundRayLength);
-        Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);
-    }
+    // bool IfOnSlope()
+    // {
+    //     return Physics.Raycast(groundCheck.position, Vector3.down, out onSlope, 0.6f, groundMask) ? true : false;
+    // }
     void SnapOnGround()
     {
         //bool r = Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, snapGroundRayLength, groundMask);
        // Debug.Log("bruh"+ hit.normal);
-
         
-        
-        if (stepInAir > 10 || stepSinceJumped <= 2 || stepSinceKockback < 5) //abort when just jumped or havn't been in air long enough
+        if (stepInAir > 2 || stepSinceJumped <= 3 || stepSinceKockback < 5) //abort when just jumped or havn't been in air long enough
 		return ;
 
-        if (!Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, snapGroundRayLength, groundMask))
+        if (!Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, snapGroundRayLength, groundMask))
         return;
 
         if (hit.normal.y < minGroundDotProduct) //if surface is too steep, return

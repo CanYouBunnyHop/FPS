@@ -14,11 +14,12 @@ public class AssaultRifle : GunBehaviour
     [Header("probably should be static")]
     [SerializeField] private PlayerMovement pm;
     [SerializeField] private LayerMask nadeHitSurface;
+    //[SerializeField] private VisualEffect mflash;
 
     //Changing firemode for this gun will break script since things are hard coded, maybe need to rewrite more code?
     //But will be difficult because each guns are unique
 
-    public override void BehaviorFixedUpdate()
+    public override void Behavior_FixedUpdate()
     {
         ARgrenadeData.CoolingDown();
 
@@ -69,7 +70,7 @@ public class AssaultRifle : GunBehaviour
     }
 
     #region Input
-    protected override void EnqueueShootInput(GunDataSO.FireMode _fireMode, int? _fireInput)
+    protected override void EnqueueShoot_Input(GunDataSO.FireMode _fireMode, int? _fireInput)
     {
         switch(_fireMode)
         {
@@ -97,9 +98,9 @@ public class AssaultRifle : GunBehaviour
         }
         //base.EnqueueShootInput(_fireMode, _fireInput);
     }
-    protected override void ReloadInput()
+    protected override void Reload_Input()
     {
-        base.ReloadInput();
+        base.Reload_Input();
     }
     #endregion
 

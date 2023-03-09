@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.VFX;
+using UnityEngine.VFX.Utility;
 public abstract class GunBehaviour : MonoBehaviour
 {
     //Important Note:
@@ -28,7 +29,7 @@ public abstract class GunBehaviour : MonoBehaviour
     //extra for determining if can shoot
     [Header("recoil debug")]
     public int shootTimes = 0;
-    public float dX {get; protected set;}
+    public float dX {get; protected set;} //recoil vector
     public float dY {get; protected set;}
 
     
@@ -36,20 +37,19 @@ public abstract class GunBehaviour : MonoBehaviour
     [Header("reload + queueing fire")]
     protected Coroutine reload;
     public Queue<FireInputActionItem> FireIAIQ;
-    
-    //[SerializeField]protected bool firing;
-    /// <summary>
-    /// Firemode is Tkey, bool = single fire, !bool = auto fire
-    /// </summary>
     protected static Dictionary<GunDataSO.FireMode,bool> FireModeDatas;
+
+    [Header("Muzzle Flash")]
+    [SerializeField] protected MuzzleFlashObject[] normalFlashes; //for m1 shooting
+    [SerializeField] protected MuzzleFlashObject[] specialFlashes; // for weapon abilities
+    [SerializeField] protected VisualEffectAsset vfxAsset;
 
     [Header("Debug")]
     [SerializeField]protected bool canShoot;
     [SerializeField]protected bool canSpecialShoot;
-    [SerializeField]public float timeSinceLastShot {get; protected set;}
-    [SerializeField]public float timeBetweenShots {get; protected set;}
+    [SerializeField]protected float timeSinceLastShot;
+    [SerializeField]protected float timeBetweenShots;
     [SerializeField]protected Vector3 aimDir;
-
 
     protected void Awake()
     {
@@ -73,9 +73,36 @@ public abstract class GunBehaviour : MonoBehaviour
         };
 
         timeBetweenShots = 1 / (gunData.fireRate / 60); //fire rate is in rpm, rounds per minute
+
+        //get vfx objects
+        GetMFlashVFX(0, ref normalFlashes);
+        GetMFlashVFX(1, ref specialFlashes);
+
+        ///<header> m flashes are child gameobjects of weapons that contains vfx </header>///
+        ///<summary> childIndex 0 should be MFlash Container, 1 will be SMFlash </summary>///
+        void GetMFlashVFX(int childIndex, ref MuzzleFlashObject[] o_flashes)
+        {
+            int iteration = 0;
+            Transform container = gunModel.transform.GetChild(childIndex);
+            GameObject[] childList = new GameObject[container.childCount]; //make new array that reflects it's child count
+            o_flashes = new MuzzleFlashObject[container.childCount];
+
+            foreach(Transform child in container) //get all child
+            {
+                var vfx = child.GetComponent<VisualEffect>();
+                var light = child.GetComponent<Light>();
+                var flashObject = new MuzzleFlashObject(vfxAsset,vfx, light);
+
+                o_flashes[iteration] = flashObject;
+
+                iteration++;
+            }
+            
+        }
+    
     }
     #region for manager update and fixedUpdate
-    public virtual void BehaviorFixedUpdate()
+    public virtual void Behavior_FixedUpdate()
     {
         canShoot = !gunData.isReloading && timeSinceLastShot > timeBetweenShots && gunData.currentAmmo > 0;
 
@@ -123,47 +150,37 @@ public abstract class GunBehaviour : MonoBehaviour
         }
     }
     
-    public void BehaviorInputUpdate()
+    public void Behavior_InputUpdate()
     {
         //hold or tap
-        InputUpdate(FireModeDatas.GetValueOrDefault(gunData.defaultFireMode) ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0), 
+        Fire_Input(FireModeDatas.GetValueOrDefault(gunData.defaultFireMode) ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0), 
                     FireModeDatas.GetValueOrDefault(gunData.specialFireMode) ? Input.GetMouseButtonDown(2) : Input.GetMouseButton(2));
 
-        ReloadInput();
+        Reload_Input();
 
-        //
-        //Debug.Log("THIS IS MOUSE " + mouseInput);
-    }
-    private void InputUpdate(bool _m0, bool _m2) //the bool is input.getmouse
-    {
-        if(_m0) 
-        {
-            EnqueueShootInput(gunData.defaultFireMode, 0); //left click
-        }
-        
-        if(_m2) 
-        {
-            EnqueueShootInput(gunData.specialFireMode, 2); //middle click
-        }
-        
-        if(Input.GetKeyDown(KeyCode.LeftAlt))
-        {
-            gunData.backwards = !gunData.backwards; //toggle aimBackwards
-        }
-
-       //cam.fieldOfView = Input.GetMouseButton(1) ? gunData.ADS_fov : camDefaultFOV;
-       cam.fieldOfView = Input.GetMouseButton(1) ? Mathf.Lerp(cam.fieldOfView, gunData.ADS_fov, Time.deltaTime * gunData.ADS_speed) : 
-                                                   Mathf.Lerp(cam.fieldOfView, camDefaultFOV, Time.deltaTime * gunData.ADS_speed);
+        AimDownSights_Input();
     }
     #endregion
 
     #region  inputs
-
+    private void Fire_Input(bool _m0, bool _m2) //the bool is input.getmouse
+    {
+        if(_m0) 
+        {
+            EnqueueShoot_Input(gunData.defaultFireMode, 0); //left click
+        }
+        
+        if(_m2) 
+        {
+            EnqueueShoot_Input(gunData.specialFireMode, 2); //middle click
+        }
+        
+    }
 
     /// <summary>
     /// _selectFire is Firemode
     /// </summary>
-    protected virtual void EnqueueShootInput(GunDataSO.FireMode _selectFire, int? _fireInput)
+    protected virtual void EnqueueShoot_Input(GunDataSO.FireMode _selectFire, int? _fireInput)
     {
         switch(_selectFire)
         {
@@ -200,13 +217,20 @@ public abstract class GunBehaviour : MonoBehaviour
             break;
         }
     }
-    protected virtual void AimDownSights()
+    protected virtual void AimDownSights_Input()
     {
-        //FOV changes
-        //Shooting less spread + recoil
+        cam.fieldOfView = Input.GetMouseButton(1) ? Mathf.Lerp(cam.fieldOfView, gunData.ADS_fov, Time.deltaTime * gunData.ADS_speed) : 
+                                                   Mathf.Lerp(cam.fieldOfView, camDefaultFOV, Time.deltaTime * gunData.ADS_speed);
         
     }
-    protected virtual void ReloadInput()
+    protected virtual void AimBackWards_Input()
+    {
+        if(Input.GetKeyDown(KeyCode.LeftAlt))
+        {
+            gunData.backwards = !gunData.backwards; //toggle aimBackwards
+        }
+    }
+    protected virtual void Reload_Input()
     {
         //manual Reload
         if (Input.GetKey(KeyCode.R) && gunData.currentAmmo < gunData.magSize)
@@ -217,7 +241,7 @@ public abstract class GunBehaviour : MonoBehaviour
                 //animation
                 Anim_Reload();
             }
-              
+        
         }
         //auto reload
         if ((Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1)) && gunData.currentAmmo <= 0 && timeSinceLastShot > timeBetweenShots-0.2)
@@ -228,14 +252,14 @@ public abstract class GunBehaviour : MonoBehaviour
                 //animation
                 Anim_Reload();
             }
-               
+        
         }
         //Cancel reload
         if (Input.GetMouseButtonDown(0)&& !Input.GetMouseButtonDown(1) && gunData.isReloading &&
         gunData.currentAmmo > 0 && gunData.canCancelReloadWithFire)
         {
             CancelReload(reload);
-            EnqueueShootInput(gunData.defaultFireMode, 0);
+            EnqueueShoot_Input(gunData.defaultFireMode, 0);
             Debug.Log("reload q");
         }
         if (Input.GetMouseButtonDown(3)&& !Input.GetMouseButtonDown(0) && gunData.isReloading &&
@@ -243,7 +267,7 @@ public abstract class GunBehaviour : MonoBehaviour
         {
             CancelReload(reload);
             //EnqueueShootInput(gunData.altFireMode, 1);
-            EnqueueShootInput(gunData.specialFireMode, 2);
+            EnqueueShoot_Input(gunData.specialFireMode, 2);
             Debug.Log("reload q");
         }
     }
@@ -260,7 +284,7 @@ public abstract class GunBehaviour : MonoBehaviour
         //remember dir based on aim backwards bool
         aimDir = gunData.backwards? -cam.transform.forward : cam.transform.forward;
         DefaultRecoilBehavior();
-
+        if(normalFlashes != null) PlayMuzzleFlash(normalFlashes);
         Anim_Shoot();
     }
     /// <summary>
@@ -270,7 +294,7 @@ public abstract class GunBehaviour : MonoBehaviour
     protected virtual void SpecialShoot()
     {
         DefaultRecoilBehavior();
-
+        if(specialFlashes != null)PlayMuzzleFlash(specialFlashes);
         Anim_SpecialShoot();
     }
     private void DefaultRecoilBehavior()
@@ -308,6 +332,16 @@ public abstract class GunBehaviour : MonoBehaviour
         GameObject hole = Instantiate(bulletHoleFx, _hit.point, transform.rotation);
         hole.transform.SetParent(_hit.collider.gameObject.transform);
         //object pooling for the hole fx, to do
+    }
+    protected virtual void PlayMuzzleFlash(MuzzleFlashObject[] vfxes)
+    {
+        if(vfxes.Length == 0) {Debug.Log(gunData.name + ":There is no VFX in the array"); return;}
+
+        foreach(MuzzleFlashObject vfx in vfxes)
+        {
+            vfx.Play();
+            StartCoroutine(vfx.CheckPlayState(1, 5));
+        }
     }
     #region reload
     protected virtual IEnumerator Reload()
@@ -365,4 +399,42 @@ public abstract class GunBehaviour : MonoBehaviour
             fireIAI = _input;
         }
     }
+}
+[System.Serializable]
+public class MuzzleFlashObject //: VFXOutputEventAbstractHandler
+{
+    //public override bool canExecuteInEditor => true;
+    //
+    public VisualEffectAsset vfxAsset;
+    public VisualEffect vfxFlash;
+    public Light light;
+    
+    // readonly int k_LifetimeID = Shader.PropertyToID("lifetime");
+    // readonly ExposedProperty duration = "FlashDuration";
+    public MuzzleFlashObject(VisualEffectAsset _vfxAsset,VisualEffect _vfx, Light _light)
+    {
+        vfxAsset = _vfxAsset;
+        vfxFlash = _vfx;
+        light = _light;
+    }
+    public void Play()
+    {
+        vfxFlash.Play();
+    }
+    //[RequireComponent(typeof(VisualEffect))]
+    public IEnumerator CheckPlayState(float _minLightIntensity, float _maxLightIntensity)
+    {
+        light.enabled = true;
+        light.intensity = Random.Range(_minLightIntensity, _maxLightIntensity);
+        yield return new WaitForSeconds(0.05f);
+        light.enabled = false;
+       // OnVFXOutputEvent(VFXEventAttribute eventAttribute);
+        //light.enabled = vfxFlash.HasAnySystemAwake()? true : false;
+    }
+    //  public override void OnVFXOutputEvent(VFXEventAttribute eventAttribute)
+    // {
+    //     light.enabled = (eventAttribute.GetInt(k_LifetimeID) < vfxFlash.GetFloat(duration))? true : false;
+        
+    //     //light.enabled = vfxFlash.HasAnySystemAwake()? true : false;
+    // }
 }

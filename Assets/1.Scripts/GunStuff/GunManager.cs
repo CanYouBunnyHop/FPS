@@ -53,7 +53,7 @@ public class GunManager : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        currentBehavior.BehaviorFixedUpdate();
+        currentBehavior.Behavior_FixedUpdate();
     }
 
     // Input
@@ -71,7 +71,7 @@ public class GunManager : MonoBehaviour
         indicatorManager.InitMat(_gunToSwitch);
         
         //Gun inputs
-        currentBehavior.BehaviorInputUpdate();
+        currentBehavior.Behavior_InputUpdate();
     }
     
     

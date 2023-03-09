@@ -8,27 +8,25 @@ public class WeaponSway : MonoBehaviour
     [Header("Sway")]
     [SerializeField] float smooth;
     [SerializeField] float rotSmooth;
-    // [SerializeField] float pitchSmooth;
-    // [SerializeField] float rollSmooth;
     [SerializeField] float swayYawMultipier;
     [SerializeField] float swayPitchMultipier;
     [SerializeField] float swayRollMultipier;
 
     [Header("Spring")]
-    private Vector3 movePos;
-    private Vector3 wSpringPos;
     [SerializeField] private float springBumpiness;
     [SerializeField] float springSmooth;
     [SerializeField] float springReturnSmooth;
+    private Vector3 movePos;
+    private Vector3 wSpringPos;
 
     [Header("Bobbing")]
-    private Vector3 bobPos;
     [SerializeField] private float bobSpeed;
     [SerializeField] private float bobScale;
     [SerializeField] private float bobSmooth;
     [SerializeField] private AnimationCurve bobPosX;
     [SerializeField] private AnimationCurve bobPosY;
     [SerializeField]private float timer = 0;
+    private Vector3 bobPos;
     
     //movement
     [Header("References + pivot")]
