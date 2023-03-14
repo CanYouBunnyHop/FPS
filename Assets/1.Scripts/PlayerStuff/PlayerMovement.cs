@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using UnityEngine.InputSystem;
+using FPS.Settings.Keybinds;
 //-------------------------------------------------------------------------------------------------------
 // Remember To change the input manager under project settings for adding counter-strafing
 //
@@ -13,47 +15,54 @@ using System;
 //-------------------------------------------------------------------------------------------------------
 namespace FPS.Player.Movement
 {
+//[RequireComponent(typeof(PlayerInputSystemManager))]
 public class PlayerMovement : MonoBehaviour
 {
+#region references
     [Header("References")]
     public float gravity;
     private CharacterController controller;
     public GrapplingHook hook; //Additional movement abilities
     public LayerMask groundMask;
+    [SerializeField] private PlayerInputSystemManager inputSystemManager;
+#endregion
 
 //--------------------------------------------------------------------------------------------------------
+#region Movement Parameters
     [Header("Jumping")]
     public float jumpForce;
     private RaycastHit onSlope;
-    private Vector3 slopeMoveDir => Vector3.ProjectOnPlane(wishdir, onSlope.normal);
+    private Vector3 slopeMoveDir;// => Vector3.ProjectOnPlane(wishdir, onSlope.normal);
     bool called; //bool for wish jump
 //--------------------------------------------------------------------------------------------------------
     [Header("Ground Move")]
     public float groundSpeed; // Moving on ground;
     public float groundAccelerate;
     public float friction;
-    private float wishSpeed;
+    ///<summary> how much physic steps later to start friction </summary>
+    [Tooltip("how much physic steps later to start friction")][SerializeField]private float lateFrictionDelay;
+    [SerializeField]private float wishSpeed;
+    private float TotalGroundSpeed;
 
     [Header("Air Move")]
     public float airSpeed;
     public float airAccelerate;
     public float capBhopSpeed;
     private float airWishSpeed;
+
 //------------------------------------------------------------------------------------------------------
     [Header("Crouch")]
-    [SerializeField] private float crouchMoveSpeed;
+    [SerializeField] private float crouchSpeedMult;
     [SerializeField] private float crouchInOutSpeed;
     [SerializeField] private float crouchDistance;
     [SerializeField] private bool wishCrouching;
-    public bool isCrouching => wishCrouching && isGrounded;
+    //public bool isCrouching => wishCrouching && isGrounded;
     private float standYScale;
-    // [SerializeField] private float crouchHeight = 0.5f;
-    // [SerializeField] private float standingHeight = 2f;
-    //[SerializeField] private float timeToCrouch = 0.25f;
-    //private Vector3 crouchingPivot = new Vector3(0, 0.5f, 0);
-    //private Vector3 standingPivot = Vector3.zero;
-    //private bool canCrouch => isGrounded;
-    //private bool isCrouching = false;
+
+    [Header("Sprint")]
+    [SerializeField] private float sprintSpeedMult;
+    [SerializeField] private bool wishSprinting;
+#endregion
 //------------------------------------------------------------------------------------------------------
 #region enums
     public enum State
@@ -63,79 +72,89 @@ public class PlayerMovement : MonoBehaviour
         GrapSurface,
         HookEnemy,
     }
-    public enum GroundedMovementState
+    public enum GroundSubState
     {
         Walk,
-        Run,
+        Sprint,
         Crouch,
         Slide,
     }
+    public AbstractState<PlayerMovement> currentGroundSubStateV2;
+    ///<summary> 0, walk | 1, crouch | 2, sprint </summary>///
+    public Dictionary<int, AbstractState<PlayerMovement>> groundSubStates = new Dictionary<int, AbstractState<PlayerMovement>>()
+    {
+        
+        {0, new PlayerState_Walk()}, 
+        {1, new PlayerState_Crouch()}, 
+        {2, new PlayerState_Sprint()}
+    };
+
 #endregion
-    
+#region Snap On Ground
     [Header("Snap On Ground")] [Tooltip("if the hit normal is less than this, abort snap, for steep angles")]
-    public float minGroundDotProduct;
-    public float snapMaxVel; //abort snap if playervel is greater
-    
+    [SerializeField]private float minGroundDotProduct;
+    [SerializeField]private float snapMaxVel; //abort snap if playervel is greater
+#endregion
 //------------------------------------------------------------------------------------------------------
 #region Debug variables
     [Header("Debug")]
     public State currentState;
+    public GroundSubState curGroundSubState; //new
+    //public GrappleState currentGrappleState;
     public Vector3 playerVelocity;
-    public bool isGrounded;
-    [SerializeField]public int stepInAir;
-    [SerializeField]public int stepOnGround;
-    [SerializeField]public int stepSinceJumped; //assign this to anything that will knock player up
+    public bool isGrounded {get; private set;}
+    [SerializeField]public int stepInAir {get; private set;}
+    [SerializeField]public int stepOnGround {get; private set;}
+    [SerializeField]public int stepSinceJumped {get; private set;} //assign this to anything that will knock player up
     [SerializeField]public int stepSinceKockback;
     [SerializeField]private float currentSpeed; //not actual speed, dot product of playervel and wish vel
     private Vector3 wishdir;
     [SerializeField]private bool wishJump = false;
-    private Collider[] gCheckColliders;
-    [SerializeField]private Vector3 magnetism = Vector3.zero;
-    //private float timeElapsed;
     
-    //private bool controllerHitGround;
     public Text text;//UI remove later
 
     [Header("Debug Gizmo")]
-    [SerializeField] private bool drawGizmo;
     [SerializeField] private float snapGroundRayLength;
     [SerializeField] private Vector3 groundCheckOffset;
     [SerializeField] private float groundCheckRadius = 0.3f;
-#endregion
+
 //--------------------------------------------------------------------------------------------------------
     public Vector3 playerZXVel => new Vector3(playerVelocity.x, 0, playerVelocity.z); 
     private bool isOnSlope => Physics.Raycast(transform.position, Vector3.down, out onSlope, 0.6f, groundMask) ? true : false;
     [SerializeField] Coroutine jumpBufferTimer; 
-    
+#endregion
     void Awake()
     {
         controller = GetComponent<CharacterController>();
         hook = GetComponent<GrapplingHook>();
+
         currentState = State.InAir;
+        curGroundSubState = GroundSubState.Walk;
         StartCoroutine(LateFixedUpdate());
 
         standYScale = transform.localScale.y; //get player's y scale which is the standing's height
+
+        currentGroundSubStateV2 = groundSubStates[0];
+        currentGroundSubStateV2.EnterState(this);
     }
 #region Inputs
-    void Direction_Input()
+    void Direction_Input(float _GroundOrAirSpeed, out float _wishSpeed)
     {
         //get WASD input into wish direction
         wishdir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         wishdir = transform.TransformDirection(wishdir);
 		wishdir.Normalize();
-        
-        wishSpeed = wishdir.magnitude; //source code here
-        wishSpeed*= groundSpeed;
 
-        airWishSpeed = wishdir.magnitude;
-        airWishSpeed*= airSpeed;
+        _wishSpeed =  wishdir.magnitude;
+        _wishSpeed *= _GroundOrAirSpeed;
     }
     
     void Jump_Input()
     {
          //Inputs for jump
-        if(Input.GetKeyDown(KeyCode.Space)||Input.GetAxis("Mouse ScrollWheel") < 0f )
+        if(inputSystemManager.jump.triggered) //if(Input.GetKeyDown(KeyCode.Space)||Input.GetAxis("Mouse ScrollWheel") < 0f )
         {
+        
             wishJump = true;
             //Hook cancel with jump
             if(currentState == State.GrapSurface || currentState == State.HookEnemy)
@@ -155,7 +174,7 @@ public class PlayerMovement : MonoBehaviour
 
         IEnumerator JumpBufferTimer()
         {
-            Debug.Log("started");
+            //Debug.Log("started");
             yield return new WaitForSecondsRealtime(0.1f);
 
             if(!isGrounded) wishJump = false;
@@ -167,61 +186,85 @@ public class PlayerMovement : MonoBehaviour
     void Crouch_Input()
     {   
         wishCrouching = Input.GetKey(KeyCode.LeftControl) && isGrounded;
+        
     }
-
-
+    void Sprint_Input()
+    {
+        wishSprinting = Input.GetKey(KeyCode.LeftShift) && !wishCrouching && isGrounded;
+    }
+    
 #endregion
+
 
 #region Updateloops Statemachine / gizmo
     void Update()
     {
         controller.Move(playerVelocity * Time.deltaTime); //since controller don't use unity's physics update, we can getaway with update
-
-        //Check slope
-        //CheckOnSlope();
-
-        //state INPUTS handling
+#region Input StateMachine (Update)
         switch(currentState)
         {
             case State.Grounded:
-            {
-                Direction_Input();
+                Ground_InputSubStateMachine(); //sub stateMachine
                 Jump_Input();
                 Crouch_Input();
-                
-                //previously in FixedUpdate
-                
+                Sprint_Input();
 
-            }
+                //Ground_InputSubStateMachine();
             break;
+
             case State.InAir:
-            {
-                Direction_Input();
+                Direction_Input(airSpeed, out airWishSpeed);
                 Jump_Input();
                 Crouch_Input();
-                //previously in FixedUpdate
-
-                
-                
-            }
             break;
+
             case State.GrapSurface:
-            {
-                Direction_Input();
+                Direction_Input(airSpeed, out airWishSpeed);
                 Jump_Input();
                 hook.CancelHookInput();
-                //previously in FixedUpdate
-                
-            }
             break;
+
             case State.HookEnemy:
-            {
-                Direction_Input();
+                Direction_Input(groundSpeed, out wishSpeed);
                 hook.CancelHookInput();
-                //previously in FixedUpdate
-                
-            }
             break;
+        }
+#endregion
+        //subStateMachine
+        void Ground_InputSubStateMachine()
+        {
+            // switch(curGroundSubState)
+            // {
+            //     case GroundSubState.Walk:
+            //     Direction_Input(groundSpeed, out wishSpeed);
+            //     break;
+
+            //     case GroundSubState.Sprint:
+            //     Direction_Input(groundSpeed, out wishSpeed);
+            //     break;
+
+            //     case GroundSubState.Crouch:
+            //     Direction_Input(groundSpeed, out wishSpeed);
+            //     break;
+
+            //     case GroundSubState.Slide:
+            //     break;
+            // }
+            switch(currentGroundSubStateV2)
+            {
+                case var state when state == groundSubStates[0]: //pattern matching (walk)
+                Direction_Input(groundSpeed, out wishSpeed);
+                break;
+
+                case var state when state == groundSubStates[1]: //pattern matching (crouch)
+                Direction_Input(groundSpeed, out wishSpeed);
+                break;
+
+                case var state when state == groundSubStates[2]: //pattern matching (sprint)
+                Direction_Input(groundSpeed, out wishSpeed);
+                break;
+            }
+
         }
 
         //UI remove later
@@ -230,7 +273,8 @@ public class PlayerMovement : MonoBehaviour
     }
     void FixedUpdate()
     {
-    
+        currentSpeed = Vector3.Dot(wishdir, playerVelocity);
+
         //Check grounded
         isGrounded = Physics.CheckSphere(transform.position + groundCheckOffset , groundCheckRadius , groundMask);
         
@@ -241,32 +285,47 @@ public class PlayerMovement : MonoBehaviour
             playerVelocity.z = 0;
         }
 
-
-        currentSpeed = Vector3.Dot(wishdir, playerVelocity);
-
         //count steps //stay in fixedUpdate
         stepSinceJumped += 1;
         stepSinceKockback += 1;
 
+        //jumping buffer, runs outside of state handler currently, 
+        //reset y vel avoid jump boost on after running on slope
+        if (wishJump && isGrounded)
+        {
+            playerVelocity.y = 0;
+            playerVelocity.y += jumpForce;
+            stepSinceJumped = 0;
+        }
+
+        //calc total ground speed
+        Check_GroundSubState();
+        //TotalGroundSpeed = 
+        Debug.Log(stepInAir);
+        
+
+#region PhysicsStateHandler(old)
         //state Physics handling
         switch(currentState)
         {
             case State.Grounded:
             {
-                GroundPhysics(currentSpeed); //unlike controller.Move(), physics have to be in fixed update for some reason, buggy in Update()
-                CheckGroundedOrInAir();      //Maybe because most of my physics calculation is already in fixedUpdate
+                //GroundPhysics(currentSpeed); //unlike controller.Move(), physics have to be in fixed update for some reason, buggy in Update()
+                Check_GroundedOrInAir();      //Maybe because most of my physics calculation is already in fixedUpdate
                 //
-                CheckToCrouch();                             // Maybe if everything is in Update() movement will be smoother, (not a big difference)
+                Check_CrouchingStanding();                             // Maybe if everything is in Update() movement will be smoother, (not a big difference)
+
+                Ground_PhysicsSubStateMachine();
             }
             break;
             case State.InAir:
             {
                 AirPhysics(currentSpeed);
-                CheckGroundedOrInAir();
+                Check_GroundedOrInAir();
                 CapBhopSpeed();
 
                 SnapOnGround();
-                CheckToCrouch();  
+                Check_CrouchingStanding();
             }
             break;
             case State.GrapSurface:
@@ -289,7 +348,7 @@ public class PlayerMovement : MonoBehaviour
                 hook.CheckObstaclesBetween();
                 if(isGrounded)
                 {
-                    GroundPhysics(currentSpeed);
+                    GroundPhysics(1, currentSpeed);
                 }
                 else
                 {
@@ -299,22 +358,58 @@ public class PlayerMovement : MonoBehaviour
             }
             break;
         }
+        //subStateMachine
+        void Ground_PhysicsSubStateMachine()
+        {
+            // switch(curGroundSubState)
+            // {
+            //     case GroundSubState.Walk:
+            //     GroundPhysics(1,currentSpeed);
+            //     break;
 
-        //jumping buffer, runs outside of state handler currently, 
-        //reset y vel avoid jump boost on after running on slope
-        if (wishJump && isGrounded) playerVelocity.y = 0;
+            //     case GroundSubState.Sprint:
+            //     GroundPhysics(sprintSpeedMult, currentSpeed);
+            //     break;
+
+            //     case GroundSubState.Crouch:
+            //     GroundPhysics(crouchSpeedMult, currentSpeed);
+            //     break;
+
+            //     case GroundSubState.Slide:
+            //     break;
+
+            // }
+            switch(currentGroundSubStateV2)
+            {
+                case var state when state == groundSubStates[0]: //pattern matching (walk)
+                GroundPhysics(1,currentSpeed);
+                break;
+                
+                case var state when state == groundSubStates[1]: //pattern matching (crouch)
+                GroundPhysics(crouchSpeedMult, currentSpeed);
+                break;
+
+                case var state when state == groundSubStates[2]: //pattern matching (sprint)
+                GroundPhysics(sprintSpeedMult, currentSpeed);
+                break;
+            }
+
+        }
+
+#endregion
         
     }   
     IEnumerator LateFixedUpdate()
     {
         while(true)
         {
-            yield return new WaitForFixedUpdate(); //apply this after 1 physics timestep late
+            yield return new WaitForFixedUpdate(); //apply after fixedUpdate
 
             switch(currentState)
             {
                 case State.Grounded:
                 {
+                    if(stepOnGround > lateFrictionDelay)
                     ApplyFriction();
                 }
                 break;
@@ -335,13 +430,6 @@ public class PlayerMovement : MonoBehaviour
                 }
                 break;
             }
-
-            //jump here //LateFixedUpdate
-            if (wishJump && isGrounded)
-            {
-                playerVelocity.y += jumpForce;
-                stepSinceJumped = 0;
-            }
         }
     }
     void OnDrawGizmos()
@@ -358,9 +446,10 @@ public class PlayerMovement : MonoBehaviour
 #endregion
 
 #region Source Engine Code translated to Unity C# / valve physics calculation
-    void GroundPhysics(float _currentSpeed)
+    void GroundPhysics(float _mult, float _currentSpeed)//_mult = sprint or crouch multiplier
     {
-            float addSpeed = wishSpeed - _currentSpeed;
+            wishSpeed *= _mult;
+            float addSpeed = wishSpeed - _currentSpeed; //addspeed is the capped speed
             float accelSpeed = wishSpeed * friction * Time.deltaTime * groundAccelerate; // without deltatime, player accelerate almost instantly
             
              if (accelSpeed > addSpeed) //cap speed
@@ -378,7 +467,7 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 //when player is on slope use slope dir
-                //slopeMoveDir = Vector3.ProjectOnPlane(wishdir, onSlope.normal);
+                slopeMoveDir = Vector3.ProjectOnPlane(wishdir, onSlope.normal);
                 playerVelocity += accelSpeed * slopeMoveDir;
             }
             
@@ -412,7 +501,7 @@ public class PlayerMovement : MonoBehaviour
         playerVelocity.x = Mathf.Clamp(playerVelocity.x, -capBhopSpeed, capBhopSpeed);
     }
 
-    public void CheckGroundedOrInAir()
+    public void Check_GroundedOrInAir()
     {
         if(isGrounded) //while grounded
         {
@@ -432,7 +521,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void CheckToCrouch()
+    ///<Summary> The physics update for switching between Crouching and standing, 
+    ///also pushes player upwards if player is stuck in ground. </Summary>
+    private void Check_CrouchingStanding()
     {
         Vector3 targetScale = wishCrouching ?  //if holding inputs or not
             targetScale = new Vector3(1, standYScale - crouchDistance, 1) :      //crouched
@@ -444,12 +535,37 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //push player up if he is underground
-        // RaycastHit[] hits = Physics.RaycastAll(transform.position + new Vector3(0,1,0), Vector3.down , 0.9f, groundMask);
-        // if(hits.Length > 0)
-        // {   
-        //     playerVelocity.y += Mathf.Lerp(playerVelocity.y, crouchInOutSpeed , crouchInOutSpeed * Time.deltaTime); 
-        // }
+        RaycastHit[] hits = Physics.RaycastAll(transform.position + new Vector3(0,1,0), Vector3.down , 0.9f, groundMask);
+        if(hits.Length > 0)
+        {   
+            playerVelocity.y += Mathf.Lerp(playerVelocity.y, crouchInOutSpeed , crouchInOutSpeed * Time.deltaTime); 
+        }
     }
+
+    void Check_GroundSubState()//ref float o_CrouchMult, ref float o_SprintMult)
+    {
+        if(!wishCrouching && !wishSprinting && currentGroundSubStateV2 != groundSubStates[0]) //walk
+        {
+            //curGroundSubState = GroundSubState.Walk; //CurGroundSubState.Exit( target state = walk);
+            currentGroundSubStateV2.ExitState(this, ref currentGroundSubStateV2, groundSubStates[0]);
+            //currentGroundSubStateV2 = groundSubStates[0];
+        } 
+
+        if(wishCrouching && currentGroundSubStateV2 != groundSubStates[1]) //crouch
+        { 
+            //curGroundSubState = GroundSubState.Crouch;
+            currentGroundSubStateV2.ExitState(this, ref currentGroundSubStateV2, groundSubStates[1]);
+            //currentGroundSubStateV2 = groundSubStates[1];
+        }
+
+        if(wishSprinting && currentGroundSubStateV2 != groundSubStates[2]) //sprint
+        {
+            //curGroundSubState = GroundSubState.Sprint;
+            currentGroundSubStateV2.ExitState(this, ref currentGroundSubStateV2, groundSubStates[2]);
+            //currentGroundSubStateV2 = groundSubStates[2];
+        }
+    } 
+
 #endregion
 
 #region friction/equal opposite force
@@ -467,8 +583,9 @@ public class PlayerMovement : MonoBehaviour
     //Apply equal opposite force after hitting something, like a wall, resets momentum. For some reason it don't work on ceiling
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if(groundMask == (groundMask | (1 << hit.gameObject.layer)))// using bitwise operators equivalent of 
-        {                                                           // if(hit.gameObject.layer == groundMask), 
+        if(groundMask == (groundMask | (1 << hit.gameObject.layer)) && wishdir.magnitude == 0 || !isGrounded)
+        {                                                           // using bitwise operators equivalent of 
+        //                                                          // if(hit.gameObject.layer == groundMask), 
         //                                                          // if using '==' would actually works
         //                                                          // shift operator example
         //                                                          // A = 1, which is '0000 0001' in 8 bit
@@ -492,30 +609,30 @@ public class PlayerMovement : MonoBehaviour
             playerVelocity.y -= hit.normal.y * Vector3.Dot(hit.moveDirection, hit.normal);
 
             //when grounded apply the raycast normal direction, works on flat and slope surface
-            if(isGrounded)
-            {
-                //Vector3 oppositeForce = onSlope.normal * Vector3.Dot(playerVelocity, onSlope.normal);
-                //playerVelocity -= oppositeForce; ///reset yvel
-                //playerVelocity.y = Mathf.Lerp(playerVelocity.y, -1f, 0.5f/Time.deltaTime); 
+            // if(isGrounded)
+            // {
+            //     //Vector3 oppositeForce = onSlope.normal * Vector3.Dot(playerVelocity, onSlope.normal);
+            //     //playerVelocity -= oppositeForce; ///reset yvel
+            //     //playerVelocity.y = Mathf.Lerp(playerVelocity.y, -1f, 0.5f/Time.deltaTime); 
 
-                //need to apply opposite normal force instead
-                //Vector3 slopeNormal = -onSlope.normal;
-                //magnetism = slopeNormal;
-                //playerVelocity += magnetism.normalized  * Time.deltaTime;
+            //     //need to apply opposite normal force instead
+            //     //Vector3 slopeNormal = -onSlope.normal;
+            //     //magnetism = slopeNormal;
+            //     //playerVelocity += magnetism.normalized  * Time.deltaTime;
                 
-                ////////////////////////////////////////////////
-                // Vector3 slopeNormal = -onSlope.normal.normalized;
-                // magnetism = Vector3.MoveTowards(playerVelocity, slopeNormal, 0.1f);
+            //     ////////////////////////////////////////////////
+            //     // Vector3 slopeNormal = -onSlope.normal.normalized;
+            //     // magnetism = Vector3.MoveTowards(playerVelocity, slopeNormal, 0.1f);
                     
-                // playerVelocity += magnetism.normalized  * Time.deltaTime;
+            //     // playerVelocity += magnetism.normalized  * Time.deltaTime;
 
-                if(Physics.Raycast(transform.position, -onSlope.normal.normalized , out RaycastHit hitGround, 0.25f, groundMask))
-                {
-                    //Vector3 targetPos = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+            //     if(Physics.Raycast(transform.position, -onSlope.normal.normalized , out RaycastHit hitGround, 0.25f, groundMask))
+            //     {
+            //         //Vector3 targetPos = new Vector3(transform.position.x, hit.point.y, transform.position.z);
 
                     
-                }
-            }
+            //     }
+            //}
         }
     }
 #endregion

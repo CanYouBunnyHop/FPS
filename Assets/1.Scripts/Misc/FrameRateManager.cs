@@ -8,6 +8,7 @@ public class FrameRateManager : MonoBehaviour
 {
     [SerializeField] private Text FrameRateText;
     private float deltaTime;
+    public float frameRate;
     [Range(30, 300)] [SerializeField] private int cappedFrameRate;
     void Awake () 
     {
@@ -22,7 +23,8 @@ public class FrameRateManager : MonoBehaviour
     {
         deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
         float fps = 1.0f / deltaTime;
-        FrameRateText.text = Mathf.Ceil (fps).ToString ();
+        frameRate = Mathf.Ceil(fps);
+        FrameRateText.text = frameRate.ToString();
     }
 }
 

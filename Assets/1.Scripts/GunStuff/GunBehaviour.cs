@@ -219,6 +219,7 @@ public abstract class GunBehaviour : MonoBehaviour
     }
     protected virtual void AimDownSights_Input()
     {
+        //change this to ... lerp is frame based
         cam.fieldOfView = Input.GetMouseButton(1) ? Mathf.Lerp(cam.fieldOfView, gunData.ADS_fov, Time.deltaTime * gunData.ADS_speed) : 
                                                    Mathf.Lerp(cam.fieldOfView, camDefaultFOV, Time.deltaTime * gunData.ADS_speed);
         

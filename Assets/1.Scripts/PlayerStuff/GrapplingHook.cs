@@ -32,6 +32,8 @@ namespace FPS.Player.Movement
         public float enemyHookDelay;
         private EnemyMovement em;
         private float lowestDistance; //Updates when rope shorter than previous distance, lowest distance reached during grapple
+        //--------------------------------------------------------------------------------------------------------------------------------------
+
         [Header("Timings/Other")]
         public GameObject grapplePoint;
         public float delay;
@@ -78,8 +80,7 @@ namespace FPS.Player.Movement
         private void LateUpdate()
         {
             //visual
-            if (showRope)
-                DrawRope();
+            if (showRope) DrawRope();
         }
         private void FixedUpdate()
         {
@@ -90,18 +91,7 @@ namespace FPS.Player.Movement
             //Get distance
             distance = Vector3.Distance(cam.position, grapplePoint.transform.position);
 
-            //Cool down
-            // if (cdd.cdTimer <= 0 && !cdd.isUsing) //if cooldown is ready and player is not using ability
-            // {
-            //     cdd.canUseAbility = true;
-            // }
-            // else
-            // {
-            //     cdd.canUseAbility = false;
-            //     cdd.cdTimer -= Time.fixedDeltaTime;
-            // }
             cdd.CoolingDown();
-
         }
         //testing
         public void StartGrapple()
@@ -110,6 +100,8 @@ namespace FPS.Player.Movement
             //if hit something
             if (Physics.Raycast(cam.position, cam.forward, out hit, maxDistance, raycastSurface))
             {
+                // hit.collider.tag == "Enemy"? StartHookEnemy() : StartGrappleSurface();
+
                 if (hit.collider.tag == "Enemy")
                 {
                     StartHookEnemy();
@@ -122,7 +114,7 @@ namespace FPS.Player.Movement
             else // if hit nothing
             {
                 //set start on line renderer
-                lerpPos = transform.position;
+                //lerpPos = transform.position;
 
                 //set visual for emptyhook
                 Vector3 emptyHook = cam.forward.normalized * maxDistance;
@@ -313,7 +305,7 @@ namespace FPS.Player.Movement
         public void EndGrapple()
         {
             cdd.isUsing = false;
-            pm.CheckGroundedOrInAir();
+            pm.Check_GroundedOrInAir();
 
             if(em != null && em.currentState == EnemyMovement.State.Hooked)
             {
