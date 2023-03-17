@@ -159,6 +159,8 @@ public abstract class GunBehaviour : MonoBehaviour
         Reload_Input();
 
         AimDownSights_Input();
+        
+        AimBackWards_Input();
     }
     #endregion
 

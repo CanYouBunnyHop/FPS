@@ -25,15 +25,14 @@ public class cooldownDataSO : ScriptableObject
     {
       
         //Cool down
-        if (cdTimer <= 0 && !isUsing) //if cooldown is ready and player is not using ability
+         canUseAbility = (cdTimer <= 0 && !isUsing); //if cooldown is ready and player is not using ability
         {
-            canUseAbility = true;
+            //canUseAbility = true;
         }
-        else
-        {
-            canUseAbility = false;
-            cdTimer -= Time.fixedDeltaTime;
-        }
+        
+        if(cdTimer > 0)
+        cdTimer -= Time.fixedDeltaTime;
+        
         
     }
     public void InitiateCoolDown()

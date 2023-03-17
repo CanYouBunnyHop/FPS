@@ -29,10 +29,10 @@ public class WeaponSway : MonoBehaviour
     [SerializeField]private float timer = 0;
     private Vector3 bobPos;
 
-    //[Header("Backwards")]
-    // [SerializeField] private float targetSwayRotX = -45;
-    // [SerializeField] private float targetPivotRotX = -140;
-    // [SerializeField] private float swingBackSmooth;
+    [Header("Backwards")]
+    [SerializeField] private float targetSwayRotX = -45;
+    [SerializeField] private float targetPivotRotX = -140;
+    [SerializeField] private float swingBackSmooth;
     public bool toggleBackTest; //remove later
     
     [Header("References + pivot")]
@@ -70,7 +70,7 @@ public class WeaponSway : MonoBehaviour
         WeaponSpring();
 
         //Swing Back
-        //WeaponSwingBackwards();
+        //WeaponSwingBackwards(out Quaternion _swayConSwing, out Quaternion _pivotSwing);
 
         weaponPivot.localPosition = pivotPosOffset + bobPos + springPos;
         transform.localPosition = cam.transform.localPosition; //follow camera's position, since it's no longer a child of camera
@@ -132,15 +132,16 @@ public class WeaponSway : MonoBehaviour
         o_targetRotation = rotationX * rotationY * rotationZ;
     }
     
-    private void WeaponSwingBackwards() //using AnimationIK
-    {
-        // Quaternion targetRot = new Quaternion(targetSwayRotX, 0, 0, 0);
-        // Quaternion pivotTargetRot = new Quaternion(targetPivotRotX, 0, 0, 0);
+    // private void WeaponSwingBackwards(out Quaternion _swayConSwing, out Quaternion _pivotSwing) //using AnimationIK
+    // {
+    //     Quaternion targetRot = new Quaternion(targetSwayRotX, 0, 0, 0);
+    //     Quaternion pivotTargetRot = new Quaternion(targetPivotRotX, 0, 0, 0);
     
-        // Quaternion trot = toggleBackTest? targetRot : Quaternion.identity;
-        // Quaternion prot = toggleBackTest? pivotTargetRot : Quaternion.identity;
+    //     Quaternion trot = toggleBackTest? targetRot : Quaternion.identity;
+    //     Quaternion prot = toggleBackTest? pivotTargetRot : Quaternion.identity;
 
-        // _swayConSwing = trot;
-        // _pivotSwing = prot;
-    }
+    //     _swayConSwing = Quaternion.RotateTowards(transform.localRotation, trot, swingBackSmooth * Time.deltaTime);
+    //     _pivotSwing = Quaternion.RotateTowards(weaponPivot.localRotation, prot, swingBackSmooth * Time.deltaTime);
+
+    // }
 }

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Enemy.Movement;
+using UnityEngine.InputSystem;
+using FPS.Settings;
 
 
 namespace FPS.Player.Movement
@@ -14,30 +16,32 @@ namespace FPS.Player.Movement
         // Hook = Player <--to-- target
         //---------------------------------------------------------------------------
         [Header("Grapple Surface")]
-        public float maxDistance;
         public float grappleSpeed;
         public float grappleMaxSpeed;
+        ///<summary> how close do you need to be to the grapple target pos to cancel hook </summary>
         public float distanceThreshold;
-        public float ropeStretchScale;
-
+        public float ropeStretchScale; 
         public float steeringStrength;
         public AnimationCurve steeringStrengthMult;
         private float steeringDuration;
         public float grappleAirFriction;
 
-        public LayerMask raycastSurface;
 
         [Header("Hook Enemy")]
         public float flySpeed;
         public float enemyHookDelay;
         private EnemyMovement em;
-        private float lowestDistance; //Updates when rope shorter than previous distance, lowest distance reached during grapple
+        
         //--------------------------------------------------------------------------------------------------------------------------------------
 
-        [Header("Timings/Other")]
-        public GameObject grapplePoint;
+        [Header("Timings/Settings")]
+        public float maxDistance;
         public float delay;
         public float fovBreak;
+
+        [Header("References")]
+        public LayerMask raycastSurface;
+        public GameObject grapplePoint;
         private PlayerMovement pm;
         private Transform cam;
         [SerializeField]private cooldownDataSO cdd;
@@ -46,14 +50,15 @@ namespace FPS.Player.Movement
         private Vector3 lerpPos;
         private LineRenderer rope;
         //---------------------------------------------------------------------------------------------
+        [Header("Debug")]
+        [SerializeField] private bool wishGrapHook;
+        public bool WishGrapHook => wishGrapHook;
+        [SerializeField] private float lowestDistance; //Updates when rope shorter than previous distance, lowest distance reached during grapple
+        [SerializeField] private bool wasInAir;
         private RaycastHit hit;
         private Vector3 grappleDir;
         private float distance;
-        private bool showRope = false;
         private float initialDistance = 0;
-        [Header("Debug")]
-        [SerializeField] private bool wasInAir;
-        //private bool isUsing;
         
 
         void Awake()
@@ -61,26 +66,18 @@ namespace FPS.Player.Movement
             pm = GetComponent<PlayerMovement>();
             cam = Camera.main.transform;
             rope = GetComponent<LineRenderer>();
+            rope.enabled = false;
 
             cdd.AwakeTimer();
         }
-        private void Update()
+        public void GrappleHook_Input()
         {
-            if (Input.GetKeyDown(KeyCode.Q) && cdd.canUseAbility)
-            {
-                lerpPos = transform.position;
-                //visual
-                showRope = true;
-                rope.enabled = true;
-                em = null;
-                
-                StartGrapple();
-            }
+            wishGrapHook = Input.GetKeyDown(KeyCode.Q) && cdd.canUseAbility;
         }
         private void LateUpdate()
         {
             //visual
-            if (showRope) DrawRope();
+            if (rope.enabled) DrawRope();
         }
         private void FixedUpdate()
         {
@@ -92,30 +89,43 @@ namespace FPS.Player.Movement
             distance = Vector3.Distance(cam.position, grapplePoint.transform.position);
 
             cdd.CoolingDown();
+
         }
         //testing
-        public void StartGrapple()
+        public void StartGrappleHook()
         {
             cdd.isUsing = true;
+            lerpPos = transform.position;
+
+            //turn on visual
+            rope.enabled = true;
+            em = null;
+            
             //if hit something
             if (Physics.Raycast(cam.position, cam.forward, out hit, maxDistance, raycastSurface))
             {
-                // hit.collider.tag == "Enemy"? StartHookEnemy() : StartGrappleSurface();
-
                 if (hit.collider.tag == "Enemy")
                 {
-                    StartHookEnemy();
+                    //StartHookEnemy();
+                    // set grappling hook target position
+                    grapplePoint.transform.SetParent(hit.collider.gameObject.transform);
+                    grapplePoint.transform.position = hit.collider.transform.position;  
+                    StartCoroutine(pm.DelayExitState(pm.actionSubStates, 1, delay));
+                    //pm.currentActionSubState.ExitState(pm, ref pm.currentActionSubState, pm.actionSubStates[1]);
                 }
                 else
                 {
-                    StartGrappleSurface();
+                    //StartGrappleSurface();
+                    grapplePoint.transform.SetParent(hit.collider.gameObject.transform);
+                    grapplePoint.transform.position = hit.point;
+                    StartCoroutine(pm.DelayExitState(pm.actionSubStates, 2, delay));
+                    //pm.currentActionSubState.ExitState(pm, ref pm.currentActionSubState, pm.actionSubStates[2]);
+                    Debug.Log("Grapple Raycast Hit Surface");
                 }
             }
+            
             else // if hit nothing
             {
-                //set start on line renderer
-                //lerpPos = transform.position;
-
                 //set visual for emptyhook
                 Vector3 emptyHook = cam.forward.normalized * maxDistance;
                 grapplePoint.transform.position = transform.position + emptyHook;
@@ -124,22 +134,20 @@ namespace FPS.Player.Movement
             }
         }
         #region  grapple functions, start and loop
-        void StartGrappleSurface()
+        public void StartGrappleSurface()
         {
+            Debug.Log("ADD");
             wasInAir = false;
             //get initial distance
             initialDistance = Vector3.Distance(cam.position, hit.point);
-
-            // set grappling hook target position
-            grapplePoint.transform.SetParent(hit.collider.gameObject.transform);
-            grapplePoint.transform.position = hit.point;
 
             //reset value of lowest distance
             lowestDistance = initialDistance;
 
             //delayed switch state
-            IEnumerator DSS = pm.DelayedSwitchState(PlayerMovement.State.GrapSurface, delay);
-            StartCoroutine(DSS);
+            // IEnumerator DSS = pm.DelayedSwitchState(PlayerMovement.State.GrapSurface, delay);
+            // StartCoroutine(DSS);
+            //StartCoroutine(pm.DelayExitState(pm.actionSubStates, 2, delay));
 
             //reset y velocity if not grounded
             Invoke(nameof(ResetVel), delay - 0.1f);
@@ -175,7 +183,7 @@ namespace FPS.Player.Movement
         //     lerpPos = transform.position;
         //}
     #endregion
-        void StartHookEnemy()
+        public void StartHookEnemy()
         {
             em = hit.collider.GetComponent<EnemyMovement>();
 
@@ -183,8 +191,9 @@ namespace FPS.Player.Movement
             grapplePoint.transform.position = hit.collider.transform.position;//render the rope on the center of enemy, different to surfaces
 
             //delayed switch state
-            IEnumerator DSS = pm.DelayedSwitchState(PlayerMovement.State.HookEnemy, delay + enemyHookDelay);
-            StartCoroutine(DSS);
+            // IEnumerator DSS = pm.DelayedSwitchState(PlayerMovement.State.HookEnemy, delay + enemyHookDelay);
+            // StartCoroutine(DSS);
+            //StartCoroutine(pm.DelayExitState(pm.actionSubStates, 1, delay));
         }
         public void ExecuteGrappleSurface()
         {
@@ -192,7 +201,7 @@ namespace FPS.Player.Movement
             float scale = distance / maxDistance;
 
             //slows player down if player has been over spinning, similar to friction
-            float omDotVD = 1 - Vector3.Dot(pm.playerVelocity.normalized, grappleDir);
+            float omDotVD = 1 - Vector3.Dot(pm.playerVelocity.normalized, grappleDir);//omDotVD = one minus dot velocity direction
             pm.playerVelocity -= (pm.playerVelocity * omDotVD) * grappleAirFriction * Time.deltaTime;
 
             //pull player to object, always
@@ -203,9 +212,7 @@ namespace FPS.Player.Movement
             pm.playerVelocity += SteerGrapple() * Time.deltaTime;
 
             //stop players from speeding up infinitely by capping speed
-            pm.playerVelocity.x = Mathf.Clamp(pm.playerVelocity.x, -grappleMaxSpeed, grappleMaxSpeed);
-            pm.playerVelocity.y = Mathf.Clamp(pm.playerVelocity.y, -grappleMaxSpeed, grappleMaxSpeed);
-            pm.playerVelocity.z = Mathf.Clamp(pm.playerVelocity.z, -grappleMaxSpeed, grappleMaxSpeed);
+            pm.playerVelocity = Vector3.ClampMagnitude(pm.playerVelocity, grappleMaxSpeed);
 
             steeringDuration += Time.deltaTime;
         }
@@ -233,7 +240,7 @@ namespace FPS.Player.Movement
 
         }
         #endregion 
-        Vector3 SteerGrapple()
+        private Vector3 SteerGrapple()
         {
             float m = steeringStrengthMult.Evaluate(steeringDuration);
             m = Mathf.Clamp(m, 0, steeringStrengthMult.Evaluate(steeringDuration));
@@ -267,16 +274,16 @@ namespace FPS.Player.Movement
                 EndGrapple();
             }
         }
-        public void CheckDistanceAfterGrapple()
+        public void CheckDistanceThreshold()
         {
             if (distance <= distanceThreshold)  //End grapple after reaching destination
             {
                 EndGrapple();
             }
         }
-        public void CancelHookInput()
+        public void CancelHook_Input(PlayerInputSystemManager _manager)
         {
-            if (Input.GetKeyDown(KeyCode.LeftControl))
+            if (_manager.grappleHook.triggered)
             {
                 EndGrapple();
             }
@@ -305,7 +312,7 @@ namespace FPS.Player.Movement
         public void EndGrapple()
         {
             cdd.isUsing = false;
-            pm.Check_GroundedOrInAir();
+            pm.Core_StateCheck();
 
             if(em != null && em.currentState == EnemyMovement.State.Hooked)
             {
@@ -313,7 +320,6 @@ namespace FPS.Player.Movement
                 em = null;
             }
 
-            showRope = false;
             rope.enabled = false;
             initialDistance = 0;
             wasInAir = false;
@@ -321,6 +327,7 @@ namespace FPS.Player.Movement
             //Initiate Cooldown
             //cdd.cdTimer = cdd.cdTime;
             cdd.InitiateCoolDown();
+            pm.currentActionSubState.ExitState(pm, ref pm.currentActionSubState, pm.actionSubStates[0]); //return to idle in action state
         }
         #endregion
 
@@ -330,12 +337,11 @@ namespace FPS.Player.Movement
             lerpPos = Vector3.Lerp(lerpPos, grapplePoint.transform.position, delay - 0f);
             rope.SetPosition(1, lerpPos);
         }
-        public void ResetVel()
+        private void ResetVel()
         {
             //apply equal opposite momentum
             if (pm.playerVelocity.y <= 0 && !pm.isGrounded)
             {
-
                 pm.playerVelocity -= Vector3.up * Vector3.Dot(pm.playerVelocity, Vector3.up);
             }
         }

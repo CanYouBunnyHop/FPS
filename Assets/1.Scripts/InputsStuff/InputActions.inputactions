@@ -67,6 +67,33 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "CycleWeaponUp",
+                    "type": "Value",
+                    "id": "ede36063-878a-4a5e-a298-d40af5b70035",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "CycleWeaponDown",
+                    "type": "Value",
+                    "id": "74f10085-a9de-4d7b-bf2d-992d0ba2a9ed",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "GrapplingHook",
+                    "type": "Button",
+                    "id": "a79caf74-827d-45ba-893c-5bf32d1ff147",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -199,6 +226,39 @@
                     "processors": "",
                     "groups": "PC MnK",
                     "action": "BackAiming",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b67c7f11-a6a0-4c04-968e-82a6b6343b99",
+                    "path": "<Mouse>/scroll/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PC MnK",
+                    "action": "CycleWeaponUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e37c7f03-fd97-4bd0-afaf-01ba7cc9d394",
+                    "path": "<Mouse>/scroll/down",
+                    "interactions": "",
+                    "processors": "Invert",
+                    "groups": "PC MnK",
+                    "action": "CycleWeaponDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9fb3be36-0676-40bf-9238-51e41fc8f5b9",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PC MnK",
+                    "action": "GrapplingHook",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

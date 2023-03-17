@@ -89,6 +89,33 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CycleWeaponUp"",
+                    ""type"": ""Value"",
+                    ""id"": ""ede36063-878a-4a5e-a298-d40af5b70035"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""CycleWeaponDown"",
+                    ""type"": ""Value"",
+                    ""id"": ""74f10085-a9de-4d7b-bf2d-992d0ba2a9ed"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""GrapplingHook"",
+                    ""type"": ""Button"",
+                    ""id"": ""a79caf74-827d-45ba-893c-5bf32d1ff147"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -223,6 +250,39 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""action"": ""BackAiming"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b67c7f11-a6a0-4c04-968e-82a6b6343b99"",
+                    ""path"": ""<Mouse>/scroll/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""PC MnK"",
+                    ""action"": ""CycleWeaponUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e37c7f03-fd97-4bd0-afaf-01ba7cc9d394"",
+                    ""path"": ""<Mouse>/scroll/down"",
+                    ""interactions"": """",
+                    ""processors"": ""Invert"",
+                    ""groups"": ""PC MnK"",
+                    ""action"": ""CycleWeaponDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9fb3be36-0676-40bf-9238-51e41fc8f5b9"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""PC MnK"",
+                    ""action"": ""GrapplingHook"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -255,6 +315,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_PlayerActionMap_Fire = m_PlayerActionMap.FindAction("Fire", throwIfNotFound: true);
         m_PlayerActionMap_ADS = m_PlayerActionMap.FindAction("ADS", throwIfNotFound: true);
         m_PlayerActionMap_BackAiming = m_PlayerActionMap.FindAction("BackAiming", throwIfNotFound: true);
+        m_PlayerActionMap_CycleWeaponUp = m_PlayerActionMap.FindAction("CycleWeaponUp", throwIfNotFound: true);
+        m_PlayerActionMap_CycleWeaponDown = m_PlayerActionMap.FindAction("CycleWeaponDown", throwIfNotFound: true);
+        m_PlayerActionMap_GrapplingHook = m_PlayerActionMap.FindAction("GrapplingHook", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -321,6 +384,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerActionMap_Fire;
     private readonly InputAction m_PlayerActionMap_ADS;
     private readonly InputAction m_PlayerActionMap_BackAiming;
+    private readonly InputAction m_PlayerActionMap_CycleWeaponUp;
+    private readonly InputAction m_PlayerActionMap_CycleWeaponDown;
+    private readonly InputAction m_PlayerActionMap_GrapplingHook;
     public struct PlayerActionMapActions
     {
         private @InputActions m_Wrapper;
@@ -332,6 +398,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         public InputAction @Fire => m_Wrapper.m_PlayerActionMap_Fire;
         public InputAction @ADS => m_Wrapper.m_PlayerActionMap_ADS;
         public InputAction @BackAiming => m_Wrapper.m_PlayerActionMap_BackAiming;
+        public InputAction @CycleWeaponUp => m_Wrapper.m_PlayerActionMap_CycleWeaponUp;
+        public InputAction @CycleWeaponDown => m_Wrapper.m_PlayerActionMap_CycleWeaponDown;
+        public InputAction @GrapplingHook => m_Wrapper.m_PlayerActionMap_GrapplingHook;
         public InputActionMap Get() { return m_Wrapper.m_PlayerActionMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -362,6 +431,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @BackAiming.started -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnBackAiming;
                 @BackAiming.performed -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnBackAiming;
                 @BackAiming.canceled -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnBackAiming;
+                @CycleWeaponUp.started -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnCycleWeaponUp;
+                @CycleWeaponUp.performed -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnCycleWeaponUp;
+                @CycleWeaponUp.canceled -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnCycleWeaponUp;
+                @CycleWeaponDown.started -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnCycleWeaponDown;
+                @CycleWeaponDown.performed -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnCycleWeaponDown;
+                @CycleWeaponDown.canceled -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnCycleWeaponDown;
+                @GrapplingHook.started -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnGrapplingHook;
+                @GrapplingHook.performed -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnGrapplingHook;
+                @GrapplingHook.canceled -= m_Wrapper.m_PlayerActionMapActionsCallbackInterface.OnGrapplingHook;
             }
             m_Wrapper.m_PlayerActionMapActionsCallbackInterface = instance;
             if (instance != null)
@@ -387,6 +465,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @BackAiming.started += instance.OnBackAiming;
                 @BackAiming.performed += instance.OnBackAiming;
                 @BackAiming.canceled += instance.OnBackAiming;
+                @CycleWeaponUp.started += instance.OnCycleWeaponUp;
+                @CycleWeaponUp.performed += instance.OnCycleWeaponUp;
+                @CycleWeaponUp.canceled += instance.OnCycleWeaponUp;
+                @CycleWeaponDown.started += instance.OnCycleWeaponDown;
+                @CycleWeaponDown.performed += instance.OnCycleWeaponDown;
+                @CycleWeaponDown.canceled += instance.OnCycleWeaponDown;
+                @GrapplingHook.started += instance.OnGrapplingHook;
+                @GrapplingHook.performed += instance.OnGrapplingHook;
+                @GrapplingHook.canceled += instance.OnGrapplingHook;
             }
         }
     }
@@ -409,5 +496,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         void OnFire(InputAction.CallbackContext context);
         void OnADS(InputAction.CallbackContext context);
         void OnBackAiming(InputAction.CallbackContext context);
+        void OnCycleWeaponUp(InputAction.CallbackContext context);
+        void OnCycleWeaponDown(InputAction.CallbackContext context);
+        void OnGrapplingHook(InputAction.CallbackContext context);
     }
 }

@@ -3,15 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace FPS.Settings.Keybinds
+namespace FPS.Settings
 {
 public class PlayerInputSystemManager : MonoBehaviour
 {
     //[SerializeField]private PlayerInput playerInput;
     //private InputAction jumpAction;
     [SerializeField]public InputActions input;
+
+    //Input Actions
     public InputAction jump => input.PlayerActionMap.Jump;
     public InputAction wasd => input.PlayerActionMap.WASD;
+    public InputAction crouch => input.PlayerActionMap.Crouch;
+    public InputAction backAiming => input.PlayerActionMap.BackAiming;
+    public InputAction sprint => input.PlayerActionMap.Sprint;
+    public InputAction grappleHook => input.PlayerActionMap.GrapplingHook;
+
+    //mouse input actions
+    public InputAction fire => input.PlayerActionMap.Fire;
+    public InputAction ads => input.PlayerActionMap.ADS;
+    public InputAction cycleUp => input.PlayerActionMap.CycleWeaponUp;
+    public InputAction cycleDown => input.PlayerActionMap.CycleWeaponDown;
 
     private void Awake()
     {
