@@ -59,7 +59,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DiffuseTexture:
-        m_Texture: {fileID: 2800000, guid: 2493c3ff0accb4b4aa0420f6a17b5a74, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -157,19 +157,20 @@ Material:
     - _ReceiveShadows: 1
     - _RimPower: 1
     - _RimSmoothStep: 0.3
-    - _RimStep: 0.65
+    - _RimStep: 0.9
     - _RimStrength: 1
     - _SHADOWS_SOFT: 1
     - _ShadowEdgeStrength: 1
     - _ShadowPower: 1
     - _ShadowSmoothStep: 0.3
-    - _ShadowStep: 0.65
+    - _ShadowStep: 0.9
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecRampSampleV: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
+    - _TexBlend: 0.9
     - _Thickness: 0.0015
     - _UVSec: 0
     - _WorkflowMode: 1

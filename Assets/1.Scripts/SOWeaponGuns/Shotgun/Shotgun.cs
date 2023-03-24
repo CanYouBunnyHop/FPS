@@ -35,8 +35,8 @@ public class Shotgun : GunBehaviour
         //clear list
         emlist.Clear();
 
-        if (pm.currentState == PlayerMovement.State.GrapSurface 
-        ||  pm.currentState == PlayerMovement.State.HookEnemy)
+        //if (pm.currentState == PlayerMovement.State.GrapSurface ||  pm.currentState == PlayerMovement.State.HookEnemy)
+        if (pm.currentActionSubState is ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
         {
             hook.EndGrapple();
         }

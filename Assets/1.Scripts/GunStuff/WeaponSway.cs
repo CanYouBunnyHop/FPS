@@ -43,6 +43,7 @@ public class WeaponSway : MonoBehaviour
     
     Vector3 mouseAxis;
     Quaternion targetRot;
+    bool highEnough = false;
 
     private void Awake()
     {
@@ -86,7 +87,7 @@ public class WeaponSway : MonoBehaviour
     {
         Vector3 dir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
 
-        if(dir.magnitude > 0 && pm.currentState == PlayerMovement.State.Grounded)
+        if(dir.magnitude > 0 && pm.currentCoreState is CoreState_Grounded)
         {
             timer += bobSpeed * Time.deltaTime;
             float bX = bobPosX.Evaluate(timer);
@@ -107,10 +108,12 @@ public class WeaponSway : MonoBehaviour
         if(pm.stepInAir > 3)
         {
             wSpringPos = new Vector3(0, -springBumpiness,0);
+            highEnough = true;
         }
-        if(pm.stepOnGround < 3 && pm.stepOnGround !=0)
+        if(pm.stepOnGround < 3 && pm.stepOnGround !=0 && highEnough)
         {
             wSpringPos = new Vector3(0, springBumpiness,0);
+            highEnough = false;
         }
 
         springPos = Vector3.Slerp(springPos, wSpringPos, springSmooth * Time.deltaTime);  //spring

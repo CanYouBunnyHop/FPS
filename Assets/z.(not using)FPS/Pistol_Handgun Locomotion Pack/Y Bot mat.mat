@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GREY_mat
+  m_Name: Y Bot mat
   m_Shader: {fileID: -6465566751694194690, guid: 8a99ea882e3f06b499df24c284474098,
     type: 3}
   m_ValidKeywords:
@@ -61,20 +61,12 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _NormalFromTexture_a54b62daee4742169ffea28eaa545358_Texture_0:
-        m_Texture: {fileID: 2800000, guid: 47e1de96875b10a4a81f8b7c9e10ebae, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SampleTexture2D_6a2b501bbf514767b86b07dec817bac3_Texture_1:
-        m_Texture: {fileID: 2800000, guid: 89e6dbbfe7ee1ed4fa223fc2a5d3ca94, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
@@ -105,8 +97,6 @@ Material:
     m_Floats:
     - ADDITIONAL_LIGHT_CALCULATE_SHADOWS: 1
     - MAIN_LIGHT_CALCULATE_SHADOWS: 1
-    - REQUIRE_DEPTH_TEXTURE: 1
-    - REQUIRE_OPAQUE_TEXTURE: 1
     - _AcuteDepthStartDot: 1
     - _AcuteDepthThresholdMult: 1
     - _AlphaClip: 0
@@ -116,28 +106,27 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthStrength: 1
-    - _DepthThreshold: 1
-    - _DepthTightnening: 1
+    - _DepthStrength: 0
+    - _DepthThreshold: 0
+    - _DepthTightnening: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EnvironmentReflections: 1
     - _FarDepthStart: 1
     - _FarDepthThresholdMult: 1
-    - _FarNormalStartDepth: 0
+    - _FarNormalStartDepth: 1
     - _FarNormalThresholdMult: 1
-    - _GlossMapScale: 1
-    - _Glossiness: 0.2
-    - _GlossyReflections: 1
+    - _GlossMapScale: 0
+    - _Glossiness: 0
+    - _GlossyReflections: 0
     - _MAIN_LIGHT_SHADOWS_CASCADE: 1
     - _Metallic: 0
-    - _Mode: 0
     - _NormalsStrength: 1
-    - _NormalsThreshold: 1
+    - _NormalsThreshold: 1.5
     - _NormalsTightnening: 1
     - _OcclusionStrength: 1
-    - _Parallax: 0.02
+    - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RampSampleV: 0
@@ -151,27 +140,26 @@ Material:
     - _ShadowPower: 1
     - _ShadowSmoothStep: 0.3
     - _ShadowStep: 0.9
-    - _Smoothness: 0.5
+    - _Smoothness: 1
     - _SmoothnessTextureChannel: 0
     - _SpecRampSampleV: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
     - _TexBlend: 0.9
-    - _Thickness: 0.0015
-    - _UVSec: 0
+    - _Thickness: 0.001
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.6226415, g: 0.6226415, b: 0.6226415, a: 1}
-    - _Color: {r: 0.62264144, g: 0.62264144, b: 0.62264144, a: 1}
+    - _BaseColor: {r: 0, g: 0.5657749, b: 1, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - _RimColor: {r: 0, g: 1.4067141, b: 1.4980392, a: 0}
-    - _ShadowEdgeColor: {r: 1.2313726, g: 0.4627451, b: 1.0039216, a: 0}
+    - _RimColor: {r: 6.964404, g: 6.157058, b: 0, a: 0}
+    - _ShadowEdgeColor: {r: 0, g: 8.651762, b: 13.14939, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &5100880775429064503
+--- !u!114 &4138187909279829617
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

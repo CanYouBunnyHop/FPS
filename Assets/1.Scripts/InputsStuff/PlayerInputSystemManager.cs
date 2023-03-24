@@ -38,7 +38,7 @@ public class PlayerInputSystemManager : MonoBehaviour
         //input.PlayerActionMap.Jump.started += Dick;
 
         //example event delegates //or "actions" which are Unity made ready to use delegates
-        jump.started += Dick; //Dick(playerInputActions.Player.Jump.started);
+        //jump.started += Dick; //Dick(playerInputActions.Player.Jump.started);
         //playerInputActions.Player.Jump.performed += Dick;
         //playerInputActions.Player.Jump.canceled += Dick;
         
