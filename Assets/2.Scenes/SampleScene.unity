@@ -1898,7 +1898,7 @@ MonoBehaviour:
   jumpForce: 7
   groundSpeed: 15
   groundAccelerate: 1
-  friction: 10
+  friction: 5.6
   slideFriction: 0
   lateFrictionDelay: 2
   wishSpeed: 0
@@ -1920,8 +1920,9 @@ MonoBehaviour:
   wishJump: 0
   text: {fileID: 982004656}
   snapGroundRayLength: 1.3
-  groundCheckOffset: {x: 0, y: 0.25, z: 0}
+  groundCheckOffset: {x: 0, y: 0.22, z: 0}
   groundCheckRadius: 0.4
+  isOnSlope: 0
 --- !u!114 &645168645
 MonoBehaviour:
   m_ObjectHideFlags: 0

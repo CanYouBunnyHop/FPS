@@ -218,7 +218,6 @@ public class PlayerMovement : MonoBehaviour
     {
         IfOnSlope();
         controller.Move(playerVelocity * Time.deltaTime); //since controller don't use unity's physics update, we can getaway with update
-       
         
 
         //new state machine
@@ -427,9 +426,8 @@ public class PlayerMovement : MonoBehaviour
                 playerVelocity += accelSpeed * slopeMoveDir;
             }
 
-            //gravity magnetism?
-            // if(wishdir != Vector3.zero)
-            // playerVelocity +=  (onSlope.normal * gravity) * Time.deltaTime;
+            // if(!wishJump)
+            // playerVelocity -= onSlope.normal * Vector3.Dot(playerVelocity, onSlope.normal);
     }
     internal void AirPhysics()
     {
@@ -485,6 +483,7 @@ public class PlayerMovement : MonoBehaviour
         if(hits.Length > 0)
         {   
             playerVelocity.y += Mathf.Lerp(playerVelocity.y, crouchInOutSpeed , crouchInOutSpeed * Time.deltaTime); 
+            Debug.Log("player underground");
         }
     }
 
@@ -630,7 +629,19 @@ public class PlayerMovement : MonoBehaviour
     //handles ground movement when player is on slopes, prevents skipping down slopes 
     void IfOnSlope() 
     {
-        isOnSlope  = Physics.Raycast(transform.position, Vector3.down, out onSlope, 0.5f, groundMask) ? true : false;
+        if(Physics.Raycast(transform.position, Vector3.down, out onSlope, 0.6f, groundMask))
+        {
+            //when hitting raycasting into the ground, if the normal is not up, must be on slope
+            if(onSlope.normal!= Vector3.up)
+            {
+                isOnSlope = true;
+            }
+            else
+            {
+                isOnSlope = false;
+            }
+        }
+        else isOnSlope = false;
     }
     internal void SnapOnGround()
     {
@@ -660,13 +671,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 #endregion
-    //switch state
-    // public IEnumerator DelayedSwitchState(State _currentState, float delay)
-    // {
-    //     yield return new WaitForSecondsRealtime(delay);
-    //     currentState = _currentState;
-    //     yield return null;
-    // }
     public IEnumerator DelayExitState<T>(Dictionary<int, AbstractState<T>> _dicToUse, int _targetState ,float delay)
     {
         string stateName = _dicToUse[_targetState].ToString();
@@ -744,23 +748,23 @@ public class CoreState_InAir : AbstractState<PlayerMovement>
         _manager.Crouch_Input();
         _manager.hook.GrappleHook_Input();
 
-         if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        {
-            _manager.AirPhysics();
-        }
+        // if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
+        // {
+        //    // _manager.AirPhysics();
+        // }
     }
     public override void DuringState(PlayerMovement _manager)
     {
         if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
         {
-           // _manager.AirPhysics(); //move it to sub state machine when air sub states are implemented
+            _manager.AirPhysics(); //move it to sub state machine when air sub states are implemented
             _manager.Core_StateCheck();
             _manager.SnapOnGround();
         }
             
         _manager.CapBhopSpeed();
 
-       
+    
         _manager.Check_CrouchingStanding();
     }
     public override void LateDuringState(PlayerMovement _manager)
@@ -784,11 +788,11 @@ public class GroundSubState_Walk : AbstractState<PlayerMovement>
     public override void UpdateState(PlayerMovement  _manager)
     {
         _manager.Direction_Input(_manager.groundSpeed);
-        _manager.GroundPhysics(1);
     }
     public override void DuringState(PlayerMovement _manager)
     {
         //if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
+        _manager.GroundPhysics(1);
         
     }
     public override void LateDuringState(PlayerMovement _manager)
