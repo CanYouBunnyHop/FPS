@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using System;
 
 using FPS.Settings;
-using FPS.Player.Movement;
 using FPS.Weapon;
 //-------------------------------------------------------------------------------------------------------
 // Remember To change the input manager under project settings for adding counter-strafing
@@ -41,21 +40,21 @@ public class PlayerMovement : MonoBehaviour
     private RaycastHit onSlope;
 //--------------------------------------------------------------------------------------------------------
     [Header("Ground Move")]
-    [SerializeField]internal float groundSpeed; // Moving on ground;
-    [SerializeField]internal float groundAccelerate;
-    [SerializeField]internal float friction;
-    [SerializeField]internal float slideFriction;
+    [SerializeField]public float groundSpeed; // Moving on ground;
+    [SerializeField]public float groundAccelerate;
+    [SerializeField]public float friction;
+    [SerializeField]public float slideFriction;
     ///<summary> how much physic steps later to start friction </summary>
     [Tooltip("how much physic steps later to start friction")][SerializeField]private float lateFrictionDelay;
     public float LateFrictionDelay => lateFrictionDelay;
-    [SerializeField]internal float wishSpeed;
+    [SerializeField]public float wishSpeed;
     private float TotalGroundSpeed;
 
     [Header("Air Move")]
-    [SerializeField]internal float airSpeed;
-    [SerializeField]internal float airAccelerate;
-    [SerializeField]internal float capBhopSpeed;
-    [SerializeField]internal float airWishSpeed;
+    [SerializeField]public float airSpeed;
+    [SerializeField]public float airAccelerate;
+    [SerializeField]public float capBhopSpeed;
+    //[SerializeField]public float airWishSpeed;
     //public float AirWishSpeed {get{return airWishSpeed;} set{airWishSpeed = value;}}
 
 //------------------------------------------------------------------------------------------------------
@@ -65,44 +64,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float crouchInOutSpeed;
     [SerializeField] private float crouchDistance;
     [SerializeField] private bool wishCrouching;
-    [SerializeField] private bool canCrouch;
+    [SerializeField] private bool canCrouch; public bool CanCrouch => canCrouch;
     private float standYScale;
 
     [Header("Sprint")]
     [SerializeField] private float sprintSpeedMult;
     public float SprintSpeedMult => sprintSpeedMult;
-    [SerializeField] private bool wishSprinting;
+    [SerializeField] private bool wishSprinting; public bool WishSprinting => wishSprinting;
 #endregion
 //------------------------------------------------------------------------------------------------------
-#region enums
-    public AbstractState<PlayerMovement> currentCoreState;
-    ///<summary> 0, Grounded | 1, InAir </summary>///
-    public Dictionary<int, AbstractState<PlayerMovement>> coreStates = new Dictionary<int, AbstractState<PlayerMovement>>()
-    {
-        {0, new CoreState_Grounded()},
-        {1, new CoreState_InAir()},
-    };
-    public AbstractState<PlayerMovement> currentGroundSubState;
-    ///<summary> 0, Walk | 1, Crouch | 2, Sprint | 3, Slide </summary>///
-    public Dictionary<int, AbstractState<PlayerMovement>> groundSubStates = new Dictionary<int, AbstractState<PlayerMovement>>()
-    {
-        {0, new GroundSubState_Walk()}, 
-        {1, new GroundSubState_Crouch()}, 
-        {2, new GroundSubState_Sprint()},
-        {3, new GroundSubState_Slide()},
-    };
-    public AbstractState<PlayerMovement> currentActionSubState;
-    ///<summary> 0, Idle | 1, HookEnemy |2, GrappleSurface| 3, Reloading | 4, WeaponSwitching </summary>///
-    public Dictionary<int, AbstractState<PlayerMovement>> actionSubStates = new Dictionary<int, AbstractState<PlayerMovement>>()
-    {
-        {0, new ActionSubState_Idle()},
-        {1, new ActionSubState_HookEnemy()},
-        {2, new ActionSubState_GrappleSurface()},
-        {3, new ActionSubState_Reloading()},
-        {4, new ActionSubState_WeaponSwitching()},
-    };
-
-#endregion
 #region Snap On Ground
     [Header("Snap On Ground")] [Tooltip("if the hit normal is less than this, abort snap, for steep angles")]
     [SerializeField]private float minGroundDotProduct;
@@ -112,13 +82,11 @@ public class PlayerMovement : MonoBehaviour
 #region Debug variables
     [Header("Debug")]
     //public State currentState;
-    public string core;
-    public string groundsub;
     public Vector3 playerVelocity;
     public bool isGrounded {get; private set;}
-    [SerializeField]public int stepInAir {get; private set;}
-    [SerializeField]public int stepOnGround {get; private set;}
-    [SerializeField]public int stepSinceJumped {get; private set;} //assign this to anything that will knock player up
+    [SerializeField]public int stepInAir;// {get; private set;}
+    [SerializeField]public int stepOnGround;// {get; private set;}
+    [SerializeField]public int stepSinceJumped;// {get; private set;} //assign this to anything that will knock player up
     [SerializeField]public int stepSinceKockback;
     [SerializeField]public float currentSpeed {get; private set;} //not actual speed, dot product of playervel and wish vel
     private Vector3 wishdir;
@@ -143,22 +111,11 @@ public class PlayerMovement : MonoBehaviour
 
         //currentState = State.InAir;
         //curGroundSubState = GroundSubState.Walk;
-        StartCoroutine(LateFixedUpdate());
 
         standYScale = transform.localScale.y; //get player's y scale which is the standing's height
-
-        currentCoreState = coreStates[1];
-        //currentCoreState.EnterState(this);
-
-        currentGroundSubState = groundSubStates[0];
-        //currentGroundSubState.EnterState(this);
-
-        currentActionSubState = actionSubStates[0];
-        //currentActionSubState.EnterState(this);
-        
     }
 #region Inputs
-    internal void Direction_Input(float _GroundOrAirSpeed)
+    public void Direction_Input(float _GroundOrAirSpeed)
     {
         //get WASD input into wish direction
         wishdir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
@@ -170,7 +127,7 @@ public class PlayerMovement : MonoBehaviour
         wishSpeed *= _GroundOrAirSpeed;
     }
     
-    internal void Jump_Input()
+    public void Jump_Input()
     {
          //Inputs for jump
         if(inputSystemManager.jump.triggered) //if(Input.GetKeyDown(KeyCode.Space)||Input.GetAxis("Mouse ScrollWheel") < 0f )
@@ -188,17 +145,17 @@ public class PlayerMovement : MonoBehaviour
             //Debug.Log("started");
             yield return new WaitForSecondsRealtime(0.1f);
 
-            if(!isGrounded) wishJump = false;
+            wishJump = false;
 
             jumpBufferTimer = null;
         }
     }
     
-    internal void Crouch_Input()
+    public void Crouch_Input()
     {   
         wishCrouching = inputSystemManager.crouch.IsPressed() && isGrounded ; //Input.GetKey(KeyCode.LeftControl)
     }
-    internal void Sprint_Input()
+    public void Sprint_Input()
     {
         wishSprinting = inputSystemManager.sprint.IsPressed() && !wishCrouching && isGrounded; //Input.GetKey(KeyCode.LeftShift)
     }
@@ -209,75 +166,21 @@ public class PlayerMovement : MonoBehaviour
 #region Updateloops Statemachine / gizmo
     void Update()
     {
-        core = currentCoreState.ToString(); groundsub = currentGroundSubState.ToString();
-
         controller.Move(playerVelocity * Time.deltaTime); //since controller don't use unity's physics update, we can getaway with update
-        
-
-        //new state machine
-        currentCoreState.UpdateState(this);
-        switch(currentCoreState) //using switch case maybe? because I feel its more readable than putting it in state Classes
-        {
-            case var x when x is CoreState_Grounded:
-            Action_SubstateCheck();
-            Ground_SubStateCheck();
-            currentGroundSubState.UpdateState(this);
-            break;
-            case var x when x is CoreState_InAir:
-            
-            break;
-        }
-#region Input StateMachine (Update)
-        // switch(currentState)
-        // {
-        //     case State.Grounded:
-        //         Jump_Input();
-        //         Crouch_Input();
-        //         Sprint_Input();
-        //         hook.GrappleHook_Input();
-
-        //         Ground_SubStateCheck();
-        //     break;
-
-        //     case State.InAir:
-        //         Direction_Input(airSpeed); //air wish spd
-        //         Jump_Input();
-        //         Crouch_Input();
-        //         hook.GrappleHook_Input();
-        //     break;
-
-        //     case State.GrapSurface:
-        //         Direction_Input(airSpeed); //air wish spd
-        //         Jump_Input();
-        //         hook.CancelHook_Input(inputSystemManager);
-        //     break;
-
-        //     case State.HookEnemy:
-        //         Direction_Input(groundSpeed);
-        //         hook.CancelHook_Input(inputSystemManager);
-        //     break;
-        // }
-#endregion
 
         //UI remove later
         string dec = Convert.ToString(wishSpeed);
         text.text = "currentspeed: "+ playerZXVel.magnitude;
-
-        //remove later, for testing
-        if(Input.GetKeyDown(KeyCode.L))
-        {
-            Debug.Log(currentCoreState.ToString() + currentGroundSubState.ToString());
-        }
-
     }
     void FixedUpdate()
     {
         currentSpeed = Vector3.Dot(wishdir, playerVelocity);
 
         //Check grounded
-        Physics.Raycast(transform.position, Vector3.down, out RaycastHit ghit ,groundCheckRadius);
+        Physics.Raycast(transform.position, Vector3.down, out RaycastHit ghit , 1);
         float slopeAngle = Vector3.Angle(ghit.normal, Vector3.up);
         isGrounded = Physics.CheckSphere(transform.position + groundCheckOffset , groundCheckRadius , groundMask) && slopeAngle < maxSlopeAngleToWalk;
+        Debug.Log(slopeAngle);
         
         //roundup small numbers avoid small movements
         if(Mathf.Abs(playerZXVel.magnitude) < 0.1) //Horizontal velocity rounded
@@ -298,90 +201,6 @@ public class PlayerMovement : MonoBehaviour
             playerVelocity.y += jumpForce;
             stepSinceJumped = 0;
         }
-        
-        //new state machine
-        currentCoreState.DuringState(this);
-
-        switch(currentCoreState)//using switch case maybe? because I feel its more readable?
-        {
-            case var x when x is CoreState_Grounded:
-            currentGroundSubState.DuringState(this);
-            break;
-
-            case var x when x is CoreState_InAir:
-            break;
-        }
-        currentActionSubState.DuringState(this);
-
-#region PhysicsStateHandler(old)
-        //state Physics handling
-        // switch(currentState)
-        // {
-        //     case State.Grounded:
-        //     {
-        //         //GroundPhysics(); //moved to sub state machine
-        //         Core_StateCheck();
-        //         Check_CrouchingStanding();                       
-
-        //         Ground_PhysicsSubStateMachine();
-        //         //Ground_SubStateCheck();
-                
-        //     }
-        //     break;
-        //     case State.InAir:
-        //     {
-        //         AirPhysics();
-        //         Core_StateCheck();
-        //         CapBhopSpeed();
-
-        //         SnapOnGround();
-        //         Check_CrouchingStanding();
-        //     }
-        //     break;
-            // case State.GrapSurface:
-            // {
-            //     hook.CheckDistanceThreshold();
-            //     hook.CheckRopeStretch();
-            //     hook.CheckPlayerFov();
-            //     hook.CheckIfPlayerLanded();
-            //     hook.ExecuteGrappleSurface();
-            // }
-            // break;
-            // case State.HookEnemy: //move hook enemy into method, this is not a core state
-            // {
-            //     hook.ExecuteHookEnemy();
-            //     hook.CheckDistanceThreshold();
-            //     hook.CheckObstaclesBetween();
-            //     if(isGrounded)
-            //     {
-            //         GroundPhysics(1);
-            //     }
-            //     else
-            //     {
-            //         AirPhysics();
-            //         CapBhopSpeed();
-            //     }
-            // }
-            // break;
-        //}
-#endregion
-    }
-    IEnumerator LateFixedUpdate()
-    {
-        while(true)
-        {
-            yield return new WaitForFixedUpdate(); //apply after fixedUpdate
-
-            switch(currentCoreState)//using switch case maybe? because I feel its more readable?
-            {
-                case var x when x is CoreState_Grounded:
-                currentGroundSubState.LateDuringState(this);
-                break;
-
-                case var x when x is CoreState_InAir:
-                break;
-            }
-        }
     }
     void OnDrawGizmos()
     {
@@ -397,7 +216,7 @@ public class PlayerMovement : MonoBehaviour
 #endregion
 
 #region Source Engine Code translated to Unity C# / valve physics calculation
-    internal void GroundPhysics(float _mult)//_mult = sprint or crouch multiplier
+    public void GroundPhysics(float _mult)//_mult = sprint or crouch multiplier
     {
             wishSpeed *= _mult;
             float addSpeed = wishSpeed - currentSpeed; //addspeed is the capped speed
@@ -408,27 +227,16 @@ public class PlayerMovement : MonoBehaviour
                 accelSpeed = addSpeed;
             }
 
-            // if(!isOnSlope)
-            // {
-            //     playerVelocity.z += accelSpeed * wishdir.z;
-            //     playerVelocity.x += accelSpeed * wishdir.x;
-            // }
-            // else
-            //{
-                Physics.Raycast(transform.position, Vector3.down, out onSlope, 0.6f, groundMask);
-
-                var slopeMoveDir = Vector3.ProjectOnPlane(wishdir, onSlope.normal);
-                playerVelocity += accelSpeed * slopeMoveDir;
-            //}
-
-            // if(!wishJump)
-            // playerVelocity -= onSlope.normal * Vector3.Dot(playerVelocity, onSlope.normal);
+            //Modified here so player can walk up and down slopes without speed penalty or tumbling
+            Physics.Raycast(transform.position, Vector3.down, out onSlope, 0.6f, groundMask);
+            var slopeMoveDir = Vector3.ProjectOnPlane(wishdir, onSlope.normal);
+            playerVelocity += accelSpeed * slopeMoveDir;
     }
-    internal void AirPhysics()
+    public void AirPhysics()
     {
-            float addSpeed = airWishSpeed - currentSpeed;
+            float addSpeed = wishSpeed - currentSpeed;
             addSpeed = Mathf.Clamp(addSpeed, 0, Mathf.Infinity); // make sure you don't and slow down when input same direction midair
-            float accelSpeed = airWishSpeed * Time.deltaTime * airAccelerate; // without deltatime, player accelerate almost instantly
+            float accelSpeed = wishSpeed * Time.deltaTime * airAccelerate; // without deltatime, player accelerate almost instantly
             
             //Debug.Log("aird "+ addSpeed);
             if(accelSpeed > addSpeed)
@@ -436,7 +244,6 @@ public class PlayerMovement : MonoBehaviour
                 accelSpeed = addSpeed;
             }
              //WASD movement
-
             playerVelocity.z += accelSpeed* wishdir.z;
             playerVelocity.x += accelSpeed* wishdir.x;
 
@@ -446,7 +253,7 @@ public class PlayerMovement : MonoBehaviour
 #endregion
 
 #region Ground air check + cap bhop speed + crouch
-    internal void CapBhopSpeed()
+    public void CapBhopSpeed()
     {
         //capping bhop speed 
         playerVelocity.z = Mathf.Clamp(playerVelocity.z, -capBhopSpeed, capBhopSpeed);
@@ -454,12 +261,12 @@ public class PlayerMovement : MonoBehaviour
     }
     ///<summary> The physics update for switching between Crouching and standing, 
     ///also pushes player upwards if player is stuck in ground. </summary>
-    internal void Check_CrouchingStanding()
+    public void Check_CrouchingStanding()
     {
         //check if anything is blocking player to stand up
-        Vector3 headPos = new Vector3(transform.position.x, transform.position.y + controller.height - 0.2f, transform.position.z );
-        bool somethingAbove = Physics.CheckSphere(headPos, 0.3f, groundMask);
-        //Debug.DrawLine(headPos, headPos + Vector3.up*0.3f, Color.red);
+        Vector3 bodyPos = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
+        bool somethingAbove = Physics.Raycast(bodyPos, Vector3.up, controller.height - 0.11f, groundMask);
+        Debug.DrawLine(bodyPos, bodyPos + Vector3.up*(controller.height - 0.11f), Color.red);
         //Debug.Log(somethingAbove);
 
         canCrouch = wishCrouching || somethingAbove;
@@ -481,71 +288,12 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("player underground");
         }
     }
-
-    ///<summary> Check Current Core states (grounded || inAir) </summary>
-    public void Core_StateCheck()
-    {
-        if(isGrounded) //while grounded
-        {
-            if(currentCoreState != coreStates[0])
-            currentCoreState.ExitState(this, ref currentCoreState, coreStates[0]);
-
-            //count steps                
-            stepInAir = 0;
-            stepOnGround += 1;
-        }
-        else // while in air
-        {
-            if(currentCoreState != coreStates[1])
-            currentCoreState.ExitState(this, ref currentCoreState, coreStates[1]);
-            
-            //count steps
-            stepOnGround = 0;
-            stepInAir += 1;
-        }
-    }
-    public void ResetYVel()
-    {
-        //playerVelocity.y = 0;
-        Debug.Log("reee");
-    }
-
     
-    ///<summary> Check Current grounded sub states (walk || crouch || sprint || slide) </summary>///
-    internal void Ground_SubStateCheck()//ref float o_CrouchMult, ref float o_SprintMult)
-    {
-        if(!canCrouch && !wishSprinting && currentGroundSubState is not GroundSubState_Walk) //walk
-        {
-            currentGroundSubState.ExitState(this, ref currentGroundSubState, groundSubStates[0]);
-        } 
-
-        if(canCrouch && currentGroundSubState is not GroundSubState_Crouch) //crouch
-        { 
-            currentGroundSubState.ExitState(this, ref currentGroundSubState, groundSubStates[1]);
-        }
-
-        if(wishSprinting && currentGroundSubState is not GroundSubState_Sprint) //sprint
-        {
-            currentGroundSubState.ExitState(this, ref currentGroundSubState, groundSubStates[2]);
-        }
-    } 
-    ///<summary> Check Current Action sub states () </summary>///
-    internal void Action_SubstateCheck()
-    {
-        if(hook.WishGrapHook && currentActionSubState is not ActionSubState_HookEnemy or ActionSubState_GrappleSurface)
-        {
-            hook.StartGrappleHook(); //the action check for grappling hook is in grappling hook
-            Debug.Log("Called ADD");
-        }
-        //if(gm.WishReload)
-
-        //if(gm.WishSwitchGun)
-    }
 
 #endregion
 
 #region friction/equal opposite force
-    internal void ApplyFriction(float _friction)
+    public void ApplyFriction(float _friction)
     {
         //Vector2 vec = new Vector2(playerVelocity.x, playerVelocity.z);
         //float speed = vec.magnitude;
@@ -590,7 +338,7 @@ public class PlayerMovement : MonoBehaviour
 
 #region slope physics
     //handles ground movement when player is on slopes, prevents skipping down slopes 
-    internal void SnapOnGround()
+    public void SnapOnGround()
     {
         //bool r = Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, snapGroundRayLength, groundMask);
        // Debug.Log("bruh"+ hit.normal);
@@ -618,347 +366,5 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 #endregion
-    public IEnumerator DelayExitState<T>(Dictionary<int, AbstractState<T>> _dicToUse, int _targetState ,float delay)
-    {
-        string stateName = _dicToUse[_targetState].ToString();
-        string stateCategory = stateName.Remove(stateName.IndexOf("_") + 1); //remove everything after the first "_"
-
-        yield return new WaitForSeconds(delay);
-
-        switch (stateCategory)
-        {
-            case string x when x == "CoreState_":
-            currentCoreState.ExitState(this, ref currentCoreState, coreStates[_targetState]);
-            break;
-
-            case string x when x == "GroundSubState_":
-            currentGroundSubState.ExitState(this, ref currentGroundSubState, groundSubStates[_targetState]);
-            break;
-
-            case string x when x == "ActionSubState_":
-            currentActionSubState.ExitState(this, ref currentActionSubState, actionSubStates[_targetState]);
-            break;
-        }
-    }
 }
 }
-
-
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------
-//                              ||
-//                 States       ||
-//                              ||
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------
-#region Player Core States (best defined as states that drastically changes how player's physics is calculated)
-public class CoreState_Grounded : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        _manager.Core_StateCheck();
-        _manager.ResetYVel();
-    }
-    public override void UpdateState(PlayerMovement _manager)
-    {
-        _manager.Jump_Input();
-        _manager.Crouch_Input();
-        _manager.Sprint_Input();
-        _manager.hook.GrappleHook_Input();
-
-        //_manager.Ground_SubStateCheck();
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        _manager.Core_StateCheck();
-        _manager.Check_CrouchingStanding();
-
-       // _manager.Ground_PhysicsSubStateMachine();
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _CurrentState, AbstractState<PlayerMovement> _TargetState)
-    {
-        base.ExitState(_manager, ref _CurrentState, _TargetState);
-    }
-}
-public class CoreState_InAir : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void UpdateState(PlayerMovement _manager)
-    {
-        _manager.Direction_Input(_manager.airSpeed); //air wish spd
-        _manager.Jump_Input();
-        _manager.Crouch_Input();
-        _manager.hook.GrappleHook_Input();
-
-        // if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        // {
-        //    // _manager.AirPhysics();
-        // }
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        {
-            _manager.AirPhysics(); //move it to sub state machine when air sub states are implemented
-            _manager.Core_StateCheck();
-            _manager.SnapOnGround();
-        }
-            
-        _manager.CapBhopSpeed();
-        _manager.Check_CrouchingStanding();
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _CurrentState, AbstractState<PlayerMovement> _TargetState)
-    {
-        base.ExitState(_manager, ref _CurrentState, _TargetState);
-    }
-}
-#endregion
-
-#region Grounded Sub States
-public class GroundSubState_Walk : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        Debug.Log("GroundSubState: " + this.ToString());
-    }
-    public override void UpdateState(PlayerMovement  _manager)
-    {
-        _manager.Direction_Input(_manager.groundSpeed);
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        //if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        _manager.GroundPhysics(1);
-        
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        if(_manager.stepOnGround > _manager.LateFrictionDelay)
-        _manager.ApplyFriction(_manager.friction);
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _currentState, AbstractState<PlayerMovement> _targetState)
-    {
-        base.ExitState(_manager, ref _currentState ,_targetState);
-        Debug.Log("GroundSubStateExit" + this.ToString());
-    }
-}
-public class GroundSubState_Crouch : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        Debug.Log("GroundSubStateState: " + this.ToString());
-    }
-    public override void UpdateState(PlayerMovement  _manager)
-    {
-        _manager.Direction_Input(_manager.groundSpeed);
-        
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        //if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        _manager.GroundPhysics(_manager.CrouchSpeedMult);
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        if(_manager.stepOnGround > _manager.LateFrictionDelay)
-        _manager.ApplyFriction(_manager.friction);
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _currentState, AbstractState<PlayerMovement> _targetState)
-    {
-        base.ExitState(_manager, ref _currentState ,_targetState);
-        Debug.Log("GroundSubStateExit" + this.ToString());
-    }
-}
-public class GroundSubState_Sprint : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        Debug.Log("GroundSubState: " + this.ToString());
-    }
-    public override void UpdateState(PlayerMovement  _manager)
-    {
-        _manager.Direction_Input(_manager.groundSpeed);
-        
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        //if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        _manager.GroundPhysics(_manager.SprintSpeedMult);
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        if(_manager.stepOnGround > _manager.LateFrictionDelay)
-        _manager.ApplyFriction(_manager.friction);
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _currentState, AbstractState<PlayerMovement> _targetState)
-    {
-        base.ExitState(_manager, ref _currentState ,_targetState);
-        Debug.Log("GroundSubStateExit" + this.ToString());
-    }
-}
-public class GroundSubState_Slide : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        Debug.Log($"Enter State: {this.ToString()}");
-    }
-    public override void UpdateState(PlayerMovement  _manager)
-    {
-        
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        if(_manager.stepOnGround > _manager.LateFrictionDelay)
-        _manager.ApplyFriction(_manager.slideFriction);
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _currentState, AbstractState<PlayerMovement> _targetState)
-    {
-        base.ExitState(_manager, ref _currentState ,_targetState);
-        Debug.Log($"Exit State: {this.ToString()}");
-    }
-}
-#endregion
-
-#region Action Sub States (best defined as state that will limit character's arm action, character only has 2 arms)
-public class ActionSubState_Idle : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void UpdateState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _CurrentState, AbstractState<PlayerMovement> _TargetState)
-    {
-        base.ExitState(_manager, ref _CurrentState, _TargetState);
-    }
-}
-public class ActionSubState_HookEnemy : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        _manager.hook.StartHookEnemy();
-    }
-    public override void UpdateState(PlayerMovement _manager)
-    {
-        _manager.Direction_Input(_manager.groundSpeed);
-        _manager.Jump_Input();
-        //_manager.hook.CancelHook_Input(_manager.InputSystemManager.grappleHook);
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        _manager.hook.CheckDistanceThreshold();
-        _manager.hook.CheckObstaclesBetween();
-
-        _manager.hook.ExecuteHookEnemy();
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _CurrentState, AbstractState<PlayerMovement> _TargetState)
-    {
-        base.ExitState(_manager, ref _CurrentState, _TargetState);
-    }
-}
-public class ActionSubState_GrappleSurface : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        _manager.hook.StartGrappleSurface();
-    }
-    public override void UpdateState(PlayerMovement _manager)
-    {
-        _manager.Direction_Input(_manager.airSpeed);
-        _manager.Jump_Input();
-        //_manager.hook.CancelHook_Input(_manager.InputSystemManager.grappleHook);
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        _manager.hook.CheckDistanceThreshold();
-        _manager.hook.CheckRopeStretch();
-        _manager.hook.CheckPlayerFov();
-        _manager.hook.CheckIfPlayerLanded();
-
-        _manager.hook.ExecuteGrappleSurface();
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        throw new NotImplementedException();
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _CurrentState, AbstractState<PlayerMovement> _TargetState)
-    {
-        base.ExitState(_manager, ref _CurrentState, _TargetState);
-    }
-}
-public class ActionSubState_Reloading : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void UpdateState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-    
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _CurrentState, AbstractState<PlayerMovement> _TargetState)
-    {
-        base.ExitState(_manager, ref _CurrentState, _TargetState);
-    }
-}
-public class ActionSubState_WeaponSwitching : AbstractState<PlayerMovement>
-{
-    public override void EnterState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void UpdateState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void DuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void LateDuringState(PlayerMovement _manager)
-    {
-        
-    }
-    public override void ExitState(PlayerMovement _manager, ref AbstractState<PlayerMovement> _CurrentState, AbstractState<PlayerMovement> _TargetState)
-    {
-        base.ExitState(_manager, ref _CurrentState, _TargetState);
-    }
-}
-
-#endregion

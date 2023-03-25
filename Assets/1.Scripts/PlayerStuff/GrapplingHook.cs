@@ -43,6 +43,7 @@ namespace FPS.Player.Movement
         public LayerMask raycastSurface;
         public GameObject grapplePoint;
         private PlayerMovement pm;
+        [SerializeField] private PlayerStateMachine pStateMachine; 
         private Transform cam;
         [SerializeField]private cooldownDataSO cdd;
         //---------------------------------------------------------------------------------------------
@@ -110,7 +111,7 @@ namespace FPS.Player.Movement
                     // set grappling hook target position
                     grapplePoint.transform.SetParent(hit.collider.gameObject.transform);
                     grapplePoint.transform.position = hit.collider.transform.position;  
-                    StartCoroutine(pm.DelayExitState(pm.actionSubStates, 1, delay));
+                    StartCoroutine(pStateMachine.DelayExitState(pStateMachine.actionSubStates, 1, delay));
                     //pm.currentActionSubState.ExitState(pm, ref pm.currentActionSubState, pm.actionSubStates[1]);
                 }
                 else
@@ -118,7 +119,7 @@ namespace FPS.Player.Movement
                     //StartGrappleSurface();
                     grapplePoint.transform.SetParent(hit.collider.gameObject.transform);
                     grapplePoint.transform.position = hit.point;
-                    StartCoroutine(pm.DelayExitState(pm.actionSubStates, 2, delay));
+                    StartCoroutine(pStateMachine.DelayExitState(pStateMachine.actionSubStates, 2, delay));
                     //pm.currentActionSubState.ExitState(pm, ref pm.currentActionSubState, pm.actionSubStates[2]);
                     Debug.Log("Grapple Raycast Hit Surface");
                 }
@@ -312,7 +313,7 @@ namespace FPS.Player.Movement
         public void EndGrapple()
         {
             cdd.isUsing = false;
-            pm.Core_StateCheck();
+            pStateMachine.Core_StateCheck();
 
             if(em != null && em.currentState == EnemyMovement.State.Hooked)
             {
@@ -327,7 +328,7 @@ namespace FPS.Player.Movement
             //Initiate Cooldown
             //cdd.cdTimer = cdd.cdTime;
             cdd.InitiateCoolDown();
-            pm.currentActionSubState.ExitState(pm, ref pm.currentActionSubState, pm.actionSubStates[0]); //return to idle in action state
+            pStateMachine.currentActionSubState.ExitState(pStateMachine, ref pStateMachine.currentActionSubState, pStateMachine.actionSubStates[0]); //return to idle in action state
         }
         #endregion
 

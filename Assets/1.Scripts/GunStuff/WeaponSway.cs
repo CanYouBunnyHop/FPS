@@ -37,6 +37,7 @@ public class WeaponSway : MonoBehaviour
     
     [Header("References + pivot")]
     [SerializeField] private PlayerMovement pm;
+    [SerializeField] private PlayerStateMachine pStateMachine;
     [SerializeField] private Camera cam;
     [SerializeField] private Transform weaponPivot;
     [SerializeField] private Vector3 pivotPosOffset;
@@ -87,7 +88,7 @@ public class WeaponSway : MonoBehaviour
     {
         Vector3 dir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
 
-        if(dir.magnitude > 0 && pm.currentCoreState is CoreState_Grounded)
+        if(dir.magnitude > 0 && pStateMachine.currentCoreState is CoreState_Grounded)
         {
             timer += bobSpeed * Time.deltaTime;
             float bX = bobPosX.Evaluate(timer);

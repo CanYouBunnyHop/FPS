@@ -15,12 +15,12 @@ MonoBehaviour:
   active: 1
   shadows:
     m_OverrideState: 1
-    m_Value: {r: 0.1376233, g: 0.105420075, b: 0.21698111, a: 1}
+    m_Value: {r: 0.22008401, g: 0.15138839, b: 0.3962264, a: 1}
   highlights:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0.8156863, b: 0.9739102, a: 1}
+    m_Value: {r: 1, g: 0.9313911, b: 0.8156863, a: 1}
   balance:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0
 --- !u!114 &-7656314219350076023
 MonoBehaviour:
@@ -49,7 +49,7 @@ MonoBehaviour:
     m_Value: 65472
   tint:
     m_OverrideState: 1
-    m_Value: {r: 0.9924941, g: 1, b: 0.48584908, a: 1}
+    m_Value: {r: 0.98473275, g: 1, b: 0, a: 1}
   highQualityFiltering:
     m_OverrideState: 0
     m_Value: 0
