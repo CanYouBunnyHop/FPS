@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 using FPS.Settings;
 
 
-namespace FPS.Player.Movement
+namespace FPS.Player
 {
     [RequireComponent(typeof(PlayerMovement))]
     public class GrapplingHook : MonoBehaviour

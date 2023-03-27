@@ -332,9 +332,22 @@ public abstract class GunBehaviour : MonoBehaviour
     #endregion
     protected void BulletHoleFx(RaycastHit _hit)
     {
-        GameObject hole = Instantiate(bulletHoleFx, _hit.point, transform.rotation);
-        hole.transform.SetParent(_hit.collider.gameObject.transform);
+        GameObject hole = VFXPool.VFX_Pool.GetItem() as GameObject; //get item from pool as gameobject
+        hole.transform.position = _hit.point;                       // set position
+
+        //set rotation to hit normals
+        Quaternion hitRot = Quaternion.FromToRotation(Vector3.up, _hit.normal);
+        hole.transform.rotation = hitRot;
+
+        var parentTransform = _hit.collider.gameObject.transform;
+        hole.transform.SetParent(parentTransform);
+
+        //Set Scale Correctly (impossible)
+
+        //coroutine
         //object pooling for the hole fx, to do
+        //create new script, follow target position frame by frame
+        //after 3 seconds, scale down to 0 via lerp, move back into item pool
     }
     protected virtual void PlayMuzzleFlash(MuzzleFlashObject[] vfxes)
     {

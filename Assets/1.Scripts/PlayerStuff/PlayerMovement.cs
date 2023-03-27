@@ -14,7 +14,7 @@ using FPS.Weapon;
 //      sensitivity = 1 
 //      Snap = false    (this is so the input gets a gradual change, important if you want counter strafe
 //-------------------------------------------------------------------------------------------------------
-namespace FPS.Player.Movement
+namespace FPS.Player
 {
 public class PlayerMovement : MonoBehaviour
 {

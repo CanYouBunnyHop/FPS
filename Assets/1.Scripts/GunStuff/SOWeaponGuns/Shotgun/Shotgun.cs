@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FPS.Player.Movement;
+using FPS.Player;
 using Enemy.Movement;
 
 public class Shotgun : GunBehaviour
