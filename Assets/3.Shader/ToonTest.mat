@@ -10,6 +10,8 @@ Material:
   m_Name: ToonTest
   m_Shader: {fileID: -6465566751694194690, guid: 8a99ea882e3f06b499df24c284474098,
     type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - ADDITIONAL_LIGHT_CALCULATE_SHADOWS
   - MAIN_LIGHT_CALCULATE_SHADOWS
@@ -22,6 +24,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -120,7 +123,7 @@ Material:
     - _Cutoff: 0.5
     - _DepthStrength: 20
     - _DepthThreshold: 0.1
-    - _DepthTightnening: 2
+    - _DepthTightnening: 0.9
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -163,7 +166,7 @@ Material:
     - _Strength: 10
     - _Surface: 0
     - _TexBlend: 0
-    - _Thickness: 0.0015
+    - _Thickness: 0.001
     - _Vibrance: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
@@ -190,4 +193,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 5
+  version: 7
