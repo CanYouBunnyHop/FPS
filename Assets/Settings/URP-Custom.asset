@@ -25,7 +25,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
   m_Name: SSAO
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
   m_Settings:
     Downsample: 0
@@ -57,7 +57,8 @@ MonoBehaviour:
   - {fileID: 4004028972659070400}
   - {fileID: 4247420223706493529}
   - {fileID: 3006081211544100763}
-  m_RendererFeatureMap: adc0de57c6d2eee51e894fddcd7277d3c055b7e9222b913759f2d58d30def13a9bdf0f5cefbeb729
+  - {fileID: 7126034893105446079}
+  m_RendererFeatureMap: adc0de57c6d2eee51e894fddcd7277d3c055b7e9222b913759f2d58d30def13a9bdf0f5cefbeb729bfbc96dcfac2e462
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -149,10 +150,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
   m_Name: Hull Outlines
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     passTag: Hull Outlines
-    Event: 550
+    Event: 450
     filterSettings:
       RenderQueueType: 0
       LayerMask:
@@ -176,3 +177,34 @@ MonoBehaviour:
       restoreCamera: 1
       offset: {x: 0, y: 0, z: 0, w: 0}
       cameraFieldOfView: 60
+--- !u!114 &7126034893105446079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8750d058490b2b641a68edd84cbea040, type: 3}
+  m_Name: DebugDepthNormal
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  settings:
+    material: {fileID: 2100000, guid: fa056b89216b07545bc5c3c5ad63f80d, type: 2}
+    materialPassIndex: -1
+    renderEvent: 550
+--- !u!114 &7188449167980282109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 846a3b2dae695a843a51fba3780dac8d, type: 3}
+  m_Name: DepthNormalFeature2
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  depthNormalsMaterial: {fileID: 0}

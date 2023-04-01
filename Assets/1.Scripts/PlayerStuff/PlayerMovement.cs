@@ -13,6 +13,9 @@ using FPS.Weapon;
 //      gravity = 8     (this makes movement less slippery, but still slides)
 //      sensitivity = 1 
 //      Snap = false    (this is so the input gets a gradual change, important if you want counter strafe
+//
+// ToDo:
+//      Smooth transition for WASD for new input manager
 //-------------------------------------------------------------------------------------------------------
 namespace FPS.Player
 {
@@ -20,13 +23,11 @@ public class PlayerMovement : MonoBehaviour
 {
 #region references
     [Header("References")]
-    
-    private CharacterController controller;
     public GrapplingHook hook; //Additional movement abilities
     public LayerMask groundMask;
-    [SerializeField] private PlayerInputSystemManager inputSystemManager;
-    public PlayerInputSystemManager InputSystemManager => inputSystemManager;
+    [SerializeField] private PlayerInputSystemManager inputSystemManager; //public PlayerInputSystemManager InputSystemManager => inputSystemManager;
     [SerializeField] private GunManager gm;
+    private CharacterController controller;
 #endregion
 
 //--------------------------------------------------------------------------------------------------------
@@ -44,17 +45,20 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]public float groundAccelerate;
     [SerializeField]public float friction;
     [SerializeField]public float slideFriction;
+    [SerializeField]private float curGroundSpeedMult = 1;
+    ///<summary> This changes in player ground sub state's enter state, curGroundSpeedMult is lerp to target </summary>
+    [HideInInspector]public float targetGroundSpeedMult = 1;
+
     ///<summary> how much physic steps later to start friction </summary>
     [Tooltip("how much physic steps later to start friction")][SerializeField]private float lateFrictionDelay;
     public float LateFrictionDelay => lateFrictionDelay;
     [SerializeField]public float wishSpeed;
-    private float TotalGroundSpeed;
 
     [Header("Air Move")]
     [SerializeField]public float airSpeed;
     [SerializeField]public float airAccelerate;
     [SerializeField]public float capBhopSpeed;
-    //[SerializeField]public float airWishSpeed;
+    [SerializeField]public float airWishSpeed;
     //public float AirWishSpeed {get{return airWishSpeed;} set{airWishSpeed = value;}}
 
 //------------------------------------------------------------------------------------------------------
@@ -68,9 +72,11 @@ public class PlayerMovement : MonoBehaviour
     private float standYScale;
 
     [Header("Sprint")]
+    [SerializeField] private float sprintAngleThreshold;
     [SerializeField] private float sprintSpeedMult;
     public float SprintSpeedMult => sprintSpeedMult;
-    [SerializeField] private bool wishSprinting; public bool WishSprinting => wishSprinting;
+    [SerializeField] private bool wishSprinting; //public bool WishSprinting => wishSprinting;
+    [SerializeField] private bool canSprint; public bool CanSprint => canSprint;
 #endregion
 //------------------------------------------------------------------------------------------------------
 #region Snap On Ground
@@ -115,13 +121,12 @@ public class PlayerMovement : MonoBehaviour
         standYScale = transform.localScale.y; //get player's y scale which is the standing's height
     }
 #region Inputs
-    public void Direction_Input(float _GroundOrAirSpeed)
+    public void Direction_Input(float _GroundOrAirSpeed, float _mult = 1)
     {
         //get WASD input into wish direction
         wishdir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         wishdir = transform.TransformDirection(wishdir);
         wishdir.Normalize();
-
 
         wishSpeed =  wishdir.magnitude;
         wishSpeed *= _GroundOrAirSpeed;
@@ -201,6 +206,12 @@ public class PlayerMovement : MonoBehaviour
             playerVelocity.y += jumpForce;
             stepSinceJumped = 0;
         }
+
+        curGroundSpeedMult = Mathf.Lerp(curGroundSpeedMult, targetGroundSpeedMult, 4 * Time.deltaTime);
+        curGroundSpeedMult = Mathf.Abs(curGroundSpeedMult - targetGroundSpeedMult) < 0.1f ? targetGroundSpeedMult : curGroundSpeedMult;
+
+        //Vector3 yRot = new Vector3(0,transform.rotation.y,0);
+        
     }
     void OnDrawGizmos()
     {
@@ -215,14 +226,15 @@ public class PlayerMovement : MonoBehaviour
     }
 #endregion
 
+
 #region Source Engine Code translated to Unity C# / valve physics calculation
-    public void GroundPhysics(float _mult)//_mult = sprint or crouch multiplier
-    {
-            wishSpeed *= _mult;
+    public void GroundPhysics()//_mult = sprint or crouch multiplier
+    {       
+            wishSpeed *= curGroundSpeedMult;
             float addSpeed = wishSpeed - currentSpeed; //addspeed is the capped speed
             float accelSpeed = wishSpeed * friction * Time.deltaTime * groundAccelerate; // without deltatime, player accelerate almost instantly
             
-             if (accelSpeed > addSpeed) //cap speed
+            if (accelSpeed > addSpeed) //cap speed
             {
                 accelSpeed = addSpeed;
             }
@@ -234,6 +246,8 @@ public class PlayerMovement : MonoBehaviour
     }
     public void AirPhysics()
     {
+            //wishSpeed *= airSpeed;
+
             float addSpeed = wishSpeed - currentSpeed;
             addSpeed = Mathf.Clamp(addSpeed, 0, Mathf.Infinity); // make sure you don't and slow down when input same direction midair
             float accelSpeed = wishSpeed * Time.deltaTime * airAccelerate; // without deltatime, player accelerate almost instantly
@@ -252,7 +266,7 @@ public class PlayerMovement : MonoBehaviour
     }
 #endregion
 
-#region Ground air check + cap bhop speed + crouch
+#region cap bhop speed + ground substate checks
     public void CapBhopSpeed()
     {
         //capping bhop speed 
@@ -287,6 +301,10 @@ public class PlayerMovement : MonoBehaviour
             playerVelocity.y += Mathf.Lerp(playerVelocity.y, crouchInOutSpeed , crouchInOutSpeed * Time.deltaTime); 
             Debug.Log("player underground");
         }
+    }
+    public void Check_Sprinting()
+    {
+        canSprint = Vector3.Angle(wishdir, transform.forward) <= sprintAngleThreshold && wishSprinting;
     }
     
 

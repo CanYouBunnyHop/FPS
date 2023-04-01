@@ -138,7 +138,7 @@ public class PlayerStateMachine : MonoBehaviour
     ///<summary> Check Current grounded sub states (walk || crouch || sprint || slide) </summary>///
     public void Ground_SubStateCheck()//ref float o_CrouchMult, ref float o_SprintMult)
     {
-        if(!pm.CanCrouch && !pm.WishSprinting && currentGroundSubState is not GroundSubState_Walk) //walk
+        if(!pm.CanCrouch && !pm.CanSprint && currentGroundSubState is not GroundSubState_Walk) //walk
         {
             currentGroundSubState.ExitState(this, ref currentGroundSubState, groundSubStates[0]);
         } 
@@ -148,7 +148,7 @@ public class PlayerStateMachine : MonoBehaviour
             currentGroundSubState.ExitState(this, ref currentGroundSubState, groundSubStates[1]);
         }
 
-        if(pm.WishSprinting && currentGroundSubState is not GroundSubState_Sprint) //sprint
+        if(pm.CanSprint && currentGroundSubState is not GroundSubState_Sprint) //sprint
         {
             currentGroundSubState.ExitState(this, ref currentGroundSubState, groundSubStates[2]);
         }
@@ -159,7 +159,7 @@ public class PlayerStateMachine : MonoBehaviour
         if(hook.WishGrapHook && currentActionSubState is not ActionSubState_HookEnemy or ActionSubState_GrappleSurface)
         {
             hook.StartGrappleHook(); //the action check for grappling hook is in grappling hook
-            Debug.Log("Called ADD");
+            //Debug.Log("Called ADD");
         }
         //if(gm.WishReload)
 
@@ -200,23 +200,26 @@ public class CoreState_Grounded : AbstractState<PlayerStateMachine>
 {
     public override void EnterState(PlayerStateMachine _manager)
     {
-        _manager.Core_StateCheck();
+        
     }
     public override void UpdateState(PlayerStateMachine _manager)
     {
+        _manager.Pm.Direction_Input(_manager.Pm.groundSpeed);
+
         _manager.Pm.Jump_Input();
         _manager.Pm.Crouch_Input();
         _manager.Pm.Sprint_Input();
         _manager.Hook.GrappleHook_Input();
 
-        //_manager.Ground_SubStateCheck();
     }
     public override void DuringState(PlayerStateMachine _manager)
     {
         _manager.Core_StateCheck();
         _manager.Pm.Check_CrouchingStanding();
+        _manager.Pm.Check_Sprinting();
 
-       // _manager.Ground_PhysicsSubStateMachine();
+        if(_manager.currentActionSubState is not ActionSubState_GrappleSurface)
+        _manager.Pm.GroundPhysics();
     }
     public override void LateDuringState(PlayerStateMachine _manager)
     {
@@ -235,15 +238,11 @@ public class CoreState_InAir : AbstractState<PlayerStateMachine>
     }
     public override void UpdateState(PlayerStateMachine _manager)
     {
-        _manager.Pm.Direction_Input(_manager.Pm.airSpeed); //air wish spd
+        _manager.Pm.Direction_Input(_manager.Pm.airSpeed);
+
         _manager.Pm.Jump_Input();
         _manager.Pm.Crouch_Input();
         _manager.Pm.hook.GrappleHook_Input();
-
-        // if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        // {
-        //    // _manager.AirPhysics();
-        // }
     }
     public override void DuringState(PlayerStateMachine _manager)
     {
@@ -256,6 +255,7 @@ public class CoreState_InAir : AbstractState<PlayerStateMachine>
             
         _manager.Pm.CapBhopSpeed();
         _manager.Pm.Check_CrouchingStanding();
+        _manager.Pm.Check_Sprinting();
     }
     public override void LateDuringState(PlayerStateMachine _manager)
     {
@@ -274,15 +274,16 @@ public class GroundSubState_Walk : AbstractState<PlayerStateMachine>
     public override void EnterState(PlayerStateMachine _manager)
     {
         Debug.Log("GroundSubState: " + this.ToString());
+        _manager.Pm.targetGroundSpeedMult = 1;
     }
     public override void UpdateState(PlayerStateMachine  _manager)
     {
-        _manager.Pm.Direction_Input(_manager.Pm.groundSpeed);
+        //_manager.Pm.Direction_Input(_manager.Pm.groundSpeed);
     }
     public override void DuringState(PlayerStateMachine _manager)
     {
         //if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        _manager.Pm.GroundPhysics(1);
+        //_manager.Pm.GroundPhysics();
         
     }
     public override void LateDuringState(PlayerStateMachine _manager)
@@ -301,16 +302,17 @@ public class GroundSubState_Crouch : AbstractState<PlayerStateMachine>
     public override void EnterState(PlayerStateMachine _manager)
     {
         Debug.Log("GroundSubStateState: " + this.ToString());
+        _manager.Pm.targetGroundSpeedMult = _manager.Pm.CrouchSpeedMult;
     }
     public override void UpdateState(PlayerStateMachine  _manager)
     {
-        _manager.Pm.Direction_Input(_manager.Pm.groundSpeed);
+        //_manager.Pm.Direction_Input();
         
     }
     public override void DuringState(PlayerStateMachine _manager)
     {
         //if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        _manager.Pm.GroundPhysics(_manager.Pm.CrouchSpeedMult);
+        //_manager.Pm.GroundPhysics();
     }
     public override void LateDuringState(PlayerStateMachine _manager)
     {
@@ -328,16 +330,17 @@ public class GroundSubState_Sprint : AbstractState<PlayerStateMachine>
     public override void EnterState(PlayerStateMachine _manager)
     {
         Debug.Log("GroundSubState: " + this.ToString());
+        _manager.Pm.targetGroundSpeedMult = _manager.Pm.SprintSpeedMult;
     }
     public override void UpdateState(PlayerStateMachine  _manager)
     {
-        _manager.Pm.Direction_Input(_manager.Pm.groundSpeed);
+       // _manager.Pm.Direction_Input();
         
     }
     public override void DuringState(PlayerStateMachine _manager)
     {
         //if(_manager.currentActionSubState is not ActionSubState_GrappleSurface or ActionSubState_HookEnemy)
-        _manager.Pm.GroundPhysics(_manager.Pm.SprintSpeedMult);
+        //_manager.Pm.GroundPhysics();
     }
     public override void LateDuringState(PlayerStateMachine _manager)
     {
@@ -409,7 +412,7 @@ public class ActionSubState_HookEnemy : AbstractState<PlayerStateMachine>
     }
     public override void UpdateState(PlayerStateMachine _manager)
     {
-        _manager.Pm.Direction_Input(_manager.Pm.groundSpeed);
+        //_manager.Pm.Direction_Input();
         _manager.Pm.Jump_Input();
         //_manager.hook.CancelHook_Input(_manager.InputSystemManager.grappleHook);
     }
@@ -437,7 +440,7 @@ public class ActionSubState_GrappleSurface : AbstractState<PlayerStateMachine>
     }
     public override void UpdateState(PlayerStateMachine _manager)
     {
-        _manager.Pm.Direction_Input(_manager.Pm.airSpeed);
+        //_manager.Pm.Direction_Input(_manager.Pm.airSpeed);
         _manager.Pm.Jump_Input();
         //_manager.hook.CancelHook_Input(_manager.InputSystemManager.grappleHook);
     }

@@ -110,7 +110,7 @@ Material:
     - ADDITIONAL_LIGHT_CALCULATE_SHADOWS: 1
     - MAIN_LIGHT_CALCULATE_SHADOWS: 1
     - _AcuteDepthStartDot: 1
-    - _AcuteDepthThresholdMult: 1
+    - _AcuteDepthThresholdMult: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -118,15 +118,15 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthStrength: 1
-    - _DepthThreshold: 1
-    - _DepthTightnening: 1
+    - _DepthStrength: 20
+    - _DepthThreshold: 0.1
+    - _DepthTightnening: 2
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EnvironmentReflections: 1
-    - _FarDepthStart: 1
-    - _FarDepthThresholdMult: 1
+    - _FarDepthStart: 0
+    - _FarDepthThresholdMult: 2
     - _FarNormalStartDepth: 1
     - _FarNormalThresholdMult: 1
     - _GlossMapScale: 0
@@ -136,7 +136,7 @@ Material:
     - _MAIN_LIGHT_SHADOWS_CASCADE: 1
     - _Metallic: 0
     - _NormalsStrength: 1
-    - _NormalsThreshold: 2
+    - _NormalsThreshold: 1
     - _NormalsTightnening: 3
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -168,7 +168,7 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.050980568, g: 1, b: 0, a: 1}
+    - _BaseColor: {r: 0.050980546, g: 1, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
