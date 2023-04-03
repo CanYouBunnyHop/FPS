@@ -153,15 +153,15 @@ Material:
     - _ReceiveShadows: 1
     - _RimPower: 7
     - _RimSmoothStep: 0
-    - _RimStep: 0.65
+    - _RimStep: 0.8
     - _RimStrength: 1
     - _SHADOWS_SOFT: 1
     - _ShadowEdgePower: 1
     - _ShadowEdgeStrength: 1
     - _ShadowPower: 7
     - _ShadowSmoothStep: 0
-    - _ShadowStep: 0.65
-    - _Smoothness: 0.08
+    - _ShadowStep: 0.8
+    - _Smoothness: 0.2
     - _SmoothnessTextureChannel: 0
     - _SpecRampSampleV: 1
     - _SpecularHighlights: 1

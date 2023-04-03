@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Settings")]
     public float gravity;
     [SerializeField] private float maxSlopeAngleToWalk;
+    [SerializeField] private float feetRayLength;
 
     [Header("Jumping")]
     public float jumpForce;
@@ -44,7 +45,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]public float groundSpeed; // Moving on ground;
     [SerializeField]public float groundAccelerate;
     [SerializeField]public float friction;
-    [SerializeField]public float slideFriction;
     [SerializeField]private float curGroundSpeedMult = 1;
     ///<summary> This changes in player ground sub state's enter state, curGroundSpeedMult is lerp to target </summary>
     [HideInInspector]public float targetGroundSpeedMult = 1;
@@ -53,6 +53,8 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("how much physic steps later to start friction")][SerializeField]private float lateFrictionDelay;
     public float LateFrictionDelay => lateFrictionDelay;
     [SerializeField]public float wishSpeed;
+    [SerializeField]private Vector3 wishdir;
+    private Vector3 slopeMoveDir;
 
     [Header("Air Move")]
     [SerializeField]public float airSpeed;
@@ -63,18 +65,23 @@ public class PlayerMovement : MonoBehaviour
 
 //------------------------------------------------------------------------------------------------------
     [Header("Crouch")]
-    [SerializeField] private float crouchSpeedMult;
-    public float CrouchSpeedMult => crouchSpeedMult; // {get{return crouchSpeedMult;} private set{crouchSpeedMult = value;}}
+    [SerializeField] private float crouchSpeedMult; public float CrouchSpeedMult => crouchSpeedMult; // {get{return crouchSpeedMult;} private set{crouchSpeedMult = value;}}
     [SerializeField] private float crouchInOutSpeed;
     [SerializeField] private float crouchDistance;
     [SerializeField] private bool wishCrouching;
     [SerializeField] private bool canCrouch; public bool CanCrouch => canCrouch;
     private float standYScale;
+    [Header("Slide")]
+    [SerializeField] private float minSpeedToSlide;
+    [SerializeField] private float minSpeedToStopSlide;
+    [SerializeField] private float slideSpeedBoost;
+    [SerializeField] public float slideFriction;
+    [SerializeField] private Vector3 slideDir;
+    [SerializeField] private bool canSlide; public bool CanSlide => canSlide;
 
     [Header("Sprint")]
     [SerializeField] private float sprintAngleThreshold;
-    [SerializeField] private float sprintSpeedMult;
-    public float SprintSpeedMult => sprintSpeedMult;
+    [SerializeField] private float sprintSpeedMult; public float SprintSpeedMult => sprintSpeedMult;
     [SerializeField] private bool wishSprinting; //public bool WishSprinting => wishSprinting;
     [SerializeField] private bool canSprint; public bool CanSprint => canSprint;
 #endregion
@@ -95,7 +102,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]public int stepSinceJumped;// {get; private set;} //assign this to anything that will knock player up
     [SerializeField]public int stepSinceKockback;
     [SerializeField]public float currentSpeed {get; private set;} //not actual speed, dot product of playervel and wish vel
-    private Vector3 wishdir;
     [SerializeField]private bool wishJump = false;
     
     public Text text;//UI remove later
@@ -124,7 +130,9 @@ public class PlayerMovement : MonoBehaviour
     public void Direction_Input(float _GroundOrAirSpeed, float _mult = 1)
     {
         //get WASD input into wish direction
-        wishdir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        var axis = inputSystemManager.wasd.ReadValue<Vector2>();
+        wishdir =  new Vector3(axis.x, 0, axis.y);
+        //wishdir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         wishdir = transform.TransformDirection(wishdir);
         wishdir.Normalize();
 
@@ -158,11 +166,11 @@ public class PlayerMovement : MonoBehaviour
     
     public void Crouch_Input()
     {   
-        wishCrouching = inputSystemManager.crouch.IsPressed() && isGrounded ; //Input.GetKey(KeyCode.LeftControl)
+        wishCrouching = inputSystemManager.crouch.IsPressed(); //Input.GetKey(KeyCode.LeftControl)
     }
     public void Sprint_Input()
     {
-        wishSprinting = inputSystemManager.sprint.IsPressed() && !wishCrouching && isGrounded; //Input.GetKey(KeyCode.LeftShift)
+        wishSprinting = inputSystemManager.sprint.IsPressed(); //Input.GetKey(KeyCode.LeftShift)
     }
     
 #endregion
@@ -208,7 +216,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         curGroundSpeedMult = Mathf.Lerp(curGroundSpeedMult, targetGroundSpeedMult, 4 * Time.deltaTime);
-        curGroundSpeedMult = Mathf.Abs(curGroundSpeedMult - targetGroundSpeedMult) < 0.1f ? targetGroundSpeedMult : curGroundSpeedMult;
+        curGroundSpeedMult = Mathf.Abs(curGroundSpeedMult - targetGroundSpeedMult) < 0.01f ? targetGroundSpeedMult : curGroundSpeedMult;
 
         //Vector3 yRot = new Vector3(0,transform.rotation.y,0);
         
@@ -241,13 +249,11 @@ public class PlayerMovement : MonoBehaviour
 
             //Modified here so player can walk up and down slopes without speed penalty or tumbling
             Physics.Raycast(transform.position, Vector3.down, out onSlope, 0.6f, groundMask);
-            var slopeMoveDir = Vector3.ProjectOnPlane(wishdir, onSlope.normal);
+            slopeMoveDir = Vector3.ProjectOnPlane(wishdir, onSlope.normal);
             playerVelocity += accelSpeed * slopeMoveDir;
     }
     public void AirPhysics()
     {
-            //wishSpeed *= airSpeed;
-
             float addSpeed = wishSpeed - currentSpeed;
             addSpeed = Mathf.Clamp(addSpeed, 0, Mathf.Infinity); // make sure you don't and slow down when input same direction midair
             float accelSpeed = wishSpeed * Time.deltaTime * airAccelerate; // without deltatime, player accelerate almost instantly
@@ -264,6 +270,23 @@ public class PlayerMovement : MonoBehaviour
             //gravity
             playerVelocity.y += gravity * Time.deltaTime;
     }
+    //custom made
+    public void SlidingPhysics()
+    {
+        //get slide dir
+        //make sure not to slide up hill
+        //get slopeMoveDir but not with wishSpeed involved
+
+        //Method 1, only works if player starts with wishdir    //bug when shift key and crouch key is held down
+        wishdir = Vector3.Lerp(wishdir, Vector3.zero, slideFriction * Time.deltaTime); //behavior works good on flat ground
+        var slopeDir =  Vector3.ProjectOnPlane(playerVelocity.normalized, onSlope.normal);
+        slideDir = (playerZXVel.magnitude >= minSpeedToStopSlide)? slopeDir : Vector3.zero;
+
+        playerVelocity += slideDir.normalized * Time.deltaTime;
+
+        
+        
+    }
 #endregion
 
 #region cap bhop speed + ground substate checks
@@ -273,17 +296,12 @@ public class PlayerMovement : MonoBehaviour
         playerVelocity.z = Mathf.Clamp(playerVelocity.z, -capBhopSpeed, capBhopSpeed);
         playerVelocity.x = Mathf.Clamp(playerVelocity.x, -capBhopSpeed, capBhopSpeed);
     }
+    
     ///<summary> The physics update for switching between Crouching and standing, 
     ///also pushes player upwards if player is stuck in ground. </summary>
     public void Check_CrouchingStanding()
     {
-        //check if anything is blocking player to stand up
-        Vector3 bodyPos = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
-        bool somethingAbove = Physics.Raycast(bodyPos, Vector3.up, controller.height - 0.11f, groundMask);
-        Debug.DrawLine(bodyPos, bodyPos + Vector3.up*(controller.height - 0.11f), Color.red);
-        //Debug.Log(somethingAbove);
-
-        canCrouch = wishCrouching || somethingAbove;
+        canCrouch = (wishCrouching || Check_SomethingAbove()); // <================ 
 
         Vector3 targetScale = canCrouch ?
             targetScale = new Vector3(1, standYScale - crouchDistance, 1) :      //crouched
@@ -294,20 +312,32 @@ public class PlayerMovement : MonoBehaviour
             transform.localScale = Vector3.Lerp(transform.localScale, targetScale, crouchInOutSpeed * Time.deltaTime);
         }
 
-        //push player up if he is underground
-        RaycastHit[] hits = Physics.RaycastAll(transform.position + new Vector3(0,1,0), Vector3.down , 0.9f, groundMask);
-        if(hits.Length > 0)
+        ////pushes player upwards if hit below, for stepping up stairs, floating collider
+        RaycastHit[] hits = Physics.RaycastAll(transform.position + new Vector3(0,1,0), Vector3.down , feetRayLength, groundMask);
+        if(hits.Length > 0 && isGrounded)
         {   
-            playerVelocity.y += Mathf.Lerp(playerVelocity.y, crouchInOutSpeed , crouchInOutSpeed * Time.deltaTime); 
+            Mathf.SmoothDamp(playerVelocity.y, 50, ref playerVelocity.y, 1f, 10);
             Debug.Log("player underground");
         }
     }
     public void Check_Sprinting()
     {
-        canSprint = Vector3.Angle(wishdir, transform.forward) <= sprintAngleThreshold && wishSprinting;
+        canSprint = Vector3.Angle(wishdir, transform.forward) <= sprintAngleThreshold && wishSprinting && !wishCrouching && isGrounded;
+    }
+
+    public void Check_Sliding()
+    {
+        if(canCrouch && playerZXVel.magnitude >= minSpeedToSlide && canSlide == false) canSlide = true;
+        //canSlide = canCrouch && playerZXVel.magnitude >= minSpeedToSlide; //start slide
+        else if(canCrouch && playerZXVel.magnitude < minSpeedToStopSlide && canSlide == true || !canCrouch ) canSlide = false;
     }
     
-
+    private bool Check_SomethingAbove()
+    {
+        //check if anything is blocking player to stand up
+        Vector3 bodyPos = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
+        return Physics.Raycast(bodyPos, Vector3.up, controller.height - 0.11f, groundMask);
+    }
 #endregion
 
 #region friction/equal opposite force
@@ -343,13 +373,20 @@ public class PlayerMovement : MonoBehaviour
         // if('0000 1001' == '0000 1001' | ('0000 1000') then applying the 'or' bitwise operator
         // if('0000 1001' == '0000 1001')   in this case, the satement is true, because layer 3 is included
 
-        //have to use hit.move direction for y rather than playervelocity, otherwise the check is buggy
-           playerVelocity.z -= hit.normal.z * Vector3.Dot(playerVelocity, hit.normal);
-           playerVelocity.x -= hit.normal.x * Vector3.Dot(playerVelocity, hit.normal);
+            //have to use hit.move direction for y rather than playervelocity, otherwise the check is buggy
+            playerVelocity.z -= hit.normal.z * Vector3.Dot(playerVelocity, hit.normal);
+            playerVelocity.x -= hit.normal.x * Vector3.Dot(playerVelocity, hit.normal);
 
             //stay on ceiling just a bit longer, otherwise slight touch with the ceiling will start going down fast
             if(playerVelocity.y > 2 && (controller.collisionFlags & CollisionFlags.Above) != 0)
             playerVelocity.y -= hit.normal.y * Vector3.Dot(hit.moveDirection, hit.normal);
+
+
+            //pushes player upwards if hit below, for stepping up stairs
+            if((isGrounded && (controller.collisionFlags & CollisionFlags.Below) != 0))
+            {
+                Mathf.SmoothDamp(playerVelocity.y, 50, ref playerVelocity.y, 1f, 10);
+            }
         }
     }
 #endregion
@@ -380,7 +417,7 @@ public class PlayerMovement : MonoBehaviour
         if (dot > 0f)
         {
             playerVelocity = (playerVelocity - hit.normal * dot).normalized * speed;
-            Debug.Log("snaping to ground now"+ dot);
+            //Debug.Log("snaping to ground now"+ dot);
         }
     }
 #endregion

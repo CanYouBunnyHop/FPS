@@ -1,5 +1,41 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6210243108557061832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53eeb1dbe9982bd43860e0fd83d9eeb9, type: 3}
+  m_Name: ScreenSpaceOutlines
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  renderPassEvent: 450
+  outlinesLayerMask:
+    serializedVersion: 2
+    m_Bits: 2147483647
+  outlinesOccluderLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  outlineSettings:
+    outlineColor: {r: 0, g: 0, b: 0, a: 1}
+    outlineScale: 1
+    depthThreshold: 0.3
+    robertsCrossMultiplier: 4
+    normalThreshold: 0.4
+    steepAngleThreshold: 0.7
+    steepAngleMultiplier: 30
+  viewSpaceNormalsTextureSettings:
+    colorFormat: 17
+    depthBufferBits: 32
+    filterMode: 2
+    backgroundColor: {r: 0, g: 0, b: 0, a: 1}
+    perObjectData: 0
+    enableDynamicBatching: 0
+    enableInstancing: 0
 --- !u!114 &-3208969980971349730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f1fe04e374be3f4fa38f03298a450ef, type: 3}
   m_Name: GlobalOutlines
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &-1878332245247344467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25,7 +61,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
   m_Name: SSAO
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
   m_Settings:
     Downsample: 0
@@ -53,12 +89,13 @@ MonoBehaviour:
       type: 3}
   m_RendererFeatures:
   - {fileID: -1878332245247344467}
+  - {fileID: 3006081211544100763}
+  - {fileID: -6210243108557061832}
   - {fileID: -3208969980971349730}
   - {fileID: 4004028972659070400}
   - {fileID: 4247420223706493529}
-  - {fileID: 3006081211544100763}
   - {fileID: 7126034893105446079}
-  m_RendererFeatureMap: adc0de57c6d2eee51e894fddcd7277d3c055b7e9222b913759f2d58d30def13a9bdf0f5cefbeb729bfbc96dcfac2e462
+  m_RendererFeatureMap: adc0de57c6d2eee59bdf0f5cefbeb7293881a3c9cbc8d0a91e894fddcd7277d3c055b7e9222b913759f2d58d30def13abfbc96dcfac2e462
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -93,7 +130,7 @@ MonoBehaviour:
     zFailOperation: 0
   m_ShadowTransparentReceive: 1
   m_RenderingMode: 0
-  m_DepthPrimingMode: 0
+  m_DepthPrimingMode: 1
   m_AccurateGbufferNormals: 0
   m_ClusteredRendering: 0
   m_TileSize: 32
@@ -112,7 +149,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   m_Settings:
-    technique: 0
+    technique: 2
     maxDrawDistance: 1000
     dBufferSettings:
       surfaceData: 2
@@ -158,7 +195,7 @@ MonoBehaviour:
       RenderQueueType: 0
       LayerMask:
         serializedVersion: 2
-        m_Bits: 768
+        m_Bits: 576
       PassNames: []
     overrideMaterial: {fileID: 2100000, guid: 881c024373c8acc45835bed323993fd4, type: 2}
     overrideMaterialPassIndex: 0

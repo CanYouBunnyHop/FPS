@@ -77,9 +77,9 @@ public abstract class GunBehaviour : MonoBehaviour
         //get vfx objects
         GetMFlashVFX(0, ref normalFlashes);
         GetMFlashVFX(1, ref specialFlashes);
-
-        ///<header> m flashes are child gameobjects of weapons that contains vfx </header>///
-        ///<summary> childIndex 0 should be MFlash Container, 1 will be SMFlash </summary>///
+    }
+    ///<param name = "o_flashes"> flashes are child gameobjects of weapons that contains vfx, this is split into 2 groups, normal and special </param>
+    ///<summary> childIndex 0 should be MFlash Container, 1 will be SMFlash </summary>
         void GetMFlashVFX(int childIndex, ref MuzzleFlashObject[] o_flashes)
         {
             int iteration = 0;
@@ -91,7 +91,8 @@ public abstract class GunBehaviour : MonoBehaviour
             {
                 var vfx = child.GetComponent<VisualEffect>();
                 var light = child.GetComponent<Light>();
-                var flashObject = new MuzzleFlashObject(vfxAsset,vfx, light);
+                var gunLights = child.transform.GetComponentsInChildren<Light>(true);
+                var flashObject = new MuzzleFlashObject(vfxAsset,vfx, light, gunLights);
 
                 o_flashes[iteration] = flashObject;
 
@@ -99,8 +100,6 @@ public abstract class GunBehaviour : MonoBehaviour
             }
             
         }
-    
-    }
     #region for manager update and fixedUpdate
     public virtual void Behavior_FixedUpdate()
     {
@@ -279,7 +278,7 @@ public abstract class GunBehaviour : MonoBehaviour
    #region shootBehaviors
     //shoot actual behaviors here
     /// <summary>
-    /// Shoot behaviors don't include default behaviors, needs to override it and define it, 
+    /// Shoot behaviors don't include default behaviors, needs to override it and defPlayMuzzleFlashine it, 
     /// base does animation and recoil calculation only
     /// </summary>
     protected virtual void Shoot()
@@ -356,7 +355,7 @@ public abstract class GunBehaviour : MonoBehaviour
         foreach(MuzzleFlashObject vfx in vfxes)
         {
             vfx.Play();
-            StartCoroutine(vfx.CheckPlayState(1, 5));
+            StartCoroutine(vfx.CheckPlayState(1, 5, 0.1f));
         }
     }
     #region reload
@@ -424,33 +423,38 @@ public class MuzzleFlashObject //: VFXOutputEventAbstractHandler
     public VisualEffectAsset vfxAsset;
     public VisualEffect vfxFlash;
     public Light light;
+    public Light[] gunLights;
     
     // readonly int k_LifetimeID = Shader.PropertyToID("lifetime");
     // readonly ExposedProperty duration = "FlashDuration";
-    public MuzzleFlashObject(VisualEffectAsset _vfxAsset,VisualEffect _vfx, Light _light)
+    public MuzzleFlashObject(VisualEffectAsset _vfxAsset,VisualEffect _vfx, Light _light, Light[] _gunLight)
     {
         vfxAsset = _vfxAsset;
         vfxFlash = _vfx;
         light = _light;
+        gunLights = _gunLight;
     }
     public void Play()
     {
         vfxFlash.Play();
     }
-    //[RequireComponent(typeof(VisualEffect))]
-    public IEnumerator CheckPlayState(float _minLightIntensity, float _maxLightIntensity)
+    ///<summary> Turns Off Muzzle GameObject and lights after delay </summary>
+    public IEnumerator CheckPlayState(float _minLightIntensity, float _maxLightIntensity, float _delay)
     {
+        foreach(Light l in gunLights)
+        {
+            l.enabled = true;
+        }
+
         light.enabled = true;
         light.intensity = Random.Range(_minLightIntensity, _maxLightIntensity);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(_delay);
         light.enabled = false;
-       // OnVFXOutputEvent(VFXEventAttribute eventAttribute);
-        //light.enabled = vfxFlash.HasAnySystemAwake()? true : false;
-    }
-    //  public override void OnVFXOutputEvent(VFXEventAttribute eventAttribute)
-    // {
-    //     light.enabled = (eventAttribute.GetInt(k_LifetimeID) < vfxFlash.GetFloat(duration))? true : false;
+
+        foreach(Light l in gunLights)
+        {
+            l.enabled = false;
+        }
         
-    //     //light.enabled = vfxFlash.HasAnySystemAwake()? true : false;
-    // }
+    }
 }
