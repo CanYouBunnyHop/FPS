@@ -222,12 +222,12 @@ public class CoreState_Grounded : AbstractState<PlayerStateMachine>
     }
     public override void UpdateState(PlayerStateMachine _manager)
     {
-        if(_manager.currentGroundSubState is not GroundSubState_Slide)
+        //if(_manager.currentGroundSubState is not GroundSubState_Slide)
         _manager.Pm.Direction_Input(_manager.Pm.groundSpeed);
     }
     public override void DuringState(PlayerStateMachine _manager)
     {
-        if(_manager.currentActionSubState is not ActionSubState_GrappleSurface || _manager.currentGroundSubState is not GroundSubState_Slide)
+        if(_manager.currentActionSubState is not ActionSubState_GrappleSurface) //|| _manager.currentGroundSubState is not GroundSubState_Slide)
         _manager.Pm.GroundPhysics();
 
         // if(_manager.currentGroundSubState is GroundSubState_Slide)
@@ -358,7 +358,7 @@ public class GroundSubState_Slide : AbstractState<PlayerStateMachine>
     {
         Debug.Log($"Enter State: {this.ToString()}");
         // if(_manager.currentGroundSubState is GroundSubState_Slide)
-        //_manager.Pm.targetGroundSpeedMult = _manager.Pm.SprintSpeedMult;
+        _manager.Pm.StartSlide();
         
     }
     public override void UpdateState(PlayerStateMachine  _manager)

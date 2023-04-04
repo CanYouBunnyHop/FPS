@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FPS.Player;
+using FPS.Settings;
 
 public class WeaponSway : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class WeaponSway : MonoBehaviour
     [SerializeField] float maxRollAngle = 45;
     [SerializeField] float smooth;
     [SerializeField] float rotSmooth;
+    [SerializeField] float rotSpeed;
     [SerializeField] float swayYawMultipier;
     [SerializeField] float swayPitchMultipier;
     [SerializeField] float swayRollMultipier;
@@ -29,21 +31,24 @@ public class WeaponSway : MonoBehaviour
     [SerializeField]private float timer = 0;
     private Vector3 bobPos;
 
-    [Header("Backwards")]
-    [SerializeField] private float targetSwayRotX = -45;
-    [SerializeField] private float targetPivotRotX = -140;
-    [SerializeField] private float swingBackSmooth;
-    public bool toggleBackTest; //remove later
+    //[Header("Backwards")]
+    //[SerializeField] private float targetSwayRotX = -45;
+    //[SerializeField] private float targetPivotRotX = -140;
+    //[SerializeField] private float swingBackSmooth;
+    //public bool toggleBackTest; //remove later
     
     [Header("References + pivot")]
     [SerializeField] private PlayerMovement pm;
     [SerializeField] private PlayerStateMachine pStateMachine;
     [SerializeField] private Camera cam;
+    [SerializeField] private Transform camPivot;
     [SerializeField] private Transform weaponPivot;
     [SerializeField] private Vector3 pivotPosOffset;
-    
-    Vector3 mouseAxis;
-    Quaternion targetRot;
+    [SerializeField] private PlayerInputSystemManager pism;
+    [SerializeField]Vector2 moveAxis;
+    [SerializeField]Vector3 mouseAxis;
+    [SerializeField]Quaternion targetRot;
+    [SerializeField]Quaternion currentRot;
     bool highEnough = false;
 
     private void Awake()
@@ -53,42 +58,42 @@ public class WeaponSway : MonoBehaviour
     private void Update()
     {
         mouseAxis = new Vector3(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), 0);
-        WeaponSwaying(out targetRot);
+        moveAxis = pism.wasd.ReadValue<Vector2>();
     }
     private void LateUpdate()
     {
+        WeaponBob();
+        WeaponSpring();
+        WeaponSwaying_SideRoll();
+
         //need to move this into method
-        Quaternion sideToSide = Quaternion.Slerp(transform.localRotation, cam.transform.rotation, 1- Mathf.Pow (smooth , Time.deltaTime)); //keep offset when player turns
-        Quaternion roll = Quaternion.Slerp(weaponPivot.localRotation, targetRot, 1 - Mathf.Pow(rotSmooth, Time.deltaTime));
+        Quaternion sideToSide = Quaternion.Slerp(transform.localRotation, camPivot.transform.rotation, 1- Mathf.Pow (smooth , Time.deltaTime)); //keep offset when player turns
+        currentRot = Quaternion.Slerp(currentRot, targetRot, 1 - Mathf.Pow(rotSmooth, Time.deltaTime)); //Quaternion.Slerp(current, target, 1 - Mathf.Pow(rsmooth, Time.deltaTime));
 
         //avoid infinite occuring with lerp
-        if(Quaternion.Angle(sideToSide, cam.transform.rotation) <= 0.5f ) {sideToSide = cam.transform.rotation;} 
-        if(Quaternion.Angle(roll, targetRot) <= 0.5f) {roll = targetRot;}
+        if(Quaternion.Angle(sideToSide, camPivot.transform.rotation) <= 0.01f ) {sideToSide = camPivot.transform.rotation;} 
+        if(Quaternion.Angle(currentRot, targetRot) <= 0.01f) {currentRot = targetRot;}
         
 
         //position
         //changed to local position, maybe has some side effects
-        WeaponBob();
-        WeaponSpring();
-
+        
         //Swing Back
         //WeaponSwingBackwards(out Quaternion _swayConSwing, out Quaternion _pivotSwing);
 
         weaponPivot.localPosition = pivotPosOffset + bobPos + springPos;
-        transform.localPosition = cam.transform.localPosition; //follow camera's position, since it's no longer a child of camera
+        transform.localPosition = camPivot.transform.localPosition; //follow camera's position, since it's no longer a child of camera
 
         //rotation
         transform.localRotation = sideToSide;
-        //do some clamping so the animations don't overshoot due to inconsistensies in frame rate
-        weaponPivot.localRotation = Quaternion.Angle(weaponPivot.localRotation, targetRot) > maxRollAngle && mouseAxis.magnitude != 0 ? 
-        weaponPivot.localRotation : roll;
+        weaponPivot.localRotation = Quaternion.Lerp(weaponPivot.localRotation, currentRot, 1 - Mathf.Pow(rotSpeed, Time.deltaTime)); //Quaternion.Slerp(current, target, 1 - Mathf.Pow(rsmooth, Time.deltaTime));
         
     }
     private void WeaponBob()
     {
         Vector3 dir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
 
-        if(dir.magnitude > 0 && pStateMachine.currentCoreState is CoreState_Grounded)
+        if(moveAxis.magnitude > 0 && pStateMachine.currentCoreState is CoreState_Grounded && pStateMachine.currentGroundSubState is not GroundSubState_Slide)
         {
             timer += bobSpeed * Time.deltaTime;
             float bX = bobPosX.Evaluate(timer);
@@ -121,31 +126,24 @@ public class WeaponSway : MonoBehaviour
         wSpringPos = Vector3.Lerp(wSpringPos, Vector3.zero, springReturnSmooth * Time.deltaTime); //return to default
     }
     ///<summary>Wepon lags after mouse movement</summary>
-    private void WeaponSwaying(out Quaternion o_targetRotation)
+    private void WeaponSwaying_SideRoll()
     {
-        float mouseX = mouseAxis.x * swayYawMultipier;
-        float mouseY = mouseAxis.y * swayPitchMultipier;
-        float mouseZ = mouseAxis.x * swayRollMultipier;
+        
+        mouseAxis = Vector3.ClampMagnitude(mouseAxis, 3);
+
+        float mouseX = mouseAxis.x * swayYawMultipier; 
+        float mouseY = mouseAxis.y * swayPitchMultipier; 
+        //float mouseZ = mouseAxis.x * swayRollMultipier;
 
         //calc target rotation
         Quaternion rotationX = Quaternion.AngleAxis(mouseY, Vector3.right); // rotates (mouseY amount) on (Vector3 axis)
         Quaternion rotationY = Quaternion.AngleAxis(-mouseX, Vector3.up);
-        Quaternion rotationZ = Quaternion.AngleAxis(-mouseZ, Vector3.forward);
 
+        //calc sideMove target rotation
+        float sideMove = moveAxis.x * swayRollMultipier;
+        Quaternion rotationZ = Quaternion.AngleAxis(-sideMove, Vector3.forward);
+        //targetRot *= rotationZ;
 
-        o_targetRotation = rotationX * rotationY * rotationZ;
+        targetRot = rotationX * rotationY * rotationZ;
     }
-    
-    // private void WeaponSwingBackwards(out Quaternion _swayConSwing, out Quaternion _pivotSwing) //using AnimationIK
-    // {
-    //     Quaternion targetRot = new Quaternion(targetSwayRotX, 0, 0, 0);
-    //     Quaternion pivotTargetRot = new Quaternion(targetPivotRotX, 0, 0, 0);
-    
-    //     Quaternion trot = toggleBackTest? targetRot : Quaternion.identity;
-    //     Quaternion prot = toggleBackTest? pivotTargetRot : Quaternion.identity;
-
-    //     _swayConSwing = Quaternion.RotateTowards(transform.localRotation, trot, swingBackSmooth * Time.deltaTime);
-    //     _pivotSwing = Quaternion.RotateTowards(weaponPivot.localRotation, prot, swingBackSmooth * Time.deltaTime);
-
-    // }
 }

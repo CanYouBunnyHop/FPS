@@ -127,7 +127,7 @@ public class PlayerMovement : MonoBehaviour
         standYScale = transform.localScale.y; //get player's y scale which is the standing's height
     }
 #region Inputs
-    public void Direction_Input(float _GroundOrAirSpeed, float _mult = 1)
+    public void Direction_Input(float _GroundOrAirSpeed)
     {
         //get WASD input into wish direction
         var axis = inputSystemManager.wasd.ReadValue<Vector2>();
@@ -278,14 +278,34 @@ public class PlayerMovement : MonoBehaviour
         //get slopeMoveDir but not with wishSpeed involved
 
         //Method 1, only works if player starts with wishdir    //bug when shift key and crouch key is held down
-        wishdir = Vector3.Lerp(wishdir, Vector3.zero, slideFriction * Time.deltaTime); //behavior works good on flat ground
-        var slopeDir =  Vector3.ProjectOnPlane(playerVelocity.normalized, onSlope.normal);
-        slideDir = (playerZXVel.magnitude >= minSpeedToStopSlide)? slopeDir : Vector3.zero;
+        //ground physics disabled
+        // wishdir = Vector3.Lerp(wishdir, Vector3.zero, slideFriction * Time.deltaTime); //behavior works good on flat ground
+        // var slopeDir =  Vector3.ProjectOnPlane(playerVelocity.normalized, onSlope.normal);
+        // slideDir = (playerZXVel.magnitude >= minSpeedToStopSlide)? slopeDir : Vector3.zero;
 
-        playerVelocity += slideDir.normalized * Time.deltaTime;
+        // playerVelocity += slideDir.normalized * Time.deltaTime;
+
+        //Method 2
+        //ground physics still enabled (maybe)
+        slideDir = Vector3.Lerp(slideDir, Vector3.zero, slideFriction * Time.deltaTime);
+        playerVelocity = Vector3.Lerp(playerVelocity, Vector3.zero, Time.deltaTime);
+
+        if(playerZXVel.magnitude > minSpeedToStopSlide)
+        {
+            playerVelocity +=  slideSpeedBoost * slideDir * Time.deltaTime;
+            Debug.Log("////////////////////// slide physics");
+        }
+        
+
+       
+
 
         
         
+    }
+    public void StartSlide()
+    {
+        slideDir = playerVelocity.normalized;
     }
 #endregion
 
@@ -385,7 +405,7 @@ public class PlayerMovement : MonoBehaviour
             //pushes player upwards if hit below, for stepping up stairs
             if((isGrounded && (controller.collisionFlags & CollisionFlags.Below) != 0))
             {
-                Mathf.SmoothDamp(playerVelocity.y, 50, ref playerVelocity.y, 1f, 10);
+                Mathf.SmoothDamp(playerVelocity.y, playerVelocity.y + 25, ref playerVelocity.y, 1f, 10);
             }
         }
     }

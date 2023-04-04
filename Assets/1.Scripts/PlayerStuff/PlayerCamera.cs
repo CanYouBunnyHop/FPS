@@ -11,21 +11,32 @@ public class PlayerCamera : MonoBehaviour
     public float mouseSensitivity;
 
     [Header("References")]
-    [SerializeField]private Transform body; // set here the player transform 
-    [SerializeField]private GunManager gm;
-    [SerializeField]private Transform campos;
+    [SerializeField] private Transform body; // set here the player transform 
+    [SerializeField] private GunManager gm;
+    [SerializeField] private Transform campos;
+    [SerializeField] private Transform camMainCamPivot;
     Vector2 mouse;
     
     [Header("Debug")]
-    public float xRot;
-    public float yRot;
+    [SerializeField] private float xRot;
+    [SerializeField] private float yRot;
+    [Header("Screen Shake")]
+    [SerializeField] private float shakeStrength;
+    [SerializeField] private float shakeSpeed;
+    [SerializeField] private Vector3 shakePos;
+    private float timer;
+    
+    [SerializeField] private AnimationCurve shakeWeight = new AnimationCurve
+    (
+        new Keyframe(0,0, Mathf.Deg2Rad * 0, Mathf.Deg2Rad * 720),
+        new Keyframe(0.2f, 1f),
+        new Keyframe(1f, 0f)
+    );
 
     [Header("Rotation Vectors")]
-    [SerializeField]private Vector3 mouseRot;
+    [SerializeField] private Vector3 mouseRot;
     public Vector3 recoilRot;
     public Vector3 targetRot;
-
-    private Vector3 vel = Vector3.zero;
 
    
     void Start()
@@ -36,7 +47,10 @@ public class PlayerCamera : MonoBehaviour
 
     {
         //move camera to player head, camera jitter if its a child of player
-        transform.position = campos.position;
+        camMainCamPivot.position = campos.position;
+        transform.localPosition = shakePos;
+
+        //shakePos = Vector3.SmoothDamp(shakePos, Vector3.zero, ref shakePos, 2 * Time.deltaTime);
 
         //inputs
         mouse.x = Input.GetAxis("Mouse X");
@@ -55,14 +69,19 @@ public class PlayerCamera : MonoBehaviour
         //clamp to avoid infinite lerp
         //if(Vector3.Angle(targetRot, Vector3.zero) <= 0.01f) targetRot = Vector3.zero;
 
-        transform.localRotation = Quaternion.Euler(recoilRot + mouseRot);
+        camMainCamPivot.localRotation = Quaternion.Euler(recoilRot + mouseRot);
         body.rotation = Quaternion.Euler(0,recoilRot.y + mouseRot.y,0);
         
         //recoilRestRot = new Vector2(xRot,yRot);
+        //test
+        if(Input.GetKeyDown(KeyCode.J))
+        {
+            StartCoroutine(ScreenShake(shakeStrength, 1f));
+        }
     }
     private void LateUpdate()
     {
-    
+        //transform.position = posAfterShake;
     }
     private void FixedUpdate()
     {
@@ -70,4 +89,36 @@ public class PlayerCamera : MonoBehaviour
          mouse.y *= Time.smoothDeltaTime * mouseSensitivity *1000;
 
     }
+    public IEnumerator ScreenShake(float _strength, float _duration)
+    {
+        timer = 0;
+        float totalDuration = _duration * shakeSpeed;
+
+        while(timer < totalDuration)
+        {
+            timer += shakeSpeed * Time.deltaTime;
+
+            float progress = timer / totalDuration;
+
+            shakePos = (GetPerlinVec3() * _strength) * shakeWeight.Evaluate(progress);
+            yield return null;
+        }
+        // if(timer >= _duration)
+        // {
+        //     shakePos = Vector3.zero;
+        //     Debug.Log("zeroo");
+        // }
+
+
+        float GetPerlinFloat(float seed)
+        {
+            return (Mathf.PerlinNoise(seed, timer) - 0.5f) * 2; // perlin noise returns 0 to 1, we want -1 to 1
+        }
+        Vector3 GetPerlinVec3()
+        {
+            return new Vector3( GetPerlinFloat(1), GetPerlinFloat(10), 0);
+        }
+        
+    }
+    
 }
