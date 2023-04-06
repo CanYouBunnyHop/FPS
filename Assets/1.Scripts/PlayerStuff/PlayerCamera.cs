@@ -76,7 +76,7 @@ public class PlayerCamera : MonoBehaviour
         //test
         if(Input.GetKeyDown(KeyCode.J))
         {
-            StartCoroutine(ScreenShake(shakeStrength, 1f));
+            StartCoroutine(ScreenShake(shakeStrength, 0.5f, shakeSpeed));
         }
     }
     private void LateUpdate()
@@ -85,38 +85,36 @@ public class PlayerCamera : MonoBehaviour
     }
     private void FixedUpdate()
     {
-         mouse.x *= Time.smoothDeltaTime * mouseSensitivity *1000;
-         mouse.y *= Time.smoothDeltaTime * mouseSensitivity *1000;
+         mouse.x *= Time.smoothDeltaTime * mouseSensitivity * 1000;
+         mouse.y *= Time.smoothDeltaTime * mouseSensitivity * 1000;
 
     }
-    public IEnumerator ScreenShake(float _strength, float _duration)
+    public IEnumerator ScreenShake(float _strength, float _duration, float _shakeSpeed)
     {
         timer = 0;
-        float totalDuration = _duration * shakeSpeed;
+        float totalDuration = _duration * _shakeSpeed;
+
+        float X = Random.Range(0,50);
+        float Y = Random.Range(0,50);
+        float Z = Random.Range(0,50);
 
         while(timer < totalDuration)
         {
-            timer += shakeSpeed * Time.deltaTime;
+            timer += _shakeSpeed * Time.deltaTime;
 
             float progress = timer / totalDuration;
 
-            shakePos = (GetPerlinVec3() * _strength) * shakeWeight.Evaluate(progress);
+            shakePos = (GetPerlinVec3(X,Y,Z) * _strength) * shakeWeight.Evaluate(progress);
             yield return null;
         }
-        // if(timer >= _duration)
-        // {
-        //     shakePos = Vector3.zero;
-        //     Debug.Log("zeroo");
-        // }
-
-
+        
         float GetPerlinFloat(float seed)
         {
             return (Mathf.PerlinNoise(seed, timer) - 0.5f) * 2; // perlin noise returns 0 to 1, we want -1 to 1
         }
-        Vector3 GetPerlinVec3()
+        Vector3 GetPerlinVec3(float x, float y, float z)
         {
-            return new Vector3( GetPerlinFloat(1), GetPerlinFloat(10), 0);
+            return new Vector3( GetPerlinFloat(x), GetPerlinFloat(y), GetPerlinFloat(z));
         }
         
     }

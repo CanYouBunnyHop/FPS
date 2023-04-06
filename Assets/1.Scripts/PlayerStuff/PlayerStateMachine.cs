@@ -4,15 +4,14 @@ using UnityEngine;
 using FPS.Player;
 using FPS.Weapon;
 using System;
+using FPS.Settings;
 
 public class PlayerStateMachine : MonoBehaviour
 {
-    [SerializeField] PlayerMovement pm;
-    public PlayerMovement Pm => pm;
-    [SerializeField] GrapplingHook hook;
-    public GrapplingHook Hook => hook;
-    [SerializeField] GunManager gm;
-    public GunManager Gm => gm;
+    [SerializeField] PlayerMovement pm; public PlayerMovement Pm => pm;
+    [SerializeField] GrapplingHook hook; public GrapplingHook Hook => hook;
+    [SerializeField] GunManager gm; public GunManager Gm => gm;
+    [SerializeField] PlayerInputSystemManager pism; public PlayerInputSystemManager Pism => pism;
 
     public AbstractState<PlayerStateMachine> currentCoreState;
     ///<summary> 0, Grounded | 1, InAir </summary>///
@@ -359,6 +358,7 @@ public class GroundSubState_Slide : AbstractState<PlayerStateMachine>
         Debug.Log($"Enter State: {this.ToString()}");
         // if(_manager.currentGroundSubState is GroundSubState_Slide)
         _manager.Pm.StartSlide();
+        //_manager.Pism.SetActiveAction(_manager.Pism.wasd, false);
         
     }
     public override void UpdateState(PlayerStateMachine  _manager)
@@ -378,6 +378,7 @@ public class GroundSubState_Slide : AbstractState<PlayerStateMachine>
     {
         base.ExitState(_manager, ref _currentState ,_targetState);
         Debug.Log($"Exit State: {this.ToString()}");
+        //_manager.Pism.SetActiveAction(_manager.Pism.wasd, true);
     }
 }
 #endregion

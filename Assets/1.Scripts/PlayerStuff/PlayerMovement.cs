@@ -25,7 +25,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("References")]
     public GrapplingHook hook; //Additional movement abilities
     public LayerMask groundMask;
-    [SerializeField] private PlayerInputSystemManager inputSystemManager; //public PlayerInputSystemManager InputSystemManager => inputSystemManager;
+    [SerializeField] private PlayerInputSystemManager pism; //public PlayerInputSystemManager InputSystemManager => pism;
+    [SerializeField] private PlayerStateMachine psm;
     [SerializeField] private GunManager gm;
     private CharacterController controller;
 #endregion
@@ -120,7 +121,7 @@ public class PlayerMovement : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         hook = GetComponent<GrapplingHook>();
-
+        pism = GetComponent<PlayerInputSystemManager>();
         //currentState = State.InAir;
         //curGroundSubState = GroundSubState.Walk;
 
@@ -129,8 +130,10 @@ public class PlayerMovement : MonoBehaviour
 #region Inputs
     public void Direction_Input(float _GroundOrAirSpeed)
     {
-        //get WASD input into wish direction
-        var axis = inputSystemManager.wasd.ReadValue<Vector2>();
+        //get WASD input into wish direction 
+        //if player is sliding, the movement axis is zero
+        var axis = psm.currentGroundSubState is not GroundSubState_Slide ? pism.wasd.ReadValue<Vector2>() : Vector2.zero;
+        
         wishdir =  new Vector3(axis.x, 0, axis.y);
         //wishdir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         wishdir = transform.TransformDirection(wishdir);
@@ -143,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
     public void Jump_Input()
     {
          //Inputs for jump
-        if(inputSystemManager.jump.triggered) //if(Input.GetKeyDown(KeyCode.Space)||Input.GetAxis("Mouse ScrollWheel") < 0f )
+        if(pism.jump.triggered) //if(Input.GetKeyDown(KeyCode.Space)||Input.GetAxis("Mouse ScrollWheel") < 0f )
         {
             wishJump = true;
         }
@@ -166,11 +169,11 @@ public class PlayerMovement : MonoBehaviour
     
     public void Crouch_Input()
     {   
-        wishCrouching = inputSystemManager.crouch.IsPressed(); //Input.GetKey(KeyCode.LeftControl)
+        wishCrouching = pism.crouch.IsPressed(); //Input.GetKey(KeyCode.LeftControl)
     }
     public void Sprint_Input()
     {
-        wishSprinting = inputSystemManager.sprint.IsPressed(); //Input.GetKey(KeyCode.LeftShift)
+        wishSprinting = pism.sprint.IsPressed(); //Input.GetKey(KeyCode.LeftShift)
     }
     
 #endregion
@@ -184,6 +187,16 @@ public class PlayerMovement : MonoBehaviour
         //UI remove later
         string dec = Convert.ToString(wishSpeed);
         text.text = "currentspeed: "+ playerZXVel.magnitude;
+
+        //test
+        if(Input.GetKeyDown(KeyCode.T))
+        {
+            pism.SetActiveAction(pism.wasd, true);
+        }
+        if(Input.GetKeyDown(KeyCode.Y))
+        {
+            pism.SetActiveAction(pism.wasd, false);
+        }
     }
     void FixedUpdate()
     {
@@ -295,13 +308,6 @@ public class PlayerMovement : MonoBehaviour
             playerVelocity +=  slideSpeedBoost * slideDir * Time.deltaTime;
             Debug.Log("////////////////////// slide physics");
         }
-        
-
-       
-
-
-        
-        
     }
     public void StartSlide()
     {

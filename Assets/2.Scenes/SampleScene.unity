@@ -129,7 +129,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh31024
+  m_Name: pb_Mesh47388
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1077,7 +1077,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh31018
+  m_Name: pb_Mesh47382
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1526,6 +1526,39 @@ MonoBehaviour:
   shakeStrength: 0.5
   shakeSpeed: 5
   shakePos: {x: 0, y: 0, z: 0}
+  shakeWeight:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 12.566371
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.2
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   mouseRot: {x: 0, y: 0, z: 0}
   recoilRot: {x: 0, y: 0, z: 0}
   targetRot: {x: 0, y: 0, z: 0}
@@ -1608,7 +1641,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh31080
+  m_Name: pb_Mesh47444
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2367,7 +2400,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 257
-  inputSystemManager: {fileID: 645168654}
+  pism: {fileID: 645168654}
+  psm: {fileID: 645168655}
   gm: {fileID: 0}
   gravity: -20
   maxSlopeAngleToWalk: 45
@@ -2390,7 +2424,7 @@ MonoBehaviour:
   crouchDistance: 0.5
   wishCrouching: 0
   canCrouch: 0
-  minSpeedToSlide: 9
+  minSpeedToSlide: 12
   minSpeedToStopSlide: 2
   slideSpeedBoost: 250
   slideFriction: 3
@@ -2594,6 +2628,7 @@ MonoBehaviour:
   pm: {fileID: 645168644}
   hook: {fileID: 645168645}
   gm: {fileID: 1460019306}
+  pism: {fileID: 645168654}
   curCoreState: 
   curGroundSubState: 
   curActionSubState: 
@@ -3833,7 +3868,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh30968
+  m_Name: pb_Mesh47332
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -4489,7 +4524,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh30852
+  m_Name: pb_Mesh47216
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -4653,7 +4688,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh30736
+  m_Name: pb_Mesh47100
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5316,7 +5351,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh30574
+  m_Name: pb_Mesh46942
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5480,7 +5515,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh30952
+  m_Name: pb_Mesh47316
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -16298,7 +16333,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh31120
+  m_Name: pb_Mesh47484
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

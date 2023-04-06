@@ -60,31 +60,12 @@ public class PlayerInputSystemManager : MonoBehaviour
         //player input manager is for local multiplayer
         
     }
-    // private void Update()
-    // {
-    //     ReturnGetButton(input.PlayerActionMap.Jump);
-
-    //     if (input.PlayerActionMap.Jump.triggered)
-    //     {
-    //         Debug.Log("isTriggered"); // this is the same as get buttonDown, only called once
-    //     }
-    // }
-    // public bool ReturnGetButton(InputAction _action)
-    // {
-    //     if(_action.ReadValue<float>() == 1) // this is the same as InputAction.IsPressed()
-    //     {
-    //         Debug.Log("tru" + _action.ReadValue<float>());
-    //         return true;
-    //     }
-    //     else return false;
-
-    //     //if(_action.ReadValueAsObject())
-    // }
-    public void Dick(InputAction.CallbackContext context)
+    public void SetActiveAction(InputAction _action, bool _enable)
     {
-       
-       Debug.Log(context.ReadValue<float>());
-
+        if(_enable)
+        _action.Enable();
+        else
+        _action.Disable();
     }
     private void OnEnable()
     {
@@ -94,29 +75,7 @@ public class PlayerInputSystemManager : MonoBehaviour
     private void OnDisable()
     {
         input.PlayerActionMap.Disable();
-        // playerInputActions.Player.Jump.started -= Dick;
-        // playerInputActions.Player.Jump.performed -= Dick;
-        // playerInputActions.Player.Jump.canceled -= Dick;
     }
-    //private void Update()
-    // {
-    //     Vector2 move = playerInputActions.Player.WASD.ReadValue<Vector2>(); //this is the new input system getaxis but no smoothing
-
-    //     if (playerInputActions.Player.Jump.IsPressed()) //.inProgress //
-    //     {
-
-    //     }
-    //     if(playerInputActions.Player.Jump.ReadValue<float>() == 1) //
-    //     {
-
-    //     }
-        
-    //     if(playerInputActions.Player.Jump.triggered) //
-    //     {
-
-    //     }
-    // }
-
 }
 
 }
