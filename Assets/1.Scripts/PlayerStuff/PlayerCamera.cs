@@ -14,7 +14,7 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private Transform body; // set here the player transform 
     [SerializeField] private GunManager gm;
     [SerializeField] private Transform campos;
-    [SerializeField] private Transform camMainCamPivot;
+    [SerializeField] private Transform camPivot;
     Vector2 mouse;
     
     [Header("Debug")]
@@ -22,8 +22,10 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float yRot;
     [Header("Screen Shake")]
     [SerializeField] private float shakeStrength;
+    [SerializeField] private float shakeRotStrength;
     [SerializeField] private float shakeSpeed;
     [SerializeField] private Vector3 shakePos;
+    [SerializeField] private Quaternion shakeRot = Quaternion.identity;
     private float timer;
     
     [SerializeField] private AnimationCurve shakeWeight = new AnimationCurve
@@ -37,18 +39,26 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private Vector3 mouseRot;
     public Vector3 recoilRot;
     public Vector3 targetRot;
+    [Header("Camera Animation")]
+    [SerializeField] private Vector3 anim_ShakePos;
+    [SerializeField] private Quaternion anim_ShakeRot;
+
 
    
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        shakePos = Vector3.zero;
+        shakeRot = Quaternion.identity;
     }
     void Update()
 
     {
-        //move camera to player head, camera jitter if its a child of player
-        camMainCamPivot.position = campos.position;
-        transform.localPosition = shakePos;
+        //move camera parent to player head, camera jitter if its a child of player
+        camPivot.position = campos.position;
+        //move camera to the camera shake posisiton and shake rotation
+        transform.localPosition = shakePos + anim_ShakePos;
+        transform.localRotation = (shakeRot * anim_ShakeRot);
 
         //shakePos = Vector3.SmoothDamp(shakePos, Vector3.zero, ref shakePos, 2 * Time.deltaTime);
 
@@ -69,14 +79,14 @@ public class PlayerCamera : MonoBehaviour
         //clamp to avoid infinite lerp
         //if(Vector3.Angle(targetRot, Vector3.zero) <= 0.01f) targetRot = Vector3.zero;
 
-        camMainCamPivot.localRotation = Quaternion.Euler(recoilRot + mouseRot);
+        camPivot.localRotation = Quaternion.Euler(recoilRot + mouseRot);
         body.rotation = Quaternion.Euler(0,recoilRot.y + mouseRot.y,0);
         
         //recoilRestRot = new Vector2(xRot,yRot);
         //test
         if(Input.GetKeyDown(KeyCode.J))
         {
-            StartCoroutine(ScreenShake(shakeStrength, 0.5f, shakeSpeed));
+            StartCoroutine(PerlinScreenShake(shakeStrength, shakeRotStrength, 0.5f, shakeSpeed));
         }
     }
     private void LateUpdate()
@@ -89,34 +99,43 @@ public class PlayerCamera : MonoBehaviour
          mouse.y *= Time.smoothDeltaTime * mouseSensitivity * 1000;
 
     }
-    public IEnumerator ScreenShake(float _strength, float _duration, float _shakeSpeed)
+
+    ///<summary> 
+    ///Randomized screen shake, good for explosion, earthquake. 
+    ///Randomised position is not great on gun animations, use animation curve instead.
+    ///</summary> 
+    public IEnumerator PerlinScreenShake(float _posStrength, float _rotStrength, float _duration, float _shakeSpeed)
     {
         timer = 0;
         float totalDuration = _duration * _shakeSpeed;
 
-        float X = Random.Range(0,50);
-        float Y = Random.Range(0,50);
-        float Z = Random.Range(0,50);
+        float X = Random.Range(0, 100);
+        float Y = Random.Range(0, 100);
+        float Z = Random.Range(0, 100);
 
-        while(timer < totalDuration)
+        float rX = Random.Range(0, 100);
+        float rY = Random.Range(0, 100);
+        float rZ = Random.Range(0, 100);
+
+        while (timer < totalDuration)
         {
             timer += _shakeSpeed * Time.deltaTime;
 
             float progress = timer / totalDuration;
 
-            shakePos = (GetPerlinVec3(X,Y,Z) * _strength) * shakeWeight.Evaluate(progress);
+            shakePos = GetPerlinVec3(X, Y, Z) * _posStrength * shakeWeight.Evaluate(progress);
+            shakeRot = Quaternion.Euler(GetPerlinVec3(rX,rY,rZ)* _rotStrength * shakeWeight.Evaluate(progress));
             yield return null;
         }
-        
+
         float GetPerlinFloat(float seed)
         {
             return (Mathf.PerlinNoise(seed, timer) - 0.5f) * 2; // perlin noise returns 0 to 1, we want -1 to 1
         }
         Vector3 GetPerlinVec3(float x, float y, float z)
         {
-            return new Vector3( GetPerlinFloat(x), GetPerlinFloat(y), GetPerlinFloat(z));
+            return new Vector3(GetPerlinFloat(x), GetPerlinFloat(y), GetPerlinFloat(z));
         }
-        
+
     }
-    
 }
